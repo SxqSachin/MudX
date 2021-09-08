@@ -1,6 +1,6 @@
 import 'mocha';
 import assert from 'assert'
-import { parseSingleConditionExprOperator, splitConditionExpr } from '../conditionParser';
+import { parseSingleConditionComparator as parseSingleConditionExprOperator, parseToExprAtom, splitConditionExpr } from '../conditionParser';
 
 describe('简单条件表达式测试', () => {
   it('判断符解析 >', () => {
@@ -61,5 +61,17 @@ describe('条件表达式切分测试', () => {
     const expr = 'unit.c == 4 && unit.d != 7 |& unit.f==4 | unit.z==c';
 
     assert.deepEqual(splitConditionExpr(expr), ['unit.c==4', 'unit.d!=7', 'unit.f==4', 'unit.z==c']);
+  });
+});
+describe('条件表达式解析', () => {
+  it('test1', () => {
+    const expr = '(((a.b > 3 & a.c > 4) | c.d == 5) & (d.v < 4 | c.c == 4))';
+
+    const res = parseToExprAtom(expr);
+
+    console.log(res);
+
+
+    // assert.deepEqual(splitConditionExpr(expr), ['unit.c>4', 'unit.c==8']);
   });
 });
