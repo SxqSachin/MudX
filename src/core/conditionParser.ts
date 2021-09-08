@@ -20,7 +20,7 @@ export function splitConditionExpr(expr: ConditionExpr): ConditionExpr[] {
 
   exprArr.push(...expr.split(/[\|\&]/g));
 
-  return exprArr;
+  return exprArr.filter(expr => !!expr);
 }
 
 // 解析单个条件表达式的比较运算符

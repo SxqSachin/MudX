@@ -28,6 +28,12 @@ describe('简单条件表达式测试', () => {
 
     assert.equal(parseSingleConditionExprOperator(expr), "==");
   });
+  it('异常测试', () => {
+    const expr = 'unit.c >!==!= 4';
+    const res = parseSingleConditionExprOperator(expr)
+
+    assert.equal(res, "!=");
+  });
 });
 
 describe('条件表达式切分测试', () => {
@@ -48,6 +54,11 @@ describe('条件表达式切分测试', () => {
   });
   it('组合连接符2', () => {
     const expr = 'unit.c == 4 & unit.d != 7 | unit.f==4 | unit.z==c';
+
+    assert.deepEqual(splitConditionExpr(expr), ['unit.c==4', 'unit.d!=7', 'unit.f==4', 'unit.z==c']);
+  });
+  it('异常测试', () => {
+    const expr = 'unit.c == 4 && unit.d != 7 |& unit.f==4 | unit.z==c';
 
     assert.deepEqual(splitConditionExpr(expr), ['unit.c==4', 'unit.d!=7', 'unit.f==4', 'unit.z==c']);
   });
