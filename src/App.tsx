@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { parseSimpleConditionComparator, parseToExprAtom } from './core/conditionParser';
+import { parseSimpleConditionComparator, parseToExprAtom } from './core/conditionParser_old';
 
 import { Parser } from 'expr-eval';
 

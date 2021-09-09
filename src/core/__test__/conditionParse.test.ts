@@ -1,6 +1,6 @@
 import 'mocha';
 import assert from 'assert'
-import { parseSingleConditionComparator as parseSingleConditionExprOperator, parseToExprAtom, splitConditionExpr } from '../conditionParser';
+import { parseSingleConditionComparator as parseSingleConditionExprOperator, parseToExprAtom, splitConditionExpr } from '../conditionParser_old';
 
 describe('简单条件表达式测试', () => {
   it('判断符解析 >', () => {
