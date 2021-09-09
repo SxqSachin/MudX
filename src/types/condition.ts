@@ -11,17 +11,19 @@ export type ConditionParseRes = {
 }
 
 export type ConditionExprUnit = {
-  expr: string | ConditionExprUnit,
+  expr: string,
+  children?: (ConditionExprUnit | string)[];
+}
+
+export type ConditionUnit = {
+  expr: string | ConditionAtom,
+  children?: (ConditionUnit | ConditionAtom)[];
 }
 
 export type ConditionAtom = {
   lVal: number | string | ConditionAtom;
   rVal: number | string | ConditionAtom;
   comparator: ConditionComparator;
-}
-
-export type ConditionUnit = {
-  atom: ConditionAtom;
 }
 
 export type ConditionParsedExpr = {

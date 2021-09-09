@@ -1,8 +1,7 @@
-import { ConditionAtom, ConditionComparator, ConditionExpr } from '../types/condition';
-import { objectExprParser } from './objectExprParser';
+import { ConditionAtom, ConditionComparator, ConditionExpr, ConditionExprUnit, ConditionUnit } from '../types/condition';
 
 const SINGLE_OPERATOR_CHAR = ['>', '<', '=', '!'];
-const CONDITION_CONNECTOR_CHAR = ['&', '|'];
+// const CONDITION_CONNECTOR_CHAR = ['&', '|'];
 
 function pureExpr(expr: string): string {
   return expr.replace(/ /g, '');
@@ -12,92 +11,99 @@ export function parseToExprAtom(expr: ConditionExpr) {
   expr = pureExpr(expr);
 
   const exprCharArr = expr.split('');
-  const exprBracketBlock: any[] = [];
 
-  let exprStack: any[] = [{expr: '', child: []}];
-  let lastExpr = '';
+  let exprStack: ConditionExprUnit[] = [];
   for (const char of exprCharArr) {
+    if (!exprStack.length) {
+      exprStack[0] = { expr: '', children: [] };
+    }
+
     if (char === '(') {
-      exprStack.push({expr: '', child: []});
+      exprStack.push({expr: '', children: []});
       continue;
     }
-    
     if (char === ')') {
       const lastExprBlock = exprStack.pop();
-      exprStack[exprStack.length - 1].child.push(lastExprBlock);
+      if (lastExprBlock) {
+        exprStack[exprStack.length - 1].children?.push(lastExprBlock);
+      }
+
       continue;
     }
     exprStack[exprStack.length - 1].expr += char;
   }
 
-  const runSplit = (unit: any) => {
+  const runSplit = (unit: ConditionExprUnit) => {
     if (!unit.expr) {
       return unit;
     }
     if (unit.expr.includes('&')) {
-      unit.child.push(...splitConditionExpr(unit.expr));
+      unit.children?.push(...splitConditionExpr(unit.expr));
       unit.expr = '&';
     } else if (unit.expr.includes('|')) {
-      unit.child.push(...splitConditionExpr(unit.expr));
+      unit.children?.push(...splitConditionExpr(unit.expr));
       unit.expr = '|';
     }
 
     return unit;
   };
 
-  const findC = (unit: any) => {
+  const findC = (unit: ConditionExprUnit) => {
     unit = runSplit(unit)
-    if (!unit.child) {
+    if (!unit.children) {
       return unit;
     }
 
-    unit.child = unit.child.map((subUnit: any) => {
+    unit.children = unit.children.map((subUnit: any) => {
       return findC(subUnit);
-      // runSplit(exprE);
-      // if (exprE.child.length) {
-      //   unit.child = findC(exprE).child;
-      // }
     });
 
     return unit;
   };
 
-  // console.log(exprStack[0]);
-
   let outUnit = exprStack[0];
   outUnit = findC(outUnit)
 
-  // exprStack = ;
+  let outU = parseSimpleConditionExprUnit(outUnit);
 
-  // exprStack = exprStack.map(unit => {
-  // });
-
-  return outUnit;
+  return outU;
 }
 
-// export function conditionParser(expr: ConditionExpr, object: any) {
-//   const exprArr = splitConditionExpr(expr);
+export function parseSimpleConditionExprUnit(conditionExprUnit: ConditionExprUnit): ConditionUnit {
+  // 表达式不是连接符，直接就是一个表达式
+  if (isConditionExpr(conditionExprUnit.expr)) {
+    return {
+      expr: parseSimpleConditionExprToAtom(conditionExprUnit.expr),
+    }
+  }
 
-//   const comparatorMapper: {[comparator in ConditionComparator]: (a: any, b: any) => boolean} = {
-//     "!=": (a, b) => a != b,
-//     ">=": (a, b) => a >= b,
-//     "<=": (a, b) => a <= b,
-//     "==": (a, b) => a == b,
-//     ">": (a, b) => a > b,
-//     "<": (a, b) => a < b,
-//   }
+  return {
+    expr: conditionExprUnit.expr,
+    children: conditionExprUnit.children?.map(expr => {
+      if (typeof expr === 'string') {
+        return parseSimpleConditionExprToAtom(expr);
+      }
+      return parseSimpleConditionExprUnit(expr);
+    })
+  }
+}
 
-//   exprArr.forEach(expr => {
-//     const comparator = parseSingleConditionComparator(expr);
+export function isConditionExpr(expr: string): boolean {
+  const atom = parseSimpleConditionExprToAtom(expr);
+  return !!atom.lVal && !!atom.rVal;
+}
 
-//     const exprPart = expr.split(comparator); 
+export function parseSimpleConditionExprToAtom(conditionExpr: ConditionExpr): ConditionAtom {
+  const comparator = parseSimpleConditionComparator(conditionExpr);
 
-//     const lVal = objectExprParser(exprPart[0], object);
-//     const rVal = objectExprParser(exprPart[1], object);
+  const exprPart = conditionExpr.split(comparator);
 
-//     const curExprCompareRes = comparatorMapper[comparator](lVal, rVal);
-//   });
-// }
+  return {
+    lVal: exprPart[0],
+    rVal: exprPart[1],
+    comparator,
+  };
+}
 
 // 将复合条件表达式拆分为单个条件表达式
 export function splitConditionExpr(expr: ConditionExpr): ConditionExpr[] {
@@ -110,7 +116,7 @@ export function splitConditionExpr(expr: ConditionExpr): ConditionExpr[] {
 }
 
 // 解析单个条件表达式的比较运算符
-export function parseSingleConditionComparator(expr: ConditionExpr): ConditionComparator {
+export function parseSimpleConditionComparator(expr: ConditionExpr): ConditionComparator {
   expr = expr.replace(/ /g, '');
 
   let lastChar: string = '';
