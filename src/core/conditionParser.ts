@@ -1,4 +1,5 @@
-import { ConditionAtom, ConditionComparator, ConditionExpr, ConditionExprUnit, ConditionUnit } from '../types/condition';
+import { ConditionAtom, ConditionComparator, ConditionCompareVal, ConditionExpr, ConditionExprUnit, ConditionSimpleCompareVal, ConditionUnit } from '../types/condition';
+import { objectExprParser } from './objectExprParser';
 
 const SINGLE_OPERATOR_CHAR = ['>', '<', '=', '!'];
 // const CONDITION_CONNECTOR_CHAR = ['&', '|'];
@@ -103,6 +104,62 @@ export function parseSimpleConditionExprToAtom(conditionExpr: ConditionExpr): Co
     rVal: exprPart[1],
     comparator,
   };
+}
+
+export function runConditionAtom({ lVal, rVal, comparator}: ConditionAtom, object: any): boolean {
+  const normalizeVal = (val: ConditionCompareVal): ConditionSimpleCompareVal => {
+    let res: ConditionSimpleCompareVal = 0;
+    switch (typeof lVal) {
+      case 'boolean':
+      case 'number':
+        res = lVal;
+        break;
+      case 'string':
+        res = objectExprParser(lVal, object);
+        break;
+      default:
+        break;
+    }
+
+    return res;
+  }
+
+  lVal = normalizeVal(lVal);
+  rVal = normalizeVal(rVal);
+
+  let res: boolean = false;
+
+  switch (comparator) {
+    case '!=':
+      res = lVal != rVal;
+      break;
+    case '==':
+      res = lVal == rVal;
+      break;
+    case '>=':
+      res = lVal >= rVal;
+      break;
+    case '<=':
+      res = lVal <= rVal;
+      break;
+    case '==':
+      res = lVal == rVal;
+      break;
+    case '>':
+      res = lVal > rVal;
+      break;
+    case '<':
+      res = lVal < rVal;
+      break;
+    case '&':
+      res = !!(lVal && rVal);
+      break;
+    case '|':
+      res = !!(lVal || rVal);
+      break;
+  }
+
+  return res;
 }
 
 // 将复合条件表达式拆分为单个条件表达式

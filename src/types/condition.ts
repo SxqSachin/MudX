@@ -4,6 +4,9 @@ export type ConditionExpr = string;
 export type ConditionComparator = '>' | '<' | '>=' | '<=' | '==' | '!=' | '&' | '|';
 export type ConditionConnector = '|' | '&';
 
+export type ConditionSimpleCompareVal = number | boolean | string;
+export type ConditionCompareVal = ConditionSimpleCompareVal | ConditionAtom;
+
 export type ConditionParseRes = {
   lValue: string | number | boolean,
   rValue: string | number | boolean,
@@ -21,8 +24,8 @@ export type ConditionUnit = {
 }
 
 export type ConditionAtom = {
-  lVal: number | string | ConditionAtom;
-  rVal: number | string | ConditionAtom;
+  lVal: ConditionCompareVal;
+  rVal: ConditionCompareVal;
   comparator: ConditionComparator;
 }
 
