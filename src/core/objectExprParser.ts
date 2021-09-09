@@ -38,7 +38,3 @@ export function SingleObjectExprParser(expr: ExprString, object: any) {
 
   return object[k1][k2];
 }
-
-function getV(key: string, object: any): any {
-  return object[key];
-}
