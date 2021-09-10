@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
-import { parseSimpleConditionComparator, parseToExprAtom } from './core/conditionParser_old';
+import { runExpr } from './core/expr';
 
 import { Parser } from 'expr-eval';
+
+import expr from './data/expr.json';
 
 function App() {
   useEffect(() => {
 
     const obj = {
-      a: {
+      unit: {
         a: 4,
         b: 5,
         c: 4,
@@ -16,28 +18,13 @@ function App() {
       }
     }
 
-    const parser = new Parser();
     let res = 0;
     console.time('t');
-    const expr = parser.parse('(((a.b > 3 and a.c > 4) or a.d == 5) and (a.v < 4 or a.c == 5))');
-    console.log(expr);
     for(let i = 0; i < 10000; i++) {
-      res = expr.evaluate(obj);
+      res = runExpr(expr.test.expr, obj);
     }
     console.log(res);
     console.timeEnd('t');
-
-    const expr3 = '(a.c + a.d) > 4';
-    const res3 = parseToExprAtom(expr3);
-    console.log(res3);
-
-    // const expr3 = '(a.c > 4 & a.d < 5 & a.e == 6) | a.ee == 4';
-    // const res3 = parseToExprAtom(expr3);
-    // console.log(res3);
-
-    // const expr4 = '((a.c > 4) & (a.d < 5))';
-    // const res4 = parseToExprAtom(expr4);
-    // console.log(res4);
   }, []);
 
   return (

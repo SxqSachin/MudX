@@ -1,0 +1,8 @@
+{
+  "test": {
+    "expr": "unit.a + unit.b > 10"
+  },
+  "test2": {
+    "expr": "unit.a + unit.c"
+  }
+}
