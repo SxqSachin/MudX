@@ -1,7 +1,7 @@
-import { UnitData } from "./Unit";
+import { UnitData, UnitStatusType } from "./Unit";
 
 type ActionEffectData = {
-  effectTo: keyof UnitData;
+  effectTo: UnitStatusType,
   val: number;
 } | {
   effectTo: 'item';

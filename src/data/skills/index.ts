@@ -11,9 +11,11 @@ scriptSkillList.forEach(scriptSkill => {
   SkillMap.set(scriptSkill.id, new Skill(scriptSkill));
 });
 jsonSkillList.forEach(jsonSkill => {
+  const { id, name, colddown } = jsonSkill;
   const skillData: SkillData = {
-    id: jsonSkill.id,
-    colddown: jsonSkill.colddown,
+    id,
+    name,
+    colddown,
     actions: (() => {
       const actions = toArray(jsonSkill.actions);
 

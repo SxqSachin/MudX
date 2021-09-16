@@ -1,9 +1,10 @@
+import { ItemData } from "../../../types/Item";
 import { SkillData } from "../../../types/Skill";
 
-export const duocui: SkillData = {
-  colddown: 10,
-  id: "duocui",
-  name: "夺萃",
+export const shield: ItemData = {
+  id: "shield",
+  name: "小圆盾",
+  durability: 100,
   actions: [
     {
       target: "target",

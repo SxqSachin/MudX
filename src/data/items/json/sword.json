@@ -1,8 +1,7 @@
 {
-  "id": "heal",
-  "name": "治疗",
-  "colddown": 10,
-  "test": "no",
+  "id": "sword",
+  "name": "长剑",
+  "durability": 100,
   "actions": [
     {
       "target": "self",
