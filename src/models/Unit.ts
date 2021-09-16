@@ -1,3 +1,4 @@
+import { IItem } from "../types/Item";
 import { ISkill } from "../types/Skill";
 import { IUnit, UnitData, } from "../types/Unit";
 import { deepClone } from "../utils";
@@ -20,17 +21,11 @@ export class Unit implements IUnit {
     return this.unitEntity;
   }
 
-  castSpell(spell: ISkill) {
+  castSkill(skill: ISkill) {
     return this;
   }
-
-  serialize(): string {
-    return JSON.stringify(this.unitEntity);
-  }
-
-  unserialize(raw: string) {
-    const unitEntity = JSON.parse(raw);
-    this.init(unitEntity);
+  useItem(item: IItem) {
+    return this;
   }
 
   get xid() {

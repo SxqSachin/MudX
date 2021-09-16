@@ -1,19 +1,18 @@
 import { Action } from "./action";
 import { XSerializable } from "./Object";
+import { IUnit } from "./Unit";
 
 export type ItemID = string;
-export type ItemData = XSerializable & {
+export type ItemRunTimeData = XSerializable & {
   id: ItemID;
 
   durability: number;
-}
-
-export type ItemRunTimeData = {
-  id: ItemData;
 
   actions: Action | Action[];
 }
 
-export interface IItem {
+export type ItemData = Omit<ItemRunTimeData, 'actions' | 'xid'>;
 
+export interface IItem {
+  onUse(target: IUnit): void;
 }

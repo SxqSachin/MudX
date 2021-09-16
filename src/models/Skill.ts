@@ -8,7 +8,6 @@ export class Skill implements ISkill {
     this.skillData = data;
   }
 
-  cast(source: IUnit, target: IUnit): IUnit {
-    throw new Error("Method not implemented.");
+  cast(source: IUnit, target: IUnit): void {
   }
 }

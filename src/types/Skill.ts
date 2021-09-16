@@ -3,18 +3,15 @@ import { XObject, XSerializable } from "./Object";
 import { SourceUnit, TargetUnit, } from "./Unit";
 
 export type SkillID = string;
-export type SkillData = XSerializable & {
+export type SkillData = {
   id: SkillID;
 
   colddown: number;
-};
-
-export type SkillRunTimeData = {
-  id: SkillID;
 
   actions: Action | Action[];
-}
+};
+export type SkillSerializeData = Omit<SkillData, 'actions'>;
 
-export interface ISkill extends XObject {
-  cast(source: SourceUnit, target: TargetUnit): TargetUnit;
+export interface ISkill {
+  cast(source: SourceUnit, target: TargetUnit): void;
 }

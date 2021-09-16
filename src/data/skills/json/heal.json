@@ -1,0 +1,16 @@
+{
+  "id": "heal",
+  "colddown": 10,
+  "actions": [
+    {
+      "target": "self",
+      "effectTo": "curHP",
+      "val": 10
+    },
+    {
+      "target": "self",
+      "effectTo": "curMP",
+      "val": -10
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { ItemData, ItemID } from "./Item";
+import { IItem, ItemData, ItemID } from "./Item";
 import { XObject, XSerializable } from "./Object";
 import { ISkill, SkillData, SkillID } from "./Skill";
 
@@ -6,7 +6,11 @@ import { ISkill, SkillData, SkillID } from "./Skill";
 export interface IUnit extends XObject, XSerializable, UnitData {
   getEntity(): UnitData;
 
-  castSpell(skill: ISkill): void;
+  castSkill(skill: ISkill): void;
+
+  useItem(item: IItem): void;
+
+  attack(target: IUnit): void;
 }
 
 export type UnitData = XSerializable & {

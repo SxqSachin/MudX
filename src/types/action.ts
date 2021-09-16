@@ -1,6 +1,6 @@
 import { UnitData } from "./Unit";
 
-export type Action = {
+type ActionEffectData = {
   effectTo: keyof UnitData;
   val: number;
 } | {
@@ -12,3 +12,7 @@ export type Action = {
   skillID: string;
   val: number;
 }
+
+export type Action = {
+  target: 'target' | 'self';
+} & ActionEffectData;
