@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { runExpr } from "./core/expr";
 
+import './data';
+
 import expr from "./data/expr.json";
 
 function App() {
