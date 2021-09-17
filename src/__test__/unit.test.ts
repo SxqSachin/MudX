@@ -31,11 +31,25 @@ describe('Unit Test', () => {
     const enemy: IUnit = new Unit(unitData);
     // const enemy = new Unit(unitData);
 
-    unit.addItemByID('shield', 3);
-    unit.addItemByID('sword', 3);
+    console.log(unit);
+    const sword = Items.get('sword');
+    unit.addItem(sword);
+    unit.equip(sword.data.xid);
 
-    unit.attack(enemy);
+    // const shield = Items.get('shield');
+    // unit.addItem(shield);
+    // unit.equip(shield.data.xid);
 
-    assert.equal(enemy.status.curHP, 7);
+    // const shield2 = Items.get('shield');
+    // unit.addItem(shield2);
+    // unit.equip(shield.data.xid);
+
+    // console.log(unit.equipments, unit.items);
+
+    // unit.attack(enemy);
+
+    console.log(unit);
+
+    assert.equal(enemy.status.curHP, 10);
   });
 });

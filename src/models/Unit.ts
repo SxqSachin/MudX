@@ -1,5 +1,6 @@
 import { Items } from "../data";
 import { IItem, ItemData, ItemID } from "../types/Item";
+import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
 import { IUnit, UnitData, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
@@ -56,8 +57,11 @@ export class Unit implements IUnit {
       items[itemID] = [];
     }
 
-    items[itemID].push(itemData);
-    this._reinitItems();
+    const isItemExist = Object.values(items).some(itemList => itemList.some(curItem => curItem.xid === item.data.xid));
+    if (!isItemExist) {
+      items[itemID].push(itemData);
+      this._reinitItems();
+    }
   }
   removeItem(item: IItem): void {
     const itemData = item.data;
@@ -107,6 +111,55 @@ export class Unit implements IUnit {
     this._reinitItems();
   }
   useItem(item: Item) {
+    this._reinitItems();
+  }
+
+  equip(xid: XID) {
+    Object.keys(this.unitEntity.items).some(itemID => {
+      const itemDataList = this.unitEntity.items[itemID];
+      return itemDataList.some((_, index) => {
+        const itemData = this.unitEntity.items[itemID][index];
+        if (itemData.xid === xid && itemData.isEquipable === true) {
+          itemData.isEquipped = true;
+
+          Object.values(this.items).some(itemList => itemList.some(curItem => {
+            if (xid === curItem.data.xid) {
+              curItem.onEquip(this);
+              return true;
+            }
+          }));
+
+          return true;
+        }
+      })
+    });
+    this._reinitItems();
+  }
+  unequip(xid: XID) {
+    Object.keys(this.unitEntity.items).some(itemID => {
+      const itemDataList = this.unitEntity.items[itemID];
+      return itemDataList.some((_, index) => {
+        const itemData = this.unitEntity.items[itemID][index];
+        if (itemData.xid === xid && itemData.isEquipable === true) {
+          itemData.isEquipped = false;
+
+          Object.values(this.items).some(itemList => itemList.some(curItem => {
+            if (xid === curItem.data.xid) {
+              curItem.onUnequip(this);
+              return true;
+            }
+          }));
+
+          return true;
+        }
+      })
+    });
+    this._reinitItems();
+  }
+  get equipments() {
+    return Object.values(this.items).flatMap(itemList => {
+      return itemList.filter(item => item.data.isEquipable && item.data.isEquipped);
+    })
   }
 
   increaseStatus(status: UnitStatusType, val: number): void {

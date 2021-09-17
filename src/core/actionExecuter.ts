@@ -57,3 +57,45 @@ export function actionExecuter(
       break;
   }
 }
+
+
+export function executeSelfAction(action: Action, self: IUnit): void {
+  let actionTarget = self;
+
+  if (!actionTarget) {
+    return;
+  }
+
+  const unitEffectActionMap = {
+    'item': {
+      '+': actionTarget.addItemByID,
+      '-': actionTarget.removeItemByID,
+    },
+    'skill': {
+      '+': actionTarget.learnSkill,
+      '-': actionTarget.forgetSkill,
+    },
+    'status': {
+      '+': actionTarget.increaseStatus,
+      '-': actionTarget.decreaseStatus,
+    }
+  }
+  let effectValDirection: '+' | '-' = action.val > 0 ? '+' : '-';
+
+  switch(action.effectTo) {
+    case 'item':
+      unitEffectActionMap.item[effectValDirection](action.itemID, action.val);
+      break;
+    case 'skill':
+      const skill = SkillMap.get(action.skillID);
+      if (!skill) {
+        break;
+      }
+      unitEffectActionMap.skill[effectValDirection](skill);
+      break;
+    default:
+      effectValDirection = '+';
+      unitEffectActionMap.status[effectValDirection].call(actionTarget, action.effectTo, action.val);
+      break;
+  }
+}

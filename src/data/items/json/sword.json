@@ -2,6 +2,9 @@
   "id": "sword",
   "name": "长剑",
   "durability": 100,
+  "isEquipable": true,
+  "isEquipped": false,
+  "isConsumable": true,
   "actions": [
     {
       "target": "self",
@@ -12,6 +15,20 @@
       "target": "self",
       "effectTo": "curMP",
       "val": -10
+    }
+  ],
+  "onEquip": [
+    {
+      "target": "self",
+      "effectTo": "atk",
+      "val": 3
+    }
+  ],
+  "onUnequip": [
+    {
+      "target": "self",
+      "effectTo": "atk",
+      "val": -3
     }
   ]
 }
