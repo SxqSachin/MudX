@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ItemMap, SkillMap } from "../data";
+import { Items, SkillMap } from "../data";
 import { Skill } from "../models/Skill";
 import { Unit } from "../models/Unit";
 import { Action } from "../types/action";
@@ -27,8 +27,8 @@ export function actionExecuter(
 
   const unitEffectActionMap = {
     'item': {
-      '+': actionTarget.addItem,
-      '-': actionTarget.addItem,
+      '+': actionTarget.addItemByID,
+      '-': actionTarget.removeItemByID,
     },
     'skill': {
       '+': actionTarget.learnSkill,
@@ -43,11 +43,7 @@ export function actionExecuter(
 
   switch(action.effectTo) {
     case 'item':
-      const item = ItemMap.get(action.itemID);
-      if (!item) {
-        break;
-      }
-      unitEffectActionMap.item[effectValDirection](item, action.val);
+      unitEffectActionMap.item[effectValDirection](action.itemID, action.val);
       break;
     case 'skill':
       const skill = SkillMap.get(action.skillID);

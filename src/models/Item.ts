@@ -1,13 +1,17 @@
 import { IItem, ItemData } from "../types/Item";
-import { ISkill, SkillData } from "../types/Skill";
 import { IUnit } from "../types/Unit";
-import { deepClone, toArray } from "../utils";
+import { deepClone, } from "../utils";
+import { uuid } from "../utils/uuid";
 
 export class Item implements IItem {
   private _itemData!: ItemData;
 
   constructor(data: ItemData) {
-    this._itemData = data;
+    const _data = deepClone(data);
+    if (!_data.xid) {
+      _data.xid = uuid();
+    }
+    this._itemData = _data;
   }
 
   get data() {

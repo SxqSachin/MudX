@@ -14,8 +14,10 @@ export interface IUnit extends XObject, XSerializable {
   forgetSkill(skill: ISkill): void;
   castSkill(skill: ISkill): void;
 
-  removeItem(item: IItem, count: number): void;
-  addItem(item: IItem, count: number): void;
+  addItemByID(itemID: ItemID, count: number): void;
+  removeItemByID(itemID: ItemID, count: number): void;
+  removeItem(item: IItem): void;
+  addItem(item: IItem): void;
   useItem(item: IItem): void;
 
   increaseStatus(statusKey: UnitStatusType, val: number): void;
@@ -25,6 +27,11 @@ export interface IUnit extends XObject, XSerializable {
   items: Readonly<{ [id in ItemID]: IItem[] }>;
   skills: Readonly<{ [id in SkillID]: ISkill }>;
   status: Readonly<{ [status in UnitStatusType]: number }>;
+
+  phyAtk: number;
+  phyDef: number;
+  powAtk: number;
+  powDef: number;
 }
 
 export type UnitData = XSerializable & {

@@ -1,5 +1,5 @@
-import { ItemMap } from "../data";
-import { IItem, ItemID } from "../types/Item";
+import { Items } from "../data";
+import { IItem, ItemData, ItemID } from "../types/Item";
 import { ISkill, SkillID } from "../types/Skill";
 import { IUnit, UnitData, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
@@ -30,6 +30,7 @@ export class Unit implements IUnit {
   }
 
   attack(target: IUnit) {
+    target.decreaseStatus('curHP', this.phyAtk);
   }
 
   learnSkill(skill: ISkill) {
@@ -46,7 +47,7 @@ export class Unit implements IUnit {
     return this;
   }
 
-  addItem(item: IItem, count: number): void {
+  addItem(item: IItem): void {
     const itemData = item.data;
     const { id: itemID } = itemData;
 
@@ -55,20 +56,10 @@ export class Unit implements IUnit {
       items[itemID] = [];
     }
 
-    if (count < 0) {
-      return this.removeItem(item, count);
-    }
-
-    if (!itemData) {
-      return;
-    }
-
-    for(let i = 0; i < count; i++) {
-      items[itemID].push(itemData);
-    }
+    items[itemID].push(itemData);
     this._reinitItems();
   }
-  removeItem(item: IItem, count: number): void {
+  removeItem(item: IItem): void {
     const itemData = item.data;
     const { id: itemID } = itemData;
     const items = this.unitEntity.items;
@@ -80,12 +71,37 @@ export class Unit implements IUnit {
     if (!items[itemID].length) {
       return;
     }
+    items[itemID].pop();
+    this._reinitItems();
+  }
+  addItemByID(itemID: ItemID, count: number) {
+    const items = this.unitEntity.items;
 
-    if (count < 0) {
-      return this.addItem(item, count);
+    if (!Items.has(itemID)) {
+      return;
     }
 
-    for(let i = 0; i < count; i++) {
+    if (!items[itemID]) {
+      items[itemID] = [];
+    }
+
+    for (let i = 0; i < count; i++) {
+      items[itemID].push(Items.getData(itemID) as ItemData);
+    }
+    this._reinitItems();
+  }
+  removeItemByID(itemID: ItemID, count: number) {
+    const items = this.unitEntity.items;
+
+    if (!Items.has(itemID)) {
+      return;
+    }
+
+    if (!items[itemID]?.length) {
+      return;
+    }
+
+    for (let i = 0; i < count; i++) {
       items[itemID].pop();
     }
     this._reinitItems();
@@ -104,7 +120,7 @@ export class Unit implements IUnit {
   }
 
   private _reinitItems() {
-    this._skills = {};
+    this._items = {};
     Object.keys(this.unitEntity.items).forEach((itemID: ItemID) => {
       this._items[itemID] = [];
       this.unitEntity.items[itemID].forEach(itemData => {
@@ -124,6 +140,11 @@ export class Unit implements IUnit {
   get status() { return this.unitEntity; }
   get items() { return this._items; }
   get skills() { return this._skills; }
+
+  get phyAtk() { return 3; }
+  get phyDef() { return 0; }
+  get powAtk() { return 0; }
+  get powDef() { return 0; }
 }
 //  get maxHP() { return this.unitEntity.maxHP; }
 //  get maxMP() { return this.unitEntity.maxMP; }

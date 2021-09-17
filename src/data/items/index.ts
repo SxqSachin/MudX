@@ -1,18 +1,21 @@
 import scriptList from './script';
 import jsonList from './json';
-import { toArray } from '../../utils';
+import { deepClone, toArray } from '../../utils';
 import { Action } from '../../types/action';
 import { Item } from '../../models/Item';
-import { ItemData } from '../../types/Item';
+import { ItemData, ItemID } from '../../types/Item';
 
 const ItemMap: Map<string, Item> = new Map();
+const ItemDataMap: Map<string, ItemData> = new Map();
 
 scriptList.forEach(scriptObj => {
+  delete scriptObj.xid;
+  ItemDataMap.set(scriptObj.id, scriptObj);
   ItemMap.set(scriptObj.id, new Item(scriptObj));
 });
 jsonList.forEach(jsonObj => {
   const { id, name, durability } = jsonObj;
-  const skillData: ItemData = {
+  const itemData: ItemData = {
     id,
     name,
     durability,
@@ -31,9 +34,34 @@ jsonList.forEach(jsonObj => {
     })()
   };
 
-  ItemMap.set(jsonObj.id, new Item(skillData));
+  ItemDataMap.set(jsonObj.id, itemData);
+  ItemMap.set(jsonObj.id, new Item(itemData));
 });
 
+const Items = {
+  get: (itemID: ItemID): Item | null => {
+    const itemData = ItemDataMap.get(itemID);
+
+    if (!itemData) {
+      return null;
+    }
+
+    return new Item(itemData);
+  },
+  getData: (itemID: ItemID): ItemData | null => {
+    const itemData = ItemDataMap.get(itemID);
+
+    if (!itemData) {
+      return null;
+    }
+
+    return deepClone(itemData);
+  },
+  has: (itemID: ItemID): boolean => {
+    return ItemDataMap.has(itemID);
+  }
+}
+
 export {
-  ItemMap
+  Items
 };

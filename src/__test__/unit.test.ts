@@ -1,6 +1,9 @@
 import assert from "assert";
+import { Items } from "../data";
+import { Item } from "../models/Item";
 import { Unit } from "../models/Unit";
-import { UnitData, UnitEntity } from "../types/Unit";
+import { IUnit, UnitData } from "../types/Unit";
+import { uuid } from "../utils/uuid";
 
 describe('Unit Test', () => {
   it('Create', () => {
@@ -19,13 +22,20 @@ describe('Unit Test', () => {
       perception: 10,
       speed: 10,
       talent: 10,
+      items: {},
+      skills: {},
+      xid: uuid(),
     }
 
-    const unit = new Unit(unitData);
-    const enemy = new Unit(unitData);
+    const unit: IUnit = new Unit(unitData);
+    const enemy: IUnit = new Unit(unitData);
+    // const enemy = new Unit(unitData);
 
-    console.log(unit);
+    unit.addItemByID('shield', 3);
+    unit.addItemByID('sword', 3);
 
-    assert.equal(unit.getEntity().curHP, 10);
+    unit.attack(enemy);
+
+    assert.equal(enemy.status.curHP, 7);
   });
 });
