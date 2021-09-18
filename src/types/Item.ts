@@ -25,7 +25,7 @@ export type ItemData = XSerializable & ({
   isConsumable: boolean;
 
   actions: Action | Action[];
-  
+
   onEquip: Action | Action[];
   onUnequip: Action | Action[];
 })

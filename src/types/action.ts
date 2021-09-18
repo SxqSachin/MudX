@@ -1,4 +1,4 @@
-import { UnitData, UnitStatusType } from "./Unit";
+import { IUnit, UnitData, UnitStatusType } from "./Unit";
 
 type ActionEffectData = {
   effectTo: UnitStatusType,
@@ -13,6 +13,6 @@ type ActionEffectData = {
   val: number;
 }
 
-export type Action = {
+export type Action = ({
   target: 'target' | 'self';
-} & ActionEffectData;
+} & ActionEffectData) | ((self: IUnit, target: IUnit) => void);

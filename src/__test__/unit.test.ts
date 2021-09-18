@@ -24,6 +24,10 @@ describe('Unit Test', () => {
       talent: 10,
       items: {},
       skills: {},
+      phyAtk: 0,
+      phyDef: 0,
+      powAtk: 0,
+      powDef: 0,
       xid: uuid(),
     }
 
@@ -31,25 +35,12 @@ describe('Unit Test', () => {
     const enemy: IUnit = new Unit(unitData);
     // const enemy = new Unit(unitData);
 
-    console.log(unit);
     const sword = Items.get('sword');
     unit.addItem(sword);
     unit.equip(sword.data.xid);
 
-    // const shield = Items.get('shield');
-    // unit.addItem(shield);
-    // unit.equip(shield.data.xid);
+    unit.attack(enemy);
 
-    // const shield2 = Items.get('shield');
-    // unit.addItem(shield2);
-    // unit.equip(shield.data.xid);
-
-    // console.log(unit.equipments, unit.items);
-
-    // unit.attack(enemy);
-
-    console.log(unit);
-
-    assert.equal(enemy.status.curHP, 10);
+    assert.equal(enemy.status.curHP, 7);
   });
 });

@@ -1,14 +1,57 @@
+import { DataCallback, VoidCallback } from ".";
 import { Item } from "../models/Item";
 import { Skill } from "../models/Skill";
 import { IItem, ItemData, ItemID } from "./Item";
 import { XID, XObject, XSerializable } from "./Object";
 import { ISkill, SkillData, SkillID } from "./Skill";
 
-// IUnit只是Entity的壳子，用于对数据进行操作
-export interface IUnit extends XObject, XSerializable {
-  getEntity(): UnitData;
+export type UnitEventType =
+  'beforeAttack' | 'doAttack' | 'afterAttack' |
+'beforeAttacked' | 'beAttacked' | 'afterAttacked';
 
+
+export type UnitEventData = {
+}
+export type UnitAttackEventData = UnitEventData & {
+  target: IUnit;
+}
+export type UnitAttackedEventData = UnitEventData & {
+  source: IUnit;
+}
+
+export type UnitFireEventFunc =
+  ((event: UnitEventType, data: UnitEventData) => void) |
+  ((event: 'beforeAttack' | 'doAttack' | 'afterAttack', data: UnitAttackEventData) => void) |
+  ((event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', data: UnitAttackedEventData) => void);
+
+type _UnitEventListener<E, T> = (event: E, listener: DataCallback<T>) => VoidCallback;
+export type UnitEventListener =
+  _UnitEventListener<UnitEventType, UnitEventData> |
+  _UnitEventListener<'beforeAttack' | 'doAttack' | 'afterAttack', UnitAttackEventData> |
+  _UnitEventListener<'beforeAttacked' | 'beAttacked' | 'afterAttacked', UnitAttackedEventData>;
+
+export interface UnitEvent {
+  /**
+   * 为该单位监听某事件
+   * @param event 事件类型
+   * @param data 事件数据
+   *
+   * @returns 解绑方法
+   */
+  on: UnitEventListener;
+
+  /**
+   * 主动触发该单位的事件
+   * @param event
+   */
+  fire: UnitFireEventFunc;
+}
+
+// IUnit只是Entity的壳子，用于对数据进行操作
+export interface IUnit extends XObject, XSerializable, UnitEvent {
   attack(target: IUnit): void;
+
+  dealDamage(target: IUnit, damage: number): void;
 
   learnSkill(skill: ISkill): void;
   forgetSkill(skill: ISkill): void;
@@ -54,6 +97,11 @@ export type UnitData = XSerializable & {
   luck: number;
   perception: number;
   speed: number;
+
+  phyAtk: number;
+  phyDef: number;
+  powAtk: number;
+  powDef: number;
 
   items: { [id in ItemID]: ItemData[] };
   skills: { [id in SkillID]: SkillData };

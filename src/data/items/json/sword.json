@@ -20,14 +20,14 @@
   "onEquip": [
     {
       "target": "self",
-      "effectTo": "atk",
+      "effectTo": "phyAtk",
       "val": 3
     }
   ],
   "onUnequip": [
     {
       "target": "self",
-      "effectTo": "atk",
+      "effectTo": "phyAtk",
       "val": -3
     }
   ]

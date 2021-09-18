@@ -1,8 +1,10 @@
+import { Publisher, Subscriber } from "../core/subscribe";
 import { Items } from "../data";
+import { DataCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { IUnit, UnitData, UnitStatusType, } from "../types/Unit";
+import { IUnit, UnitAttackedEventData, UnitAttackEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
 import { hasProperity } from "../utils/object";
 import { uuid } from "../utils/uuid";
@@ -14,6 +16,9 @@ export class Unit implements IUnit {
   private _items!:  { [id in ItemID]: Item[] };
   private _skills!:  { [id in SkillID]: Skill };
 
+  private _publisher!: Publisher<UnitEventType, UnitEventData>;
+  private _subscriber!: Subscriber<UnitEventType, UnitEventData>;
+
   constructor(entity: UnitData) {
     this.init(entity);
   }
@@ -22,16 +27,22 @@ export class Unit implements IUnit {
     data = deepClone(data);
     this.unitEntity = data;
 
+    this._publisher = new Publisher();
+    this._subscriber = new Subscriber();
+
     this._reinitItems();
     this._reinitSkills();
   }
 
-  getEntity() {
-    return this.unitEntity;
+  attack(target: IUnit) {
+    const damage = this.phyAtk;
+    const targetDef = target.phyDef;
+
+    this.dealDamage(target, damage - targetDef)
   }
 
-  attack(target: IUnit) {
-    target.decreaseStatus('curHP', this.phyAtk);
+  dealDamage(target: IUnit, damage: number) {
+    target.decreaseStatus('curHP', damage);
   }
 
   learnSkill(skill: ISkill) {
@@ -172,6 +183,19 @@ export class Unit implements IUnit {
     this.unitEntity[status] = val;
   }
 
+  on(event: 'beforeAttack' | 'doAttack' | 'afterAttack', listener: DataCallback<UnitAttackEventData>): VoidCallback;
+  on(event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', listener: DataCallback<UnitAttackedEventData>): VoidCallback;
+  on(event: UnitEventType, listener: DataCallback<any>): VoidCallback {
+    return this._subscriber.subscribe(this._publisher, event, listener);
+  }
+
+  fire(event: UnitEventType, data: UnitEventData): void;
+  fire(event: 'beforeAttack' | 'doAttack' | 'afterAttack', data: UnitAttackEventData): void;
+  fire(event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', data: UnitAttackedEventData): void;
+  fire(event: UnitEventType, data: UnitEventData): void {
+    return this._publisher.publish(event, data);
+  }
+
   private _reinitItems() {
     this._items = {};
     Object.keys(this.unitEntity.items).forEach((itemID: ItemID) => {
@@ -194,10 +218,20 @@ export class Unit implements IUnit {
   get items() { return this._items; }
   get skills() { return this._skills; }
 
-  get phyAtk() { return 3; }
-  get phyDef() { return 0; }
-  get powAtk() { return 0; }
-  get powDef() { return 0; }
+  get phyAtk() {
+    const { strength, phyAtk } = this.status;
+    return strength + phyAtk;
+  }
+  get phyDef() {
+    const { phy, phyDef } = this.status;
+    return phy + phyDef;
+  }
+  get powAtk() {
+    return this.unitEntity.powAtk;
+  }
+  get powDef() {
+    return this.unitEntity.powDef;
+  }
 }
 //  get maxHP() { return this.unitEntity.maxHP; }
 //  get maxMP() { return this.unitEntity.maxMP; }

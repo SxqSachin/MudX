@@ -5,6 +5,7 @@ import { Action } from '../../types/action';
 import { Item } from '../../models/Item';
 import { ItemData, ItemID } from '../../types/Item';
 import { EMPTY_XID } from '../../types/Object';
+import { UnitStatusType } from '../../types/Unit';
 
 const ItemMap: Map<string, Item> = new Map();
 const ItemDataMap: Map<string, ItemData> = new Map();
@@ -47,8 +48,8 @@ jsonList.forEach(jsonObj => {
     if (jsonObj.onEquip) {
       itemData.onEquip = jsonObj.onEquip.map(action => {
         return {
-          effectTo: action.effectTo as any,
-          target: action.target as any,
+          effectTo: action.effectTo as UnitStatusType,
+          target: action.target as 'self' | 'target',
           val: action.val,
         }
       })
@@ -56,8 +57,8 @@ jsonList.forEach(jsonObj => {
     if (jsonObj.onEquip) {
       itemData.onUnequip = jsonObj.onUnequip.map(action => {
         return {
-          effectTo: action.effectTo as any,
-          target: action.target as any,
+          effectTo: action.effectTo as UnitStatusType,
+          target: action.target as 'self' | 'target',
           val: action.val,
         }
       })
