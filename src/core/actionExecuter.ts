@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Items, SkillMap } from "../data";
 import { Skill } from "../models/Skill";
 import { Unit } from "../models/Unit";
-import { Action } from "../types/action";
+import { Action, SelfAction } from "../types/action";
 import { IUnit } from "../types/Unit";
 
 export function actionExecuter(
@@ -11,6 +11,10 @@ export function actionExecuter(
   target: IUnit
 ): void {
   let actionTarget;
+
+  if (typeof action === 'function') {
+    return action(self, target);
+  }
 
   switch (action.target) {
     case "self":
@@ -59,7 +63,11 @@ export function actionExecuter(
 }
 
 
-export function executeSelfAction(action: Action, self: IUnit): void {
+export function executeSelfAction(action: SelfAction, self: IUnit): void {
+  if (typeof action === 'function') {
+    return action(self);
+  }
+
   let actionTarget = self;
 
   if (!actionTarget) {

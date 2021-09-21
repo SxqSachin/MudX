@@ -52,7 +52,7 @@ export class Unit implements IUnit {
   }
 
   dealDamage(target: IUnit, damage: number) {
-    target.decreaseStatus('curHP', damage);
+    target.decreaseStatus('curHP', Math.max(damage, 0));
   }
 
   learnSkill(skill: ISkill) {

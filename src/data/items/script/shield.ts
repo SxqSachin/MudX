@@ -1,6 +1,7 @@
 import { ItemData } from "../../../types/Item";
 import { EMPTY_XID } from "../../../types/Object";
 import { SkillData } from "../../../types/Skill";
+import { IUnit } from "../../../types/Unit";
 
 export const shield: ItemData = {
   xid: EMPTY_XID,
@@ -16,12 +17,20 @@ export const shield: ItemData = {
     {
       effectTo: 'phyDef',
       val: 2,
+    },
+    (self: IUnit) => {
+      const unregister = self.on('takeDamage', data => {
+        const damage = data.damage;
+        console.log('damaged', damage);
+
+        self.increaseStatus('curHP', damage);
+      });
     }
   ],
   onUnequip: [
     {
       effectTo: 'phyDef',
       val: -2,
-    }
+    },
   ],
 };
