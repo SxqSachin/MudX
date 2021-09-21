@@ -49,8 +49,6 @@ describe('Unit Test', () => {
     });
 
     unit.attack(enemy);
-    unit.attack(enemy);
-    unit.attack(enemy);
 
     assert.equal(enemy.status.curHP, 10);
   });

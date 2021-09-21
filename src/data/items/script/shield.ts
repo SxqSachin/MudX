@@ -2,6 +2,7 @@ import { ItemData } from "../../../types/Item";
 import { EMPTY_XID } from "../../../types/Object";
 import { SkillData } from "../../../types/Skill";
 import { IUnit } from "../../../types/Unit";
+import { Dice } from "../../../utils/random";
 
 export const shield: ItemData = {
   xid: EMPTY_XID,
@@ -19,11 +20,12 @@ export const shield: ItemData = {
       val: 2,
     },
     (self: IUnit) => {
-      const unregister = self.on('takeDamage', data => {
-        const damage = data.damage;
-        console.log('damaged', damage);
-
-        self.increaseStatus('curHP', damage);
+      self.on('takeDamage', data => {
+        if (Dice.d6 > 3) {
+          const damage = data.damage;
+          console.log('damaged', damage);
+          self.increaseStatus('curHP', damage);
+        }
       });
     }
   ],
