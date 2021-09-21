@@ -1,4 +1,4 @@
-import { Action } from "./action";
+import { Action, SelfAction } from "./action";
 import { XSerializable } from "./Object";
 import { IUnit } from "./Unit";
 
@@ -26,8 +26,8 @@ export type ItemData = XSerializable & ({
 
   actions: Action | Action[];
 
-  onEquip: Action | Action[];
-  onUnequip: Action | Action[];
+  onEquip: SelfAction | SelfAction[];
+  onUnequip: SelfAction | SelfAction[];
 })
 
 export type ItemSerializeData = Omit<ItemData, 'actions'>;

@@ -16,3 +16,5 @@ type ActionEffectData = {
 export type Action = ({
   target: 'target' | 'self';
 } & ActionEffectData) | ((self: IUnit, target: IUnit) => void);
+
+export type SelfAction = ActionEffectData | ((self: IUnit, target: IUnit) => void);

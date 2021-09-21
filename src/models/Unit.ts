@@ -4,7 +4,7 @@ import { DataCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { IUnit, UnitAttackedEventData, UnitAttackEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitStatusType, } from "../types/Unit";
+import { IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitSelf, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
 import { hasProperity } from "../utils/object";
 import { uuid } from "../utils/uuid";
@@ -38,7 +38,17 @@ export class Unit implements IUnit {
     const damage = this.phyAtk;
     const targetDef = target.phyDef;
 
-    this.dealDamage(target, damage - targetDef)
+    const damageVal = damage - targetDef;
+
+    this.fire('beforeAttack', { source: this, target, damage: damageVal });
+    target.fire('beforeAttacked', { source: this, target, damage: damageVal });
+
+    this.dealDamage(target, damageVal)
+    this.fire('dealDamage', { source: this, target, damage: damageVal });
+    target.fire('takeDamage', { source: this, target, damage: damageVal });
+
+    this.fire('afterAttack', { source: this, target, damage: damageVal });
+    target.fire('afterAttacked', { source: this, target, damage: damageVal });
   }
 
   dealDamage(target: IUnit, damage: number) {
@@ -50,16 +60,20 @@ export class Unit implements IUnit {
     const { id } = skillData;
     this.unitEntity.skills[id] = skillData;
     this._reinitSkills();
+
+    return this;
   }
   forgetSkill(skill: ISkill) {
     delete this.unitEntity.skills[skill.data.id];
     this._reinitSkills();
+
+    return this;
   }
   castSkill(skill: ISkill) {
     return this;
   }
 
-  addItem(item: IItem): void {
+  addItem(item: IItem): UnitSelf {
     const itemData = item.data;
     const { id: itemID } = itemData;
 
@@ -73,8 +87,10 @@ export class Unit implements IUnit {
       items[itemID].push(itemData);
       this._reinitItems();
     }
+
+    return this;
   }
-  removeItem(item: IItem): void {
+  removeItem(item: IItem): UnitSelf {
     const itemData = item.data;
     const { id: itemID } = itemData;
     const items = this.unitEntity.items;
@@ -84,16 +100,18 @@ export class Unit implements IUnit {
     }
 
     if (!items[itemID].length) {
-      return;
+      return this;
     }
     items[itemID].pop();
     this._reinitItems();
+
+    return this;
   }
   addItemByID(itemID: ItemID, count: number) {
     const items = this.unitEntity.items;
 
     if (!Items.has(itemID)) {
-      return;
+      return this;
     }
 
     if (!items[itemID]) {
@@ -104,25 +122,31 @@ export class Unit implements IUnit {
       items[itemID].push(Items.getData(itemID) as ItemData);
     }
     this._reinitItems();
+
+    return this;
   }
   removeItemByID(itemID: ItemID, count: number) {
     const items = this.unitEntity.items;
 
     if (!Items.has(itemID)) {
-      return;
+      return this;
     }
 
     if (!items[itemID]?.length) {
-      return;
+      return this;
     }
 
     for (let i = 0; i < count; i++) {
       items[itemID].pop();
     }
     this._reinitItems();
+
+    return this;
   }
   useItem(item: Item) {
     this._reinitItems();
+
+    return this;
   }
 
   equip(xid: XID) {
@@ -145,6 +169,8 @@ export class Unit implements IUnit {
       })
     });
     this._reinitItems();
+
+    return this;
   }
   unequip(xid: XID) {
     Object.keys(this.unitEntity.items).some(itemID => {
@@ -166,32 +192,46 @@ export class Unit implements IUnit {
       })
     });
     this._reinitItems();
+
+    return this;
   }
+
+  equipItem(item: IItem) {
+    return this.equip(item.data.xid);
+  }
+  unequipItem(item: IItem) {
+    return this.unequip(item.data.xid);
+  }
+
   get equipments() {
     return Object.values(this.items).flatMap(itemList => {
       return itemList.filter(item => item.data.isEquipable && item.data.isEquipped);
     })
   }
 
-  increaseStatus(status: UnitStatusType, val: number): void {
-    this.setStatus(status, this.unitEntity[status] + val);
+  increaseStatus(status: UnitStatusType, val: number): UnitSelf {
+    return this.setStatus(status, this.unitEntity[status] + val);
   }
-  decreaseStatus(status: UnitStatusType, val: number): void {
-    this.setStatus(status, this.unitEntity[status] - val);
+  decreaseStatus(status: UnitStatusType, val: number): UnitSelf {
+    return this.setStatus(status, this.unitEntity[status] - val);
   }
-  setStatus(status: UnitStatusType, val: number): void {
+  setStatus(status: UnitStatusType, val: number): UnitSelf {
     this.unitEntity[status] = val;
+
+    return this;
   }
 
-  on(event: 'beforeAttack' | 'doAttack' | 'afterAttack', listener: DataCallback<UnitAttackEventData>): VoidCallback;
-  on(event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', listener: DataCallback<UnitAttackedEventData>): VoidCallback;
-  on(event: UnitEventType, listener: DataCallback<any>): VoidCallback {
+  on(event: 'beforeAttack' | 'afterAttack', listener: DataCallback<UnitAttackEventData>): VoidCallback;
+  on(event: 'beforeAttacked' | 'afterAttacked', listener: DataCallback<UnitAttackedEventData>): VoidCallback;
+  on(event: 'dealDamage' | 'takeDamage', listener: DataCallback<UnitDamageEventData>): VoidCallback;
+  on(event: UnitEventType, listener: DataCallback<UnitEventData>): VoidCallback {
     return this._subscriber.subscribe(this._publisher, event, listener);
   }
 
   fire(event: UnitEventType, data: UnitEventData): void;
-  fire(event: 'beforeAttack' | 'doAttack' | 'afterAttack', data: UnitAttackEventData): void;
-  fire(event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', data: UnitAttackedEventData): void;
+  fire(event: 'beforeAttack' | 'afterAttack', data: UnitAttackEventData): void;
+  fire(event: 'beforeAttacked' | 'afterAttacked', data: UnitAttackedEventData): void;
+  fire(event: 'dealDamage' | 'takeDamage', data: UnitDamageEventData): void;
   fire(event: UnitEventType, data: UnitEventData): void {
     return this._publisher.publish(event, data);
   }

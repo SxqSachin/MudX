@@ -11,17 +11,17 @@ export const shield: ItemData = {
   isEquipped: false,
   isConsumable: false,
   actions: [
-    {
-      target: "target",
-      effectTo: "curHP",
-      val: -10,
-    },
-    {
-      target: "self",
-      effectTo: "curHP",
-      val: 10,
-    },
   ],
-  onEquip: [],
-  onUnequip: [],
+  onEquip: [
+    {
+      effectTo: 'phyDef',
+      val: 2,
+    }
+  ],
+  onUnequip: [
+    {
+      effectTo: 'phyDef',
+      val: -2,
+    }
+  ],
 };

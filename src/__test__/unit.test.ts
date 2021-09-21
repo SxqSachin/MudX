@@ -36,11 +36,20 @@ describe('Unit Test', () => {
     // const enemy = new Unit(unitData);
 
     const sword = Items.get('sword');
-    unit.addItem(sword);
-    unit.equip(sword.data.xid);
+    unit.addItem(sword).equipItem(sword);
+
+    const shield = Items.get('shield');
+    enemy.addItem(shield).equipItem(shield);
+
+    unit.on('beforeAttack', data => {
+      console.log('beforeAttack');
+    });
+    enemy.on('beforeAttacked', data => {
+      console.log('beforeAttacked');
+    });
 
     unit.attack(enemy);
 
-    assert.equal(enemy.status.curHP, 7);
+    assert.equal(enemy.status.curHP, 9);
   });
 });

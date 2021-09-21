@@ -6,29 +6,38 @@ import { XID, XObject, XSerializable } from "./Object";
 import { ISkill, SkillData, SkillID } from "./Skill";
 
 export type UnitEventType =
-  'beforeAttack' | 'doAttack' | 'afterAttack' |
-'beforeAttacked' | 'beAttacked' | 'afterAttacked';
+  'beforeAttack' | 'afterAttack' |
+  'beforeAttacked' | 'afterAttacked' |
+  'dealDamage' | 'takeDamage';
+;
 
 
 export type UnitEventData = {
-}
-export type UnitAttackEventData = UnitEventData & {
   target: IUnit;
-}
-export type UnitAttackedEventData = UnitEventData & {
   source: IUnit;
+  damage: number;
 }
+export type UnitAttackEventData = UnitEventData;
+export type UnitAttackedEventData = UnitEventData;
+export type UnitDamageEventData = UnitEventData;
 
+type _T1<T, T2> = (event: T, data: T2) => void;
 export type UnitFireEventFunc =
-  ((event: UnitEventType, data: UnitEventData) => void) |
-  ((event: 'beforeAttack' | 'doAttack' | 'afterAttack', data: UnitAttackEventData) => void) |
-  ((event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', data: UnitAttackedEventData) => void);
+  _T1<UnitEventType, UnitEventData> &
+  _T1<'beforeAttack' | 'afterAttack', UnitAttackEventData> &
+  _T1<'beforeAttacked' | 'afterAttacked', UnitAttackedEventData> &
+  _T1<'dealDamage' | 'takeDamage', UnitDamageEventData>;
+  // (event: UnitEventType, data: UnitEventData) => void |
+  // ((event: 'beforeAttack' | 'doAttack' | 'afterAttack', data: UnitAttackEventData) => void) |
+  // ((event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', data: UnitAttackedEventData) => void);
 
-type _UnitEventListener<E, T> = (event: E, listener: DataCallback<T>) => VoidCallback;
+type _T2<T, T2> = (event: T, listener: DataCallback<T2>) => VoidCallback;
 export type UnitEventListener =
-  _UnitEventListener<UnitEventType, UnitEventData> |
-  _UnitEventListener<'beforeAttack' | 'doAttack' | 'afterAttack', UnitAttackEventData> |
-  _UnitEventListener<'beforeAttacked' | 'beAttacked' | 'afterAttacked', UnitAttackedEventData>;
+  _T2<'beforeAttack' | 'afterAttack', UnitAttackEventData> &
+  _T2<'beforeAttacked' | 'afterAttacked', UnitAttackedEventData> &
+  _T2<'dealDamage' | 'takeDamage', UnitDamageEventData>;
+  // ((event: 'beforeAttack' | 'doAttack' | 'afterAttack', listener: DataCallback<UnitAttackEventData>) => VoidCallback) |
+  // ((event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', listener: DataCallback<UnitAttackedEventData>) => VoidCallback);
 
 export interface UnitEvent {
   /**
@@ -48,27 +57,31 @@ export interface UnitEvent {
 }
 
 // IUnit只是Entity的壳子，用于对数据进行操作
+export type UnitSelf = IUnit;
 export interface IUnit extends XObject, XSerializable, UnitEvent {
   attack(target: IUnit): void;
 
   dealDamage(target: IUnit, damage: number): void;
 
-  learnSkill(skill: ISkill): void;
-  forgetSkill(skill: ISkill): void;
-  castSkill(skill: ISkill): void;
+  learnSkill(skill: ISkill): UnitSelf;
+  forgetSkill(skill: ISkill): UnitSelf;
+  castSkill(skill: ISkill): UnitSelf;
 
-  addItemByID(itemID: ItemID, count: number): void;
-  removeItemByID(itemID: ItemID, count: number): void;
-  removeItem(item: IItem): void;
-  addItem(item: IItem): void;
-  useItem(item: IItem): void;
+  addItemByID(itemID: ItemID, count: number): UnitSelf;
+  removeItemByID(itemID: ItemID, count: number): UnitSelf;
+  removeItem(item: IItem): UnitSelf;
+  addItem(item: IItem): UnitSelf;
+  useItem(item: IItem): UnitSelf;
 
-  equip(xid: XID): void;
-  unequip(xid: XID): void;
+  equip(xid: XID): UnitSelf;
+  unequip(xid: XID): UnitSelf;
 
-  increaseStatus(statusKey: UnitStatusType, val: number): void;
-  decreaseStatus(statusKey: UnitStatusType, val: number): void;
-  setStatus(statusKey: UnitStatusType, val: number): void;
+  equipItem(Item: IItem): UnitSelf;
+  unequipItem(Item: IItem): UnitSelf;
+
+  increaseStatus(statusKey: UnitStatusType, val: number): UnitSelf;
+  decreaseStatus(statusKey: UnitStatusType, val: number): UnitSelf;
+  setStatus(statusKey: UnitStatusType, val: number): UnitSelf;
 
   items: Readonly<{ [id in ItemID]: IItem[] }>;
   skills: Readonly<{ [id in SkillID]: ISkill }>;
