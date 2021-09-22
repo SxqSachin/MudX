@@ -21,11 +21,17 @@ export const shield: ItemData = {
     },
     (self: IUnit) => {
       self.on('takeDamage', data => {
-        if (Dice.d6 > 3) {
-          const damage = data.damage;
-          console.log('damaged', damage);
-          self.increaseStatus('curHP', damage);
+        // if (Dice.d6 > 3) {
+        //   // const damage = data.damage;
+        //   // console.log('damaged', damage);
+        //   // self.increaseStatus('curHP', 1);
+        // }
+
+        if (data.damage) {
+          data.damage -= 1;
         }
+
+        return data;
       });
     }
   ],

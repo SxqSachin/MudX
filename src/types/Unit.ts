@@ -1,4 +1,4 @@
-import { DataCallback, VoidCallback } from ".";
+import { DataCallback, DataProcessCallback, VoidCallback } from ".";
 import { Item } from "../models/Item";
 import { Skill } from "../models/Skill";
 import { IItem, ItemData, ItemID } from "./Item";
@@ -8,34 +8,51 @@ import { ISkill, SkillData, SkillID } from "./Skill";
 export type UnitEventType =
   'beforeAttack' | 'afterAttack' |
   'beforeAttacked' | 'afterAttacked' |
-  'dealDamage' | 'takeDamage';
+  'dealDamage' | 'takeDamage' |
+  'addItem' | 'removeItem' |
+  'equipItem' | 'unequipItem' |
+  'learnSkill' | 'forgetSkill' |
+  'castSkill' | 'beSkillTarget'
+  ;
 ;
 
 
 export type UnitEventData = {
-  target: IUnit;
-  source: IUnit;
-  damage: number;
-}
-export type UnitAttackEventData = UnitEventData;
-export type UnitAttackedEventData = UnitEventData;
-export type UnitDamageEventData = UnitEventData;
+  target?: IUnit;
+  source?: IUnit;
+  damage?: number;
 
-type _T1<T, T2> = (event: T, data: T2) => void;
+  item?: IItem;
+  skill?: ISkill;
+}
+export type UnitAttackEventData = Omit<UnitEventData, 'item' | 'skill'>;
+export type UnitAttackedEventData = Omit<UnitEventData, 'item' | 'skill'>;
+export type UnitDamageEventData = Omit<UnitEventData, 'item' | 'skill'>;
+
+export type UnitItemEventData = Pick<UnitEventData, 'item'>;
+export type UnitSkillEventData = Pick<UnitEventData, 'source' | 'target' | 'skill'>;
+const a: UnitSkillEventData = {} as UnitSkillEventData;
+
+type _T1<T, T2> = (event: T, data: T2) => T2 | null;
 export type UnitFireEventFunc =
-  _T1<UnitEventType, UnitEventData> &
   _T1<'beforeAttack' | 'afterAttack', UnitAttackEventData> &
   _T1<'beforeAttacked' | 'afterAttacked', UnitAttackedEventData> &
-  _T1<'dealDamage' | 'takeDamage', UnitDamageEventData>;
+  _T1<'dealDamage' | 'takeDamage', UnitDamageEventData> &
+  _T1<'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', UnitItemEventData> &
+  _T1<'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', UnitSkillEventData>
+  ;
   // (event: UnitEventType, data: UnitEventData) => void |
   // ((event: 'beforeAttack' | 'doAttack' | 'afterAttack', data: UnitAttackEventData) => void) |
   // ((event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', data: UnitAttackedEventData) => void);
 
-type _T2<T, T2> = (event: T, listener: DataCallback<T2>) => VoidCallback;
+type _T2<T, T2> = (event: T, listener: DataProcessCallback<T2>) => VoidCallback;
 export type UnitEventListener =
   _T2<'beforeAttack' | 'afterAttack', UnitAttackEventData> &
   _T2<'beforeAttacked' | 'afterAttacked', UnitAttackedEventData> &
-  _T2<'dealDamage' | 'takeDamage', UnitDamageEventData>;
+  _T2<'dealDamage' | 'takeDamage', UnitDamageEventData> &
+  _T2<'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', UnitItemEventData> &
+  _T2<'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', UnitSkillEventData>
+  ;
   // ((event: 'beforeAttack' | 'doAttack' | 'afterAttack', listener: DataCallback<UnitAttackEventData>) => VoidCallback) |
   // ((event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', listener: DataCallback<UnitAttackedEventData>) => VoidCallback);
 
@@ -56,16 +73,20 @@ export interface UnitEvent {
   fire: UnitFireEventFunc;
 }
 
+export type DamageInfo = {
+  triggerEvent: boolean;
+}
+
 // IUnit只是Entity的壳子，用于对数据进行操作
 export type UnitSelf = IUnit;
 export interface IUnit extends XObject, XSerializable, UnitEvent {
   attack(target: IUnit): void;
 
-  dealDamage(target: IUnit, damage: number): void;
+  dealDamage(target: IUnit, damage: number, info?: DamageInfo): void;
 
   learnSkill(skill: ISkill): UnitSelf;
   forgetSkill(skill: ISkill): UnitSelf;
-  castSkill(skill: ISkill): UnitSelf;
+  castSkill(skillID: SkillID, target: IUnit): UnitSelf;
 
   addItemByID(itemID: ItemID, count: number): UnitSelf;
   removeItemByID(itemID: ItemID, count: number): UnitSelf;

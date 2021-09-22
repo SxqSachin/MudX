@@ -5,15 +5,23 @@ export const duocui: SkillData = {
   id: "duocui",
   name: "夺萃",
   actions: [
-    {
-      target: "target",
-      effectTo: "curHP",
-      val: -10,
-    },
-    {
-      target: "self",
-      effectTo: "curHP",
-      val: 10,
-    },
+    (self, target) => {
+      self.dealDamage(target, target.status.maxHP - 1, {
+        triggerEvent: true
+      });
+    }
   ],
+  onLearn: [
+    self => {
+      self.on('dealDamage', data => {
+        self.dealDamage(data.target, 5, {
+          triggerEvent: false,
+        });
+      })
+      self.on('takeDamage', data => {
+        self.increaseStatus('curHP', 0);
+      })
+    }
+  ],
+  onForget: [],
 };

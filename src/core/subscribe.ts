@@ -1,4 +1,4 @@
-import { DataCallback, VoidCallback } from "../types"
+import { DataCallback, DataProcessCallback, VoidCallback } from "../types"
 import { EMPTY_XID, XID } from "../types/Object";
 import { uuid } from "../utils/uuid";
 
@@ -15,12 +15,12 @@ export class Subscriber<EVENT, DATA> {
     this._xid = uuid();
   }
 
-  subscribe(publisher: Publisher<EVENT, DATA>, event: XEvent<EVENT>, listener: DataCallback<DATA>): VoidCallback {
+  subscribe(publisher: Publisher<EVENT, DATA>, event: XEvent<EVENT>, listener: DataProcessCallback<DATA>): VoidCallback {
     return publisher.addSubscribe(this, event, listener);
   }
 }
 
-type SubscribeEventObject<EVENT, DATA> = {event: XEvent<EVENT>, xid: EventDataXID, listener: DataCallback<XEventData<DATA>>};
+type SubscribeEventObject<EVENT, DATA> = {event: XEvent<EVENT>, xid: EventDataXID, listener: DataProcessCallback<XEventData<DATA>>};
 export class Publisher<EVENT, DATA> {
   private _subscriberMap!: Map<SubscriberXID, SubscribeEventObject<EVENT, DATA>[]>;
 
@@ -28,17 +28,22 @@ export class Publisher<EVENT, DATA> {
     this._subscriberMap = new Map();
   }
 
-  publish(event: XEvent<EVENT>, data: XEventData<DATA>): void {
+  publish(event: XEvent<EVENT>, data: XEventData<DATA>): DATA {
+    let curData = data;
+
     this._subscriberMap.forEach(subscribeData => {
       subscribeData.forEach(eventData => {
         if (eventData.event === event) {
-          eventData.listener(data);
+          const curProcessRes = eventData.listener(curData);
+          curData = curProcessRes ?? curData;
         }
       })
     })
+
+    return curData;
   }
 
-  addSubscribe(subscribe: Subscriber<EVENT, DATA>, event: XEvent<EVENT>, listener: DataCallback<XEventData<DATA>>): VoidCallback {
+  addSubscribe(subscribe: Subscriber<EVENT, DATA>, event: XEvent<EVENT>, listener: DataProcessCallback<XEventData<DATA>>): VoidCallback {
     const subscribeXID = subscribe.xid;
     const listenerXID = uuid();
 

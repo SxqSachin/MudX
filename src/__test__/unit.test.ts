@@ -1,5 +1,6 @@
 import assert from "assert";
 import { Items } from "../data";
+import { Skills } from "../data/skills";
 import { Item } from "../models/Item";
 import { Unit } from "../models/Unit";
 import { IUnit, UnitData } from "../types/Unit";
@@ -38,18 +39,19 @@ describe('Unit Test', () => {
     const sword = Items.get('sword');
     unit.addItem(sword).equipItem(sword);
 
+    const sword2 = Items.get('sword');
+    unit.addItem(sword2).equipItem(sword2);
+
     const shield = Items.get('shield');
     enemy.addItem(shield).equipItem(shield);
 
-    unit.on('beforeAttack', data => {
-      console.log('beforeAttack');
-    });
-    enemy.on('beforeAttacked', data => {
-      console.log('beforeAttacked');
-    });
+    // unit.learnSkill(Skills.get('duocui'));
+    // enemy.learnSkill(Skills.get('duocui'));
 
     unit.attack(enemy);
 
-    assert.equal(enemy.status.curHP, 10);
+    console.log(localStorage)
+
+    assert.equal(enemy.status.curHP, 7);
   });
 });

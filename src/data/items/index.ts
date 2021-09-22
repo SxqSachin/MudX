@@ -3,7 +3,7 @@ import jsonList from './json';
 import { deepClone, toArray } from '../../utils';
 import { Action } from '../../types/action';
 import { Item } from '../../models/Item';
-import { ItemData, ItemID } from '../../types/Item';
+import { IItem, ItemData, ItemID } from '../../types/Item';
 import { EMPTY_XID } from '../../types/Object';
 import { UnitStatusType } from '../../types/Unit';
 
@@ -78,13 +78,13 @@ const DEFAULT_ITEM_DATA: ItemData = Object.freeze({
   isEquipable: false,
   xid: EMPTY_XID,
 });
-const DEFAULT_ITEM: Item = new Item(DEFAULT_ITEM_DATA);
+const DEFAULT_ITEM: IItem = new Item(DEFAULT_ITEM_DATA);
 
 const Items = {
-  get: (itemID: ItemID): Item => {
+  get: (itemID: ItemID): IItem => {
     return Items.create(itemID);
   },
-  create: (itemID: ItemID): Item => {
+  create: (itemID: ItemID): IItem => {
     const itemData = ItemDataMap.get(itemID);
 
     if (!itemData) {

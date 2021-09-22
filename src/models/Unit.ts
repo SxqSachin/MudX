@@ -1,15 +1,20 @@
 import { Publisher, Subscriber } from "../core/subscribe";
 import { Items } from "../data";
-import { DataCallback, VoidCallback } from "../types";
+import { Skills } from "../data/skills";
+import { DataCallback, DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitSelf, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitItemEventData, UnitSelf, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
 import { hasProperity } from "../utils/object";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";
 import { Skill } from "./Skill";
+
+const DefaultDamageInfo: DamageInfo = {
+  triggerEvent: true,
+};
 
 export class Unit implements IUnit {
   private unitEntity!: UnitData;
@@ -44,32 +49,57 @@ export class Unit implements IUnit {
     target.fire('beforeAttacked', { source: this, target, damage: damageVal });
 
     this.dealDamage(target, damageVal)
-    this.fire('dealDamage', { source: this, target, damage: damageVal });
-    target.fire('takeDamage', { source: this, target, damage: damageVal });
 
     this.fire('afterAttack', { source: this, target, damage: damageVal });
     target.fire('afterAttacked', { source: this, target, damage: damageVal });
   }
 
-  dealDamage(target: IUnit, damage: number) {
+  dealDamage(target: IUnit, damage: number, info: DamageInfo = DefaultDamageInfo) {
+    if (info?.triggerEvent) {
+      damage = this.fire('dealDamage', { source: this, target, damage })?.damage ?? damage;
+      damage = target.fire('takeDamage', { source: this, target, damage })?.damage ?? damage;
+    }
+
     target.decreaseStatus('curHP', Math.max(damage, 0));
   }
 
   learnSkill(skill: ISkill) {
     const skillData = skill.data;
     const { id } = skillData;
+
+    if (!!this.unitEntity.skills[id]) {
+      return this;;
+    }
+
     this.unitEntity.skills[id] = skillData;
+
+    this._reinitSkills();
+
+    this.skills[id].onLearn(this);
+    this.fire('learnSkill', { skill: this.skills[id] })
+
+    return this;
+  }
+  forgetSkill({ data: { id } }: ISkill) {
+    delete this.unitEntity.skills[id];
+
+    this.skills[id].onLearn(this);
+    this.fire('forgetSkill', { skill: this.skills[id] })
+
     this._reinitSkills();
 
     return this;
   }
-  forgetSkill(skill: ISkill) {
-    delete this.unitEntity.skills[skill.data.id];
-    this._reinitSkills();
+  castSkill(skillID: SkillID, target: IUnit) {
+    if (!this.skills[skillID]) {
+      return this;
+    }
 
-    return this;
-  }
-  castSkill(skill: ISkill) {
+    this.skills[skillID].cast(this, target);
+    this.fire('castSkill', { target, skill: this.skills[skillID] })
+    target.fire('beSkillTarget', { source: this, skill: this.skills[skillID] })
+
+
     return this;
   }
 
@@ -221,18 +251,11 @@ export class Unit implements IUnit {
     return this;
   }
 
-  on(event: 'beforeAttack' | 'afterAttack', listener: DataCallback<UnitAttackEventData>): VoidCallback;
-  on(event: 'beforeAttacked' | 'afterAttacked', listener: DataCallback<UnitAttackedEventData>): VoidCallback;
-  on(event: 'dealDamage' | 'takeDamage', listener: DataCallback<UnitDamageEventData>): VoidCallback;
-  on(event: UnitEventType, listener: DataCallback<UnitEventData>): VoidCallback {
+  on(event: UnitEventType, listener: DataProcessCallback<UnitEventData>): VoidCallback {
     return this._subscriber.subscribe(this._publisher, event, listener);
   }
 
-  fire(event: UnitEventType, data: UnitEventData): void;
-  fire(event: 'beforeAttack' | 'afterAttack', data: UnitAttackEventData): void;
-  fire(event: 'beforeAttacked' | 'afterAttacked', data: UnitAttackedEventData): void;
-  fire(event: 'dealDamage' | 'takeDamage', data: UnitDamageEventData): void;
-  fire(event: UnitEventType, data: UnitEventData): void {
+  fire(event: UnitEventType, data: UnitEventData): UnitEventData {
     return this._publisher.publish(event, data);
   }
 

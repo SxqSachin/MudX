@@ -14,5 +14,9 @@ export function toArray<T>(obj: T | T[]): T[] {
     return obj;
   }
 
+  if (!obj) {
+    return []
+  }
+
   return [obj];
 }
