@@ -1,5 +1,7 @@
 import { testGameEvent } from './test';
 
-export default [
+const events = [
   testGameEvent,
 ]
+
+export default events;

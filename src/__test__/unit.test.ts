@@ -1,4 +1,5 @@
 import assert from "assert";
+import { XStorage } from "../core/storage";
 import { Items } from "../data";
 import { Skills } from "../data/skills";
 import { Item } from "../models/Item";
@@ -48,9 +49,12 @@ describe('Unit Test', () => {
     // unit.learnSkill(Skills.get('duocui'));
     // enemy.learnSkill(Skills.get('duocui'));
 
-    unit.attack(enemy);
+    console.log(XStorage.getItem('unit'));
+    XStorage.setItem('unit', unit.serialize())
+    console.log(XStorage.getItem('unit'));
 
-    console.log(localStorage)
+
+    unit.attack(enemy);
 
     assert.equal(enemy.status.curHP, 7);
   });

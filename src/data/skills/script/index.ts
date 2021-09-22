@@ -1,5 +1,6 @@
 import { duocui } from './duocui';
 
-export default [
+const a = [
   duocui
 ]
+export default a;

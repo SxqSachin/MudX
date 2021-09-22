@@ -18,12 +18,12 @@ export type UnitEventType =
 
 
 export type UnitEventData = {
-  target?: IUnit;
-  source?: IUnit;
-  damage?: number;
+  target: IUnit;
+  source: IUnit;
+  damage: number;
 
-  item?: IItem;
-  skill?: ISkill;
+  item: IItem;
+  skill: ISkill;
 }
 export type UnitAttackEventData = Omit<UnitEventData, 'item' | 'skill'>;
 export type UnitAttackedEventData = Omit<UnitEventData, 'item' | 'skill'>;

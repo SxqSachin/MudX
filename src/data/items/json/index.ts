@@ -1,7 +1,7 @@
 import sword from './sword.json';
 
-sword.actions
-
-export default [
+const a = [
   sword,
 ]
+
+export default a;

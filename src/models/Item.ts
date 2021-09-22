@@ -1,4 +1,4 @@
-import { actionExecuter, executeSelfAction } from "../core/actionExecuter";
+import { executeSelfAction } from "../core/actionExecuter";
 import { IItem, ItemData } from "../types/Item";
 import { isEmptyXID } from "../types/Object";
 import { IUnit } from "../types/Unit";

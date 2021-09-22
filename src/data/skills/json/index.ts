@@ -1,5 +1,6 @@
 import heal from './heal.json';
 
-export default [
+const a = [
   heal,
 ]
+export default a;

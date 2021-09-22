@@ -1,7 +1,4 @@
 import scriptList from './script';
-import { deepClone, toArray } from '../../utils';
-import { ItemData, ItemID } from '../../types/Item';
-import { EMPTY_XID } from '../../types/Object';
 import { GameEvent, GameEventID } from '../../types/game-event';
 
 const EventMap: Map<string, GameEvent> = new Map();
@@ -14,9 +11,13 @@ const DEFAULT_GAME_EVENT: GameEvent = {
   id: '__DEFAULT__',
   name: '__DEFAULT__',
   description: '',
-  next: () => DEFAULT_GAME_EVENT,
   onEnter: [],
   onLeave: [],
+  options: {
+    id: '__DEFAULT__',
+    name: '__DEFAULT_NAME__',
+    next: () => DEFAULT_GAME_EVENT,
+  }
 };
 
 const GameEvents = {

@@ -1,8 +1,6 @@
 import { ItemData } from "../../../types/Item";
 import { EMPTY_XID } from "../../../types/Object";
-import { SkillData } from "../../../types/Skill";
 import { IUnit } from "../../../types/Unit";
-import { Dice } from "../../../utils/random";
 
 export const shield: ItemData = {
   xid: EMPTY_XID,

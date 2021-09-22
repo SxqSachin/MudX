@@ -1,7 +1,4 @@
-import { useEffect } from "react";
-import { Items, SkillMap } from "../data";
-import { Skill } from "../models/Skill";
-import { Unit } from "../models/Unit";
+import { Skills } from "../data";
 import { Action, SelfAction } from "../types/action";
 import { IUnit } from "../types/Unit";
 
@@ -50,7 +47,7 @@ export function actionExecuter(
       unitEffectActionMap.item[effectValDirection](action.itemID, action.val);
       break;
     case 'skill':
-      const skill = SkillMap.get(action.skillID);
+      const skill = Skills.get(action.skillID);
       if (!skill) {
         break;
       }
@@ -95,7 +92,7 @@ export function executeSelfAction(action: SelfAction, self: IUnit): void {
       unitEffectActionMap.item[effectValDirection](action.itemID, action.val);
       break;
     case 'skill':
-      const skill = SkillMap.get(action.skillID);
+      const skill = Skills.get(action.skillID);
       if (!skill) {
         break;
       }

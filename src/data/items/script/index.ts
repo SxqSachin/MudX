@@ -1,5 +1,6 @@
 import { shield } from './shield';
 
-export default [
+const a = [
   shield 
 ]
+export default a;

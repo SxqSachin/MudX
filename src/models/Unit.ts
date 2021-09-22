@@ -5,7 +5,7 @@ import { DataCallback, DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitItemEventData, UnitSelf, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
 import { hasProperity } from "../utils/object";
 import { uuid } from "../utils/uuid";
@@ -76,7 +76,7 @@ export class Unit implements IUnit {
     this._reinitSkills();
 
     this.skills[id].onLearn(this);
-    this.fire('learnSkill', { skill: this.skills[id] })
+    this.fire('learnSkill', { source: this, target: this, skill: this.skills[id] })
 
     return this;
   }
@@ -84,7 +84,7 @@ export class Unit implements IUnit {
     delete this.unitEntity.skills[id];
 
     this.skills[id].onLearn(this);
-    this.fire('forgetSkill', { skill: this.skills[id] })
+    this.fire('forgetSkill', { source: this, target: this, skill: this.skills[id] })
 
     this._reinitSkills();
 
@@ -96,8 +96,8 @@ export class Unit implements IUnit {
     }
 
     this.skills[skillID].cast(this, target);
-    this.fire('castSkill', { target, skill: this.skills[skillID] })
-    target.fire('beSkillTarget', { source: this, skill: this.skills[skillID] })
+    this.fire('castSkill', { source: this, target, skill: this.skills[skillID] })
+    target.fire('beSkillTarget', { source: this, target, skill: this.skills[skillID] })
 
 
     return this;
@@ -251,10 +251,20 @@ export class Unit implements IUnit {
     return this;
   }
 
+  on(event: 'beforeAttack' | 'afterAttack', listener: DataProcessCallback<UnitAttackEventData>): VoidCallback;
+  on(event: 'beforeAttacked' | 'afterAttacked', listener: DataProcessCallback<UnitAttackedEventData>): VoidCallback;
+  on(event: 'dealDamage' | 'takeDamage', listener: DataProcessCallback<UnitDamageEventData>): VoidCallback;
+  on(event: 'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', listener: DataProcessCallback<UnitItemEventData>): VoidCallback;
+  on(event: 'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', listener: DataProcessCallback<UnitSkillEventData>): VoidCallback;
   on(event: UnitEventType, listener: DataProcessCallback<UnitEventData>): VoidCallback {
     return this._subscriber.subscribe(this._publisher, event, listener);
   }
 
+  fire(event: 'beforeAttack' | 'afterAttack', data: UnitAttackEventData): UnitAttackEventData;
+  fire(event: 'beforeAttacked' | 'afterAttacked', data: UnitAttackedEventData): UnitAttackedEventData;
+  fire(event: 'dealDamage' | 'takeDamage', data: UnitDamageEventData): UnitAttackedEventData;
+  fire(event: 'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', data: UnitItemEventData): UnitItemEventData;
+  fire(event: 'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', data: UnitSkillEventData): UnitSkillEventData;
   fire(event: UnitEventType, data: UnitEventData): UnitEventData {
     return this._publisher.publish(event, data);
   }
@@ -294,6 +304,10 @@ export class Unit implements IUnit {
   }
   get powDef() {
     return this.unitEntity.powDef;
+  }
+
+  serialize(): string {
+    return JSON.stringify(this.unitEntity);
   }
 }
 //  get maxHP() { return this.unitEntity.maxHP; }

@@ -9,4 +9,5 @@ export type XSerializable = {
 }
 
 export interface XObject extends XSerializable {
+  serialize(): string;
 }
