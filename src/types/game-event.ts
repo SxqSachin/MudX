@@ -1,4 +1,5 @@
 import { SelfAction } from "./action";
+import { ConditionExpr } from "./condition";
 import { IUnit } from "./Unit";
 
 export type GameEventID = string;
@@ -7,13 +8,18 @@ export type GameEvent = {
 
   name: string;
 
-  description: string;
+  forks: GameEventFork | GameEventFork[];
+}
+
+export type GameEventFork = {
+  condition?: ConditionExpr;
+  description: string | (() => string);
 
   onEnter: SelfAction | SelfAction[];
   onLeave: SelfAction | SelfAction[];
 
   options: GameEventOption | GameEventOption[];
-}
+};
 
 export type GameEventOptionID = string;
 export type GameEventOption = {

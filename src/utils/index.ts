@@ -1,6 +1,6 @@
 import clone from 'just-clone';
 
-export function isStrint(obj: any) {
+export function isString(obj: any) {
   return typeof obj === 'string';
 }
 
