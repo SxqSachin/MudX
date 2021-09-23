@@ -113,9 +113,13 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
   phyDef: number;
   powAtk: number;
   powDef: number;
+
+  name: string;
 }
 
 export type UnitData = XSerializable & {
+  name: string;
+
   maxHP: number;
   maxMP: number;
   maxSP: number;
@@ -140,7 +144,7 @@ export type UnitData = XSerializable & {
   items: { [id in ItemID]: ItemData[] };
   skills: { [id in SkillID]: SkillData };
 }
-export type UnitStatusType = Exclude<keyof UnitData, 'items' | 'skills' | 'xid'>;
+export type UnitStatusType = Exclude<keyof UnitData, 'items' | 'skills' | 'xid' | 'name'>;
 
 export type SourceUnit = IUnit;
 export type TargetUnit = IUnit;

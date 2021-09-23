@@ -91,7 +91,7 @@ const Items = {
       return DEFAULT_ITEM;
     }
 
-    return new Item(itemData);
+    return new Item(deepClone(itemData));
   },
   getData: (itemID: ItemID): ItemData => {
     const itemData = ItemDataMap.get(itemID);

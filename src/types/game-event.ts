@@ -29,5 +29,7 @@ export type GameEventOption = {
 
   note?: string;
 
+  onChoose?: SelfAction | SelfAction[];
+
   next: GameEventID | ((player: IUnit) => GameEventID | GameEvent);
 }

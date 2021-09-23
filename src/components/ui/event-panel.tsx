@@ -40,11 +40,11 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
       <h2>{event.name}</h2>
       <hr className="my-4"/>
       <p>{desc}</p>
-      <div className="flex flex-col">
+      <div className="flex flex-row w-full justify-around">
       {
         toArray(fork.options).map((option, index) => {
           return (
-            <button key={option.name + option.id + index} onClick={() => onChooseOption(option)}>{option.name}</button>
+            <button className="border border-black rounded-md px-6 py-4" key={option.name + option.id + index} onClick={() => onChooseOption(option)}>{option.name}</button>
           )
         })
       }

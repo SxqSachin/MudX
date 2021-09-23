@@ -2,7 +2,7 @@ import scriptSkillList from './script';
 import jsonSkillList from './json';
 import { Skill } from '../../models/Skill';
 import { ISkill, SkillData, SkillID } from '../../types/Skill';
-import { toArray } from '../../utils';
+import { deepClone, toArray } from '../../utils';
 import { Action, SelfAction } from '../../types/action';
 
 const SkillMap: Map<string, Skill> = new Map();
@@ -58,7 +58,7 @@ jsonSkillList.forEach(jsonSkill => {
 
 const Skills = {
   get: (skillID: SkillID): ISkill => {
-    return SkillMap.get(skillID) as any as ISkill;
+    return deepClone(SkillMap.get(skillID) as any as ISkill);
   },
 }
 
