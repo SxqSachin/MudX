@@ -6,14 +6,21 @@ const event: GameEvent = Object.freeze({
   name: "调试中心",
 
   forks: {
-    description: () => `这里是调试中心。(编号-${getRandomString()})}`,
-    onEnter: [],
-    onLeave: [],
+    description: () => `这里是调试中心。(编号-${getRandomString()})`,
 
     options: [
       {
         id: '1',
         name: "选项1",
+        onChoose: env => {
+          console.log('before choose', env.player.status.curHP);
+          if (env.player) {
+            env.player.dealDamage(env.player, 1);
+          }
+          console.log('after choose', env.player.status.curHP);
+
+          return env;
+        },
         next: () => {
           return "test-center";
         },

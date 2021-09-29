@@ -4,6 +4,26 @@ export function isString(obj: any) {
   return typeof obj === 'string';
 }
 
+export function isEmpty(obj: any) {
+  if (!obj) { // boolean number
+    return true;
+  }
+
+  if (typeof obj === 'string' && (!obj.length || obj === '')) { // string
+    return true;
+  }
+
+  if (Array.isArray(obj) && !obj.length) {
+    return true;
+  }
+
+  if (!Object.keys(obj)) { // obj
+    return true;
+  }
+
+  return false;
+}
+
 export function deepClone<T>(obj: T): T {
   return clone(obj as unknown as object) as unknown as T;
   // return JSON.parse(JSON.stringify(obj));

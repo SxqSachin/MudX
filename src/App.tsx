@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { BattlePanel } from "./components/ui/battle-panel";
 import { GameEventPanel } from "./components/ui/event-panel";
@@ -7,10 +7,12 @@ import './data';
 
 import { GameEvents } from "./data";
 import { Unit } from "./models/Unit";
-import { EnemyCharacterAtom, PlayerCharacterAtom } from "./store";
+import { EnemyCharacterAtom, GameEnvironmentAtom, PlayerCharacterAtom } from "./store";
 import { BattleAction } from "./types/battle";
+import { GameEnvironment } from "./types/game";
 import { GameEvent, GameEventOption } from "./types/game-event";
 import { IUnit } from "./types/Unit";
+import { toArray } from "./utils";
 import { Dice } from "./utils/random";
 
 function App() {
@@ -19,6 +21,12 @@ function App() {
   const [playerCharacter, setPlayerCharacter] = useRecoilState(PlayerCharacterAtom);
   const [enemy, setEnemy] = useRecoilState(EnemyCharacterAtom);
   const [, setForceUpdate] = useState([]);
+
+  const [gameEnvironment, setGameEnvironment] = useRecoilState(GameEnvironmentAtom);
+
+  const forceUpdate = () => {
+    setForceUpdate([]);
+  }
 
   useEffect(() => {
     setEvent(GameEvents.get('test-center'));
@@ -30,13 +38,32 @@ function App() {
 
     const enemy = Unit.create('enemy');
     setEnemy(enemy);
+
+    gameEnvironment.player = player;
+    gameEnvironment.enemy = enemy;
+
+    setGameEnvironment(gameEnvironment);
   }, []);
 
   const onChooseOption = (option: GameEventOption) => {
+    let gameEnv = gameEnvironment;
+    console.log(option);
+    toArray(option.onChoose).forEach(cb => {
+      if (!cb) {
+        return;
+      }
+
+      const processedGameEnv = cb(gameEnv);
+      if (processedGameEnv) {
+        gameEnv = processedGameEnv;
+      }
+    });
+    setGameEnvironment(gameEnv);
+
     if (typeof option.next === 'string') {
       setEvent(GameEvents.get(option.next));
     } else {
-      const res = option.next({} as IUnit);
+      const res = option.next(gameEnv);
 
       if (typeof res === 'string') {
         setEvent(GameEvents.get(res));
@@ -46,11 +73,7 @@ function App() {
     }
 
     setTest(Dice.d100);
-    console.log(option);
-  }
-
-  const forceUpdate = () => {
-    setForceUpdate([]);
+    forceUpdate();
   }
 
   const handleBattleAction = (action: BattleAction) => {
@@ -58,7 +81,6 @@ function App() {
       playerCharacter.attack(enemy);
       forceUpdate();
 
-      console.log(enemy.status.curHP);
     }
   }
 

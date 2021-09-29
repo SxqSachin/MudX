@@ -1,3 +1,5 @@
+import { DataProcessCallback } from ".";
+import { GameEnvironment } from "./game";
 import { IUnit, UnitData, UnitStatusType } from "./Unit";
 
 type ActionEffectData = {
@@ -18,3 +20,5 @@ export type Action = ({
 } & ActionEffectData) | ((self: IUnit, target: IUnit) => void);
 
 export type SelfAction = ActionEffectData | ((self: IUnit) => void);
+
+export type GameAction = DataProcessCallback<GameEnvironment>;
