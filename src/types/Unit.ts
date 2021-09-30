@@ -106,7 +106,8 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
 
   items: Readonly<{ [id in ItemID]: IItem[] }>;
   skills: Readonly<{ [id in SkillID]: ISkill }>;
-  status: Readonly<{ [status in UnitStatusType]: number }>;
+  status: Readonly<UnitStatus>;
+  data: Readonly<UnitData>;
   equipments: Readonly<IItem[]>;
 
   phyAtk: number;
@@ -145,6 +146,7 @@ export type UnitData = XSerializable & {
   skills: { [id in SkillID]: SkillData };
 }
 export type UnitStatusType = Exclude<keyof UnitData, 'items' | 'skills' | 'xid' | 'name'>;
+export type UnitStatus = { [status in UnitStatusType]: number };
 
 export type SourceUnit = IUnit;
 export type TargetUnit = IUnit;

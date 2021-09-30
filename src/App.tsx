@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { BattlePanel } from "./components/ui/battle-panel";
 import { GameEventPanel } from "./components/ui/event-panel";
+import { UnitStatusPanel } from "./components/ui/unit-status-panel";
 
 import './data';
 
@@ -20,7 +21,7 @@ function App() {
   const [test, setTest] = useState(1);
   const [playerCharacter, setPlayerCharacter] = useRecoilState(PlayerCharacterAtom);
   const [enemy, setEnemy] = useRecoilState(EnemyCharacterAtom);
-  const [, setForceUpdate] = useState([]);
+  const [isForceUpdate, setForceUpdate] = useState([]);
 
   const [gameEnvironment, setGameEnvironment] = useRecoilState(GameEnvironmentAtom);
 
@@ -43,6 +44,7 @@ function App() {
     gameEnvironment.enemy = enemy;
 
     setGameEnvironment(gameEnvironment);
+    forceUpdate();
   }, []);
 
   const onChooseOption = (option: GameEventOption) => {
@@ -80,16 +82,32 @@ function App() {
     if (action === 'ATTACK') {
       playerCharacter.attack(enemy);
       forceUpdate();
-
     }
   }
 
+  const BattlePanelMemo = useMemo(() => {
+    if (!(playerCharacter && enemy)) {
+      return <></>;
+    }
+
+    return <BattlePanel player={playerCharacter} enemy={enemy} onAction={handleBattleAction}></BattlePanel>
+  }, [isForceUpdate]);
+
+  if (!playerCharacter) {
+    return <></>;
+  }
+
   return (
-    <div className="App">
-      <GameEventPanel event={event} onChooseOption={onChooseOption}></GameEventPanel>
-      {
-        (playerCharacter && enemy) && <BattlePanel player={playerCharacter} enemy={enemy} onAction={handleBattleAction}></BattlePanel>
-      }
+    <div className="App flex flex-row p-8">
+      <div className="w-4/5 mr-4">
+        <GameEventPanel event={event} onChooseOption={onChooseOption}></GameEventPanel>
+        {
+          BattlePanelMemo
+        }
+      </div>
+      <div className="w-1/5 ml-4">
+        <UnitStatusPanel unit={playerCharacter}></UnitStatusPanel>
+      </div>
     </div>
   );
 }

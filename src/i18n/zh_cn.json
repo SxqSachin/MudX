@@ -1,0 +1,22 @@
+{
+  "maxHP": "最大生命",
+  "maxMP": "最大魔法",
+  "maxSP": "最大体力",
+  "curHP": "当前生命",
+  "curMP": "当前魔法",
+  "curSP": "当前体力",
+
+  "phy": "体质",
+  "strength": "力量",
+  "dexterity": "敏捷",
+  "intelligence": "智慧",
+  "talent": "天赋",
+  "luck": "运气",
+  "perception": "洞察",
+  "speed": "速度",
+
+  "phyAtk": "物理攻击",
+  "phyDef": "物理防御",
+  "powAtk": "魔法攻击",
+  "powDef": "魔法防御"
+}

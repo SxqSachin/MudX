@@ -13,11 +13,7 @@ const event: GameEvent = Object.freeze({
         id: '1',
         name: "选项1",
         onChoose: env => {
-          console.log('before choose', env.player.status.curHP);
-          if (env.player) {
-            env.player.dealDamage(env.player, 1);
-          }
-          console.log('after choose', env.player.status.curHP);
+          env.player.dealDamage(env.player, 1);
 
           return env;
         },

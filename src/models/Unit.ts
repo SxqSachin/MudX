@@ -5,7 +5,7 @@ import { DataCallback, DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
 import { hasProperity } from "../utils/object";
 import { uuid } from "../utils/uuid";
@@ -287,7 +287,18 @@ export class Unit implements IUnit {
   }
 
   get xid() { return this.unitEntity.xid; }
-  get status() { return this.unitEntity; }
+  get status(): UnitStatus {
+    const data: Partial<UnitData> = { ...this.unitEntity };
+    delete data.xid;
+    delete data.items;
+    delete data.skills;
+    delete data.name;
+
+    const status = data as UnitStatus;
+
+    return status;
+  }
+  get data() { return this.unitEntity; }
   get items() { return this._items; }
   get skills() { return this._skills; }
 
@@ -341,6 +352,29 @@ export class Unit implements IUnit {
     }
 
     return new Unit(unitData);
+  }
+
+  public static emptyStatus(): { [key in UnitStatusType]: number } {
+    return {
+      curHP: 0,
+      curMP: 0,
+      curSP: 0,
+      maxHP: 0,
+      maxMP: 0,
+      maxSP: 0,
+      phy: 0,
+      strength: 0,
+      dexterity: 0,
+      intelligence: 0,
+      luck: 0,
+      perception: 0,
+      speed: 0,
+      talent: 0,
+      phyAtk: 0,
+      phyDef: 0,
+      powAtk: 0,
+      powDef: 0,
+    }
   }
 }
 //  get maxHP() { return this.unitEntity.maxHP; }
