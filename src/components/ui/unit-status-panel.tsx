@@ -12,10 +12,6 @@ type UnitStatusPanelParam = {
   unit: IUnit,
 }
 export function UnitStatusPanel({unit}: UnitStatusPanelParam) {
-  console.log(unit.status, process.env);
-
-  ;
-
   return (
     <div className="w-full">
       <div className="flex flex-col">

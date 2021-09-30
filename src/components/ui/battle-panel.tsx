@@ -34,7 +34,7 @@ export function BattlePanel({player, enemy, onAction}: BattlePanelParam) {
         </div>
       </div>
       <div className="">
-        <button onClick={() => handleAction("ATTACK")}>Attack</button>
+        <button className="btn" onClick={() => handleAction("ATTACK")}>Attack</button>
       </div>
 
 

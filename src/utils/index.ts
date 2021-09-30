@@ -1,4 +1,5 @@
 import clone from 'just-clone';
+import { VoidCallback } from '../types';
 
 export function isString(obj: any) {
   return typeof obj === 'string';
@@ -40,3 +41,7 @@ export function toArray<T>(obj: T | T[]): T[] {
 
   return [obj];
 }
+
+// ====================
+
+export const noop: VoidCallback = () => void(0);

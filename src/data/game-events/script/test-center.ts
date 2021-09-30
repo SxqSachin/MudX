@@ -1,4 +1,9 @@
+import { addPlayerHPOption, removePlayerHPOption } from "../../../models/game-event-option";
+import { DataProcessCallback } from "../../../types";
+import { GameEnvironment } from "../../../types/game";
 import { GameEvent } from "../../../types/game-event";
+import { UnitStatus, UnitStatusType } from "../../../types/Unit";
+import { noop } from "../../../utils";
 import { getRandomString } from "../../../utils/random";
 
 const event: GameEvent = Object.freeze({
@@ -12,11 +17,7 @@ const event: GameEvent = Object.freeze({
       {
         id: '1',
         name: "选项1",
-        onChoose: env => {
-          env.player.dealDamage(env.player, 1);
-
-          return env;
-        },
+        onChoose: removePlayerHPOption(1),
         next: () => {
           return "test-center";
         },
@@ -24,6 +25,7 @@ const event: GameEvent = Object.freeze({
       {
         id: '2',
         name: "选项2",
+        onChoose: addPlayerHPOption(1),
         next: () => {
           return "test-center";
         },
@@ -31,4 +33,9 @@ const event: GameEvent = Object.freeze({
     ],
   },
 });
+
+//   => (env) => {
+//   env.player.increaseStatus('curHP', val);
+// }
+
 export default event;
