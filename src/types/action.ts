@@ -22,3 +22,5 @@ export type Action = ({
 export type SelfAction = ActionEffectData | ((self: IUnit) => void);
 
 export type GameAction = DataProcessCallback<GameEnvironment>;
+
+export type ItemAction = 'USE' | 'EQUIP' | 'UNEQUIP';
