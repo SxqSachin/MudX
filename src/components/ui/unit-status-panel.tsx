@@ -10,7 +10,7 @@ export function UnitStatusPanel({ unit }: UnitStatusPanelParam) {
       <ul className="w-full h-full flex flex-col relative">
         {Object.keys(unit.status).map((key) => {
           return (
-            <li className="mb-8" key={key}>
+            <li className="mb-1" key={key}>
               <span> {i18n(key)} </span>
               <span className="float-right">
                 {unit.status[key as UnitStatusType]}

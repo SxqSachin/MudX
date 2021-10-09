@@ -16,7 +16,7 @@ export function ProgressBar({ max, cur, direction, className }: ProgressBarParam
 
   return (
     <div className={className + " w-full h-6 border border-black relative"}>
-      <div className={directionClass + " inline-block h-full bg-gray-200"} style={{width: `${percent}%`}}>
+      <div className={directionClass + " inline-block h-full bg-gray-200"} style={{width: `${Math.min(percent, 100)}%`}}>
       </div>
       <span className={textDirectionClass + " absolute"} style={{[direction]: 0}}> {cur}/{max} </span>
     </div>
