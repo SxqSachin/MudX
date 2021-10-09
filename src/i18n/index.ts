@@ -1,7 +1,6 @@
 import ZH_CN from './zh_cn.json';
 
-
-type I18NType = keyof typeof ZH_CN;
+// type I18NType = keyof typeof ZH_CN;
 
 const i18nMap = {
   'zh_cn': ZH_CN,

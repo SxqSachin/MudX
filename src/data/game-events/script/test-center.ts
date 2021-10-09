@@ -1,9 +1,5 @@
 import { addPlayerHPOption, removePlayerHPOption } from "../../../models/game-event-option";
-import { DataProcessCallback } from "../../../types";
-import { GameEnvironment } from "../../../types/game";
 import { GameEvent } from "../../../types/game-event";
-import { UnitStatus, UnitStatusType } from "../../../types/Unit";
-import { noop } from "../../../utils";
 import { getRandomString } from "../../../utils/random";
 
 const event: GameEvent = Object.freeze({

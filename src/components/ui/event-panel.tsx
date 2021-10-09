@@ -3,17 +3,15 @@ import { useRecoilState } from "recoil";
 import { runExpr } from "../../core/expr";
 import { GameEnvironmentAtom } from "../../store";
 import { DataCallback } from "../../types";
-import { GameEnvironment } from "../../types/game";
 import { GameEvent, GameEventFork, GameEventOption } from "../../types/game-event";
-import { IUnit } from "../../types/Unit";
-import { isEmpty, isString, toArray } from "../../utils";
+import { isEmpty, toArray } from "../../utils";
 
 type GameEventPanelParam = {
   event: GameEvent,
   onChooseOption: DataCallback<GameEventOption>,
 }
 export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
-  const [gameEvent, setGameEvent] = useState({} as GameEvent);
+  const [, setGameEvent] = useState({} as GameEvent);
   const [fork, setFork] = useState({} as GameEventFork);
   const [desc, setDesc] = useState('');
   const [gameEnvironment, setGameEnvironment] = useRecoilState(GameEnvironmentAtom);

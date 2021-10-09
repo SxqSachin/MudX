@@ -1,5 +1,5 @@
-import { DataCallback, DataProcessCallback, VoidCallback } from "../types"
-import { EMPTY_XID, XID } from "../types/Object";
+import { DataProcessCallback, VoidCallback } from "../types"
+import { XID } from "../types/Object";
 import { uuid } from "../utils/uuid";
 
 type SubscriberXID = XID;

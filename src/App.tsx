@@ -20,7 +20,7 @@ import { Dice } from "./utils/random";
 
 function App() {
   const [event, setEvent] = useState({} as GameEvent);
-  const [test, setTest] = useState(1);
+  const [, setTest] = useState(1);
   const [playerCharacter, setPlayerCharacter] = useRecoilState(PlayerCharacterAtom);
   const [enemy, setEnemy] = useRecoilState(EnemyCharacterAtom);
   const [isForceUpdate, setForceUpdate] = useState([]);

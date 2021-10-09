@@ -1,13 +1,11 @@
 import { Publisher, Subscriber } from "../core/subscribe";
 import { Items } from "../data";
-import { Skills } from "../data/skills";
-import { DataCallback, DataProcessCallback, VoidCallback } from "../types";
+import { DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventListener, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
-import { hasProperity } from "../utils/object";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";
 import { Skill } from "./Skill";
@@ -192,10 +190,14 @@ export class Unit implements IUnit {
               curItem.onEquip(this);
               return true;
             }
+
+            return false;
           }));
 
           return true;
         }
+
+        return false;
       })
     });
     this._reinitItems();
@@ -215,10 +217,14 @@ export class Unit implements IUnit {
               curItem.onUnequip(this);
               return true;
             }
+
+            return false;
           }));
 
           return true;
         }
+
+        return false;
       })
     });
     this._reinitItems();
