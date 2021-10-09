@@ -10,6 +10,8 @@ export type ItemData = XSerializable & ({
   durability: number;
 
   isEquipable: false;
+
+  isUseable: boolean;
   isConsumable: boolean;
 
   actions: Action | Action[];
@@ -22,6 +24,7 @@ export type ItemData = XSerializable & ({
   isEquipable: true;
   isEquipped: boolean;
 
+  isUseable: boolean;
   isConsumable: boolean;
 
   actions: Action | Action[];

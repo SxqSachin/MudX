@@ -5,6 +5,7 @@
   "isEquipable": true,
   "isEquipped": false,
   "isConsumable": true,
+  "isUseable": true,
   "actions": [
     {
       "target": "self",

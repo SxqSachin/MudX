@@ -10,6 +10,7 @@ export const shield: ItemData = {
   isEquipable: true,
   isEquipped: false,
   isConsumable: false,
+  isUseable: false,
   actions: [
   ],
   onEquip: [

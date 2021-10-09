@@ -18,7 +18,7 @@ export function isEmpty(obj: any) {
     return true;
   }
 
-  if (!Object.keys(obj)) { // obj
+  if (!Object.keys(obj).length) { // obj
     return true;
   }
 

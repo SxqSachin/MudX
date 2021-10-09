@@ -16,14 +16,16 @@ scriptList.forEach(scriptObj => {
   ItemMap.set(scriptObj.id, new Item(scriptObj));
 });
 jsonList.forEach(jsonObj => {
-  const { id, name, durability, } = jsonObj;
+  const tItemData = jsonObj as any as ItemData;
+  const { id, name, durability, } = tItemData;
   const itemData: ItemData = {
     id,
     xid: EMPTY_XID,
     name,
     durability,
-    isEquipable: jsonObj.isEquipable ?? false,
-    isConsumable: jsonObj.isConsumable,
+    isEquipable: tItemData.isEquipable ?? false,
+    isConsumable: tItemData.isConsumable,
+    isUseable: tItemData.isUseable ?? false,
     actions: (() => {
       const actions = toArray(jsonObj.actions);
 
@@ -75,6 +77,7 @@ const DEFAULT_ITEM_DATA: ItemData = Object.freeze({
   actions: [],
   durability: -1,
   isConsumable: false,
+  isUseable: false,
   isEquipable: false,
   xid: EMPTY_XID,
 });

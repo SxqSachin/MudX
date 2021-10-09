@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, } from "recoil";
 import { BattlePanel } from "./components/ui/battle-panel";
 import { DebugPanel } from "./components/ui/debug-panel";
 import { GameEventPanel } from "./components/ui/event-panel";
 import { UnitInfoPanel } from "./components/ui/unit-info-panel";
-import { UnitItemPanel } from "./components/ui/unit-item-panel";
-import { UnitStatusPanel } from "./components/ui/unit-status-panel";
 
 import './data';
 
@@ -17,7 +15,6 @@ import { BattleAction } from "./types/battle";
 import { GameEnvironment } from "./types/game";
 import { GameEvent, GameEventOption } from "./types/game-event";
 import { IItem } from "./types/Item";
-import { IUnit } from "./types/Unit";
 import { toArray } from "./utils";
 import { Dice } from "./utils/random";
 
@@ -110,6 +107,11 @@ function App() {
 
   const onItemAction = (action: ItemAction, item: IItem) => {
     switch (action) {
+      case 'EQUIP':
+        playerCharacter.equipItem(item);
+        gameEnvironment.player = playerCharacter;
+        applyEnvironment(gameEnvironment);
+        break;
       case 'UNEQUIP':
         playerCharacter.unequipItem(item);
         gameEnvironment.player = playerCharacter;
