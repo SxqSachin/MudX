@@ -19,13 +19,13 @@ export function UnitInfoPanel({unit, onItemAction}: UnitInfoPanelParam) {
   }
 
   return (
-    <div className="w-full h-full">
-      <div className="flex flex-col h-full">
+    <div className="w-full h-full relative">
+      <div className="h-full flex flex-col overflow-auto" style={{height: "calc(100% - 3rem)"}}>
         { curPanel === 'STATUS' && <UnitStatusPanel unit={unit}></UnitStatusPanel> }
         { curPanel === 'ITEM' && <UnitItemPanel unit={unit} onItemAction={onItemAction}></UnitItemPanel> }
         { curPanel === 'EQUIPMENT' && <UnitEquipmentPanel unit={unit} onItemAction={onItemAction}></UnitEquipmentPanel> }
       </div>
-      <div className="flex flex-row justify-between border-top h-8">
+      <div className="absolute bottom-0 w-full flex flex-row justify-between border-t p-4 pb-0 h-18">
         <button onClick={() => onPanelChange('STATUS')}>Status</button>
         <button onClick={() => onPanelChange('ITEM')}>Item</button>
         <button onClick={() => onPanelChange('EQUIPMENT')}>Equipment</button>
