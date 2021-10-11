@@ -125,16 +125,16 @@ function App() {
   }
 
   return (
-    <div className="App w-screen h-screen flex flex-col">
-      <div className="flex flex-row p-8 w-full h-2/3">
-        <div className="w-3/4 mr-4">
+    <div className="App w-screen h-screen flex flex-col p-8">
+      <div className="flex flex-row w-full h-2/3">
+        <div className="w-3/4 mr-2 border rounded-md p-4">
           <GameEventPanel event={event} onChooseOption={onChooseOption}></GameEventPanel>
           {
             BattlePanelMemo
           }
           <DebugPanel onEnvironmentChange={applyEnvironment}></DebugPanel>
         </div>
-        <div className="w-1/4 ml-4 flex flex-col border rounded-md p-4">
+        <div className="w-1/4 ml-2 flex flex-col border rounded-md p-4">
           <UnitInfoPanel unit={playerCharacter} onItemAction={onItemAction}></UnitInfoPanel>
         </div>
       </div>
