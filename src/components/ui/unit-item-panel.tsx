@@ -47,7 +47,7 @@ export function UnitItemPanel({ unit, onItemAction }: UnitItemPanelParam) {
           });
         })}
       </div>
-      {!isEmpty(curFocusItem) && <ItemDetailPopup item={curFocusItem} onClose={() => clearCurFocusItem} onItemAction={handleItemAction}></ItemDetailPopup>}
+      {!isEmpty(curFocusItem) && <ItemDetailPopup item={curFocusItem} onClose={clearCurFocusItem} onItemAction={handleItemAction}></ItemDetailPopup>}
     </>
   );
 }

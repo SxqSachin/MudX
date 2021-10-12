@@ -8,7 +8,7 @@ export type GameEnvironment = {
   fork: GameEventFork;
 
   state: GameState[];
-  panels: GamePanelType[];
+  panels: Set<GamePanelType>;
 }
 
 export type GameState = "EVENT" | "BATTLE";

@@ -9,7 +9,7 @@ import './data';
 
 import { GameEvents, Items } from "./data";
 import { Unit } from "./models/Unit";
-import { EnemyCharacterAtom, GameEnvironmentAtom, PlayerCharacterAtom } from "./store";
+import { GameEnvironmentAtom, } from "./store";
 import { ItemAction } from "./types/action";
 import { BattleAction } from "./types/battle";
 import { GameEnvironment } from "./types/game";
@@ -19,12 +19,7 @@ import { toArray } from "./utils";
 import { Dice } from "./utils/random";
 
 function App() {
-  const [event, setEvent] = useState({} as GameEvent);
-  const [, setTest] = useState(1);
-  const [playerCharacter, setPlayerCharacter] = useRecoilState(PlayerCharacterAtom);
-  const [enemy, setEnemy] = useRecoilState(EnemyCharacterAtom);
   const [isForceUpdate, setForceUpdate] = useState([]);
-
   const [gameEnvironment, setGameEnvironment] = useRecoilState(GameEnvironmentAtom);
 
   const forceUpdate = () => {
@@ -32,7 +27,8 @@ function App() {
   }
 
   useEffect(() => {
-    setEvent(GameEvents.get('test-center'));
+    gameEnvironment.panels.add('EVENT');
+    gameEnvironment.event = GameEvents.get('test-center');
 
     const player = Unit.create('player');
     player.increaseStatus('phyAtk', 3);
@@ -43,7 +39,6 @@ function App() {
     player.addItem(sword2).equipItem(sword2);
 
     const enemy = Unit.create('enemy');
-    setEnemy(enemy);
 
     gameEnvironment.player = player;
     gameEnvironment.enemy = enemy;
@@ -54,7 +49,8 @@ function App() {
 
   const onChooseOption = (option: GameEventOption) => {
     let gameEnv = gameEnvironment;
-    console.log(option);
+    let gameEvent = gameEnv.event;
+
     toArray(option.onChoose).forEach(cb => {
       if (!cb) {
         return;
@@ -65,62 +61,80 @@ function App() {
         gameEnv = processedGameEnv;
       }
     });
-    applyEnvironment(gameEnv);
 
     if (typeof option.next === 'string') {
-      setEvent(GameEvents.get(option.next));
+      gameEvent = GameEvents.get(option.next);
     } else {
       const res = option.next(gameEnv);
 
       if (typeof res === 'string') {
-        setEvent(GameEvents.get(res));
+        gameEvent = GameEvents.get(res);
       } else {
-        setEvent(res);
+        gameEvent = res;
       }
     }
 
-    setTest(Dice.d100);
+    gameEnv.event = gameEvent;
+
+    applyEnvironment(gameEnv);
+
     forceUpdate();
   }
 
   const handleBattleAction = (action: BattleAction) => {
+    const { player, enemy } = gameEnvironment;
+    if (!enemy) {
+      return;
+    }
     if (action === 'ATTACK') {
-      playerCharacter.attack(enemy);
+      player.attack(enemy);
       forceUpdate();
     }
   }
 
-  const BattlePanelMemo = useMemo(() => {
-    if (!(playerCharacter && enemy)) {
-      return <></>;
-    }
-
-    return <BattlePanel player={playerCharacter} enemy={enemy} onAction={handleBattleAction}></BattlePanel>
-  }, [isForceUpdate, playerCharacter, enemy]);
-
   const applyEnvironment = (env: GameEnvironment) => {
-    setPlayerCharacter(env.player);
-    env.enemy && setEnemy(env.enemy);
     setGameEnvironment(gameEnvironment);
     forceUpdate();
   }
 
   const onItemAction = (action: ItemAction, item: IItem) => {
+    const { player } = gameEnvironment;
     switch (action) {
       case 'EQUIP':
-        playerCharacter.equipItem(item);
-        gameEnvironment.player = playerCharacter;
+        player.equipItem(item);
+        gameEnvironment.player = player;
         applyEnvironment(gameEnvironment);
         break;
       case 'UNEQUIP':
-        playerCharacter.unequipItem(item);
-        gameEnvironment.player = playerCharacter;
+        player.unequipItem(item);
+        gameEnvironment.player = player;
         applyEnvironment(gameEnvironment);
         break;
     }
   }
 
-  if (!playerCharacter) {
+  const gameEventPanelMemo = useMemo(() => {
+    if (!gameEnvironment.panels.has('EVENT')) {
+      return null;
+    }
+
+    return <GameEventPanel event={gameEnvironment.event} onChooseOption={onChooseOption}></GameEventPanel>
+  }, [gameEnvironment.panels.keys(), gameEnvironment.event]);
+
+  const BattlePanelMemo = (() => {
+    const { player, enemy, panels } = gameEnvironment;
+    if (!panels.has('BATTLE')) {
+      return null;
+    }
+
+    if (!(player && enemy)) {
+      return null;
+    }
+
+    return <BattlePanel player={player} enemy={enemy} onAction={handleBattleAction}></BattlePanel>
+  })();
+
+  if (!gameEnvironment.player) {
     return <></>;
   }
 
@@ -128,14 +142,12 @@ function App() {
     <div className="App w-screen h-screen flex flex-col p-8">
       <div className="flex flex-row w-full h-2/3">
         <div className="w-3/4 mr-2 border rounded-md p-4">
-          <GameEventPanel event={event} onChooseOption={onChooseOption}></GameEventPanel>
-          {
-            BattlePanelMemo
-          }
+          { gameEventPanelMemo }
+          { BattlePanelMemo }
           <DebugPanel onEnvironmentChange={applyEnvironment}></DebugPanel>
         </div>
         <div className="w-1/4 ml-2 flex flex-col border rounded-md p-4">
-          <UnitInfoPanel unit={playerCharacter} onItemAction={onItemAction}></UnitInfoPanel>
+          <UnitInfoPanel unit={gameEnvironment.player} onItemAction={onItemAction}></UnitInfoPanel>
         </div>
       </div>
       <div className="border mt-4 rounded-md h-1/3">
