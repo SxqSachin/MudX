@@ -6,8 +6,9 @@ import { GameEnvironment } from "../../types/game";
 
 type DebugPanelParam = {
   onEnvironmentChange: DataCallback<GameEnvironment>,
+  className: string;
 }
-export function DebugPanel({onEnvironmentChange}: DebugPanelParam) {
+export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
   const gameEnvironment = useRecoilValue(GameEnvironmentAtom);
 
   const increaseHP = (val: number) => {
@@ -36,7 +37,7 @@ export function DebugPanel({onEnvironmentChange}: DebugPanelParam) {
 
 
   return (
-    <div className="w-full">
+    <div className={"w-full " + className}>
       <button className="btn" onClick={() => increaseHP(1)}> Increase HP </button>
       <button className="btn" onClick={enterBattle}> EnterBattle </button>
       <button className="btn" onClick={leaveBattle}> LeaveBattle </button>

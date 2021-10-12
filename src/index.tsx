@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './style/index.css';
 import './style/base.scss';
-import App from './App';
+import App from './views/index';
 import { RecoilRoot } from 'recoil';
 
 ReactDOM.render(

@@ -1,22 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilState, } from "recoil";
-import { BattlePanel } from "./components/ui/battle-panel";
-import { DebugPanel } from "./components/ui/debug-panel";
-import { GameEventPanel } from "./components/ui/event-panel";
-import { UnitInfoPanel } from "./components/ui/unit-info-panel";
+import { BattlePanel } from "../../components/ui/battle-panel";
+import { DebugPanel } from "../../components/ui/debug-panel";
+import { GameEventPanel } from "../../components/ui/event-panel";
+import { UnitInfoPanel } from "../../components/ui/unit-info-panel";
 
-import './data';
+import '../../data';
 
-import { GameEvents, Items } from "./data";
-import { Unit } from "./models/Unit";
-import { GameEnvironmentAtom, } from "./store";
-import { ItemAction } from "./types/action";
-import { BattleAction } from "./types/battle";
-import { GameEnvironment } from "./types/game";
-import { GameEvent, GameEventOption } from "./types/game-event";
-import { IItem } from "./types/Item";
-import { toArray } from "./utils";
-import { Dice } from "./utils/random";
+import { GameEvents, Items } from "../../data";
+import { Unit } from "../../models/Unit";
+import { GameEnvironmentAtom, } from "../../store";
+import { ItemAction } from "../../types/action";
+import { BattleAction } from "../../types/battle";
+import { GameEnvironment } from "../../types/game";
+import { GameEvent, GameEventOption } from "../../types/game-event";
+import { IItem } from "../../types/Item";
+import { toArray } from "../../utils";
+import { Dice } from "../../utils/random";
 
 function App() {
   const [isForceUpdate, setForceUpdate] = useState([]);
@@ -141,10 +141,10 @@ function App() {
   return (
     <div className="App w-screen h-screen flex flex-col p-8">
       <div className="flex flex-row w-full h-2/3">
-        <div className="w-3/4 mr-2 border rounded-md p-4">
+        <div className="w-3/4 mr-2 border rounded-md p-4 relative">
           { gameEventPanelMemo }
           { BattlePanelMemo }
-          <DebugPanel onEnvironmentChange={applyEnvironment}></DebugPanel>
+          <DebugPanel className="absolute bottom-0 left-0 p-" onEnvironmentChange={applyEnvironment}></DebugPanel>
         </div>
         <div className="w-1/4 ml-2 flex flex-col border rounded-md p-4">
           <UnitInfoPanel unit={gameEnvironment.player} onItemAction={onItemAction}></UnitInfoPanel>
