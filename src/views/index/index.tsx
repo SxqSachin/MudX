@@ -8,14 +8,16 @@ import { UnitInfoPanel } from "../../components/ui/unit-info-panel";
 import '../../data';
 
 import { GameEvents, Items } from "../../data";
+import events from "../../data/game-events/script";
 import { Unit } from "../../models/Unit";
 import { GameEnvironmentAtom, } from "../../store";
 import { ItemAction } from "../../types/action";
 import { BattleAction } from "../../types/battle";
 import { GameEnvironment } from "../../types/game";
-import { GameEvent, GameEventOption } from "../../types/game-event";
+import { GameEvent, GameEventNextType, GameEventOption } from "../../types/game-event";
 import { IItem } from "../../types/Item";
 import { toArray } from "../../utils";
+import { calcOptionNextEvent, doPushStory, isOptionWillPushStory, } from "../../utils/game-event";
 import { Dice } from "../../utils/random";
 
 function App() {
@@ -26,18 +28,20 @@ function App() {
     setForceUpdate([]);
   }
 
+  const applyEnvironment = (env: GameEnvironment) => {
+    setGameEnvironment(gameEnvironment);
+    forceUpdate();
+
+    // @ts-ignore
+    global.env = env;
+  }
+
   useEffect(() => {
+    gameEnvironment.story = GameEvents.createStory('新故事', '这是一个新故事', 10);
+    gameEnvironment.event = gameEnvironment.story.pages[0].event;
     gameEnvironment.panels.add('EVENT');
-    gameEnvironment.event = GameEvents.get('test-center');
 
     const player = Unit.create('player');
-    player.increaseStatus('phyAtk', 3);
-
-    const sword = Items.get('sword');
-    const sword2 = Items.get('sword');
-    player.addItem(sword).equipItem(sword);
-    player.addItem(sword2).equipItem(sword2);
-
     const enemy = Unit.create('enemy');
 
     gameEnvironment.player = player;
@@ -49,7 +53,6 @@ function App() {
 
   const onChooseOption = (option: GameEventOption) => {
     let gameEnv = gameEnvironment;
-    let gameEvent = gameEnv.event;
 
     toArray(option.onChoose).forEach(cb => {
       if (!cb) {
@@ -62,16 +65,9 @@ function App() {
       }
     });
 
-    if (typeof option.next === 'string') {
-      gameEvent = GameEvents.get(option.next);
-    } else {
-      const res = option.next(gameEnv);
-
-      if (typeof res === 'string') {
-        gameEvent = GameEvents.get(res);
-      } else {
-        gameEvent = res;
-      }
+    let gameEvent = calcOptionNextEvent(option, gameEnv);
+    if (isOptionWillPushStory(option, gameEnv)) {
+      doPushStory(gameEnv);
     }
 
     gameEnv.event = gameEvent;
@@ -90,11 +86,6 @@ function App() {
       player.attack(enemy);
       forceUpdate();
     }
-  }
-
-  const applyEnvironment = (env: GameEnvironment) => {
-    setGameEnvironment(gameEnvironment);
-    forceUpdate();
   }
 
   const onItemAction = (action: ItemAction, item: IItem) => {

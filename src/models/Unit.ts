@@ -314,7 +314,7 @@ export class Unit implements IUnit {
   }
   get phyDef() {
     const { phy, phyDef } = this.status;
-    return phy + phyDef;
+    return phy * 0.5 + phyDef;
   }
   get powAtk() {
     return this.unitEntity.powAtk;

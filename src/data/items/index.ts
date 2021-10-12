@@ -27,9 +27,15 @@ jsonList.forEach(jsonObj => {
     isConsumable: tItemData.isConsumable,
     isUseable: tItemData.isUseable ?? false,
     actions: (() => {
-      const actions = toArray(jsonObj.actions);
+      const actions = toArray(tItemData.actions);
+      if (Array.isArray(tItemData.actions)) {
+        var a = tItemData.actions[0];
+      }
 
       return actions.map(action => {
+        if (typeof action === 'function') {
+          return action;
+        }
         const actionObj: Action = {
           effectTo: action.effectTo as any,
           target: action.target as any,
@@ -44,23 +50,27 @@ jsonList.forEach(jsonObj => {
     onUnequip: [],
   };
 
-  if (itemData.isEquipable) {
+  if (itemData.isEquipable && tItemData.isEquipable) {
     itemData.isEquipped = jsonObj.isEquipped ?? false;
     itemData.isConsumable = jsonObj.isConsumable ?? false;
-    if (jsonObj.onEquip) {
-      itemData.onEquip = jsonObj.onEquip.map(action => {
+    if (tItemData.onEquip) {
+      itemData.onEquip = toArray(tItemData.onEquip).map(action => {
+        if (typeof action === 'function') {
+          return action;
+        }
         return {
           effectTo: action.effectTo as UnitStatusType,
-          target: action.target as 'self' | 'target',
           val: action.val,
         }
       })
     }
-    if (jsonObj.onEquip) {
-      itemData.onUnequip = jsonObj.onUnequip.map(action => {
+    if (itemData.onEquip) {
+      itemData.onUnequip = toArray(tItemData.onUnequip).map(action => {
+        if (typeof action === 'function') {
+          return action;
+        }
         return {
           effectTo: action.effectTo as UnitStatusType,
-          target: action.target as 'self' | 'target',
           val: action.val,
         }
       })
@@ -97,13 +107,9 @@ const Items = {
     return new Item(deepClone(itemData));
   },
   getData: (itemID: ItemID): ItemData => {
-    const itemData = ItemDataMap.get(itemID);
+    const newItem = Items.create(itemID);
 
-    if (!itemData) {
-      return DEFAULT_ITEM_DATA;
-    }
-
-    return deepClone(itemData);
+    return newItem.data;
   },
   has: (itemID: ItemID): boolean => {
     return ItemDataMap.has(itemID);

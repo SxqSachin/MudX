@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 import { GameEnvironment, GamePanelType, GameState } from "../types/game";
-import { GameEvent, GameEventFork } from "../types/game-event";
+import { GameEvent, GameEventFork, Story } from "../types/game-event";
 import { IUnit } from "../types/Unit";
 
 export const GameEnvironmentAtom = atom<GameEnvironment>({
@@ -8,8 +8,11 @@ export const GameEnvironmentAtom = atom<GameEnvironment>({
   default: {
     player: undefined as any as IUnit,
     enemy: undefined as any as IUnit,
+
+    story: undefined as any as Story,
     event: undefined as any as GameEvent,
     fork: undefined as any as GameEventFork,
+
     panels: new Set() as any as Set<GamePanelType>,
     state: ["EVENT"],
   },

@@ -16,6 +16,8 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
   const [desc, setDesc] = useState('');
   const [gameEnvironment, setGameEnvironment] = useRecoilState(GameEnvironmentAtom);
 
+  // todo onEnter要触发刷新
+
   const onEnterFork = (fork: GameEventFork) => {
     setFork(fork);
     setDesc(typeof fork.description === 'string' ? fork.description : fork.description());
@@ -36,19 +38,28 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
   }
 
   useEffect(() => {
-    const gameEnvObject = {
-    };
-
     if (!isEmpty(fork)) {
       onLeaveFork(fork);
     }
 
     let passedFork: GameEventFork = null as any;
     toArray(event.forks).some(fork => {
-      if (!fork.condition) {
-        passedFork = fork;
-      } else if (!!runExpr(fork.condition, gameEnvObject)) {
-        passedFork = fork;
+      switch (typeof fork.condition) {
+        case 'undefined':
+          passedFork = fork;
+          break;
+        case 'boolean':
+          passedFork = fork.condition ? fork : undefined!;
+          break;
+        case 'string':
+          passedFork = runExpr(fork.condition, gameEnvironment) ? fork : undefined!;
+          break;
+        case 'function':
+          passedFork = fork.condition(gameEnvironment) ? fork : undefined!;
+          break;
+        default:
+          passedFork = fork;
+          break;
       }
 
       return passedFork;
@@ -72,15 +83,27 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
 
   return (
     <div>
-      <h2>{event.name}</h2>
+      <h2>{event.name}<span>({gameEnvironment.story.curPage}/{ gameEnvironment.story.totalPage})</span></h2>
       <hr className="my-4"/>
       <p>{desc}</p>
       <div className="flex flex-row w-full justify-around">
       {
         toArray(fork.options).map((option, index) => {
-          return (
-            <button className="border border-black rounded-md px-6 py-4" key={option.name + option.id + index} onClick={() => handleChooseOption(option)}>{option.name}</button>
-          )
+          const enabledBtn = <button className="border border-black rounded-md px-6 py-4" key={option.name + option.id + index} onClick={() => handleChooseOption(option)}>{option.name}</button>;
+          const disabledBtn = <button className="border border-black bg-gray-500 text-white rounded-md px-6 py-4 cursor-not-allowed" key={option.name + option.id + index} >{option.name}</button>;
+
+          switch (typeof option.condition) {
+            case 'undefined':
+              return enabledBtn;
+            case 'boolean':
+              return option.condition ? enabledBtn : disabledBtn;
+            case 'string':
+              return runExpr(option.condition, gameEnvironment) ? enabledBtn : disabledBtn;
+            case 'function':
+              return option.condition(gameEnvironment) ? enabledBtn : disabledBtn;
+            default:
+              return enabledBtn;
+          }
         })
       }
       </div>

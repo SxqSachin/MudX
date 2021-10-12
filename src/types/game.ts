@@ -1,9 +1,11 @@
-import { GameEvent, GameEventFork } from "./game-event";
+import { GameEvent, GameEventFork, Story } from "./game-event";
 import { IUnit } from "./Unit";
 
 export type GameEnvironment = {
   player: IUnit;
   enemy?: IUnit;
+
+  story: Story;
   event: GameEvent;
   fork: GameEventFork;
 

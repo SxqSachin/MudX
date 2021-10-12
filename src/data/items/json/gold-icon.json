@@ -1,0 +1,9 @@
+{
+  "id": "gold-icon",
+  "name": "金币",
+  "durability": 100,
+  "isEquipable": false,
+  "isEquipped": false,
+  "isConsumable": false,
+  "isUseable": false
+}

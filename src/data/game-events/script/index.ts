@@ -1,8 +1,10 @@
-import { testGameEvent } from './test';
+import { event as 获得护身符 } from './获得护身符';
+import { event as 许愿井 } from './许愿井';
 import testCenter from './test-center';
 
 const events = [
-  testGameEvent,
+  许愿井,
+  获得护身符,
   testCenter,
 ]
 

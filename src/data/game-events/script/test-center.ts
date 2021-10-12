@@ -6,6 +6,10 @@ const event: GameEvent = Object.freeze({
   id: "test-center",
   name: "调试中心",
 
+  ext: {
+    test: true,
+  },
+
   forks: {
     description: () => `这里是调试中心。(编号-${getRandomString()})`,
 
