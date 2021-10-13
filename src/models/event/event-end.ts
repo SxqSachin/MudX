@@ -2,7 +2,7 @@ import { GameEvent, GameEventNextType } from "../../types/game-event";
 
 export function endEvent(): GameEvent {
   return {
-    id: "__EVENT_END",
+    id: GameEventNextType.GAME_EVENT_END,
     name: "事件结束",
 
     forks: {

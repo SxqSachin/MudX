@@ -3,25 +3,26 @@ import { useRecoilState, } from "recoil";
 import { BattlePanel } from "../../components/ui/battle-panel";
 import { DebugPanel } from "../../components/ui/debug-panel";
 import { GameEventPanel } from "../../components/ui/event-panel";
+import { StoryChoosePanel } from "../../components/ui/story-choose-panel";
 import { UnitInfoPanel } from "../../components/ui/unit-info-panel";
 
 import '../../data';
 
-import { GameEvents, Items } from "../../data";
-import events from "../../data/game-events/script";
+import { GameEvents, } from "../../data";
+import { endEvent } from "../../models/event/event-end";
+import { storyEndEvent } from "../../models/event/story-end";
 import { Unit } from "../../models/Unit";
 import { GameEnvironmentAtom, } from "../../store";
 import { ItemAction } from "../../types/action";
 import { BattleAction } from "../../types/battle";
-import { GameEnvironment } from "../../types/game";
-import { GameEvent, GameEventNextType, GameEventOption } from "../../types/game-event";
+import { GameEnvironment, GamePanelType } from "../../types/game";
+import { GameEvent, GameEventNextType, GameEventOption, Story } from "../../types/game-event";
 import { IItem } from "../../types/Item";
 import { toArray } from "../../utils";
-import { calcOptionNextEvent, doPushStory, isOptionWillPushStory, } from "../../utils/game-event";
-import { Dice } from "../../utils/random";
+import { calcOptionNextEvent, getOptionNextType, } from "../../utils/game-event";
 
 function App() {
-  const [isForceUpdate, setForceUpdate] = useState([]);
+  const [, setForceUpdate] = useState([]);
   const [gameEnvironment, setGameEnvironment] = useRecoilState(GameEnvironmentAtom);
 
   const forceUpdate = () => {
@@ -37,8 +38,8 @@ function App() {
   }
 
   useEffect(() => {
-    gameEnvironment.story = GameEvents.createStory('新故事', '这是一个新故事', 10);
-    gameEnvironment.event = gameEnvironment.story.pages[0].event;
+    gameEnvironment.story = GameEvents.createStory('新故事', '这是一个新故事', 3);
+    gameEnvironment.event = GameEvents.get(gameEnvironment.story.pages[0].event);
     gameEnvironment.panels.add('EVENT');
 
     const player = Unit.create('player');
@@ -65,9 +66,23 @@ function App() {
       }
     });
 
+    const optionNextType = getOptionNextType(option, gameEnv);
     let gameEvent = calcOptionNextEvent(option, gameEnv);
-    if (isOptionWillPushStory(option, gameEnv)) {
-      doPushStory(gameEnv);
+    if (optionNextType === GameEventNextType.PUSH_STORY) {
+      if (gameEnv.story.curPage >= gameEnv.story.totalPage) { // 故事读完了
+        gameEvent = storyEndEvent();
+      } else { // 推进到下一章节
+        gameEnv.story.curPage++;
+        gameEvent = GameEvents.get(gameEnv.story.pages[gameEnv.story.curPage - 1].event);
+      }
+    } else if(optionNextType === GameEventNextType.START_NEW_STORY) { // 开始新的故事
+      gameEnv.panels.delete("EVENT");
+      gameEnv.panels.delete("BATTLE");
+      gameEnv.panels.add("STORY_CHOOSE");
+    } else if(optionNextType === GameEventNextType.GAME_EVENT_END) { // 当前章节结束
+      gameEvent = endEvent();
+    } else { // 普通的故事推进
+      gameEvent = calcOptionNextEvent(option, gameEnv);
     }
 
     gameEnv.event = gameEvent;
@@ -112,6 +127,22 @@ function App() {
     return <GameEventPanel event={gameEnvironment.event} onChooseOption={onChooseOption}></GameEventPanel>
   }, [gameEnvironment.panels.keys(), gameEnvironment.event]);
 
+  const storyChooseMemo = useMemo(() => {
+    if (!gameEnvironment.panels.has('STORY_CHOOSE')) {
+      return null;
+    }
+
+    const handleChooseStory = (story: Story) => {
+      gameEnvironment.story = story;
+      gameEnvironment.event = GameEvents.get(story.pages[0].event);
+      gameEnvironment.panels.add('EVENT').delete('STORY_CHOOSE');
+
+      applyEnvironment(gameEnvironment);
+    };
+
+    return <StoryChoosePanel onChooseStory={handleChooseStory}></StoryChoosePanel>
+  }, [gameEnvironment.panels.keys()]);
+
   const BattlePanelMemo = (() => {
     const { player, enemy, panels } = gameEnvironment;
     if (!panels.has('BATTLE')) {
@@ -135,6 +166,7 @@ function App() {
         <div className="w-3/4 mr-2 border rounded-md p-4 relative">
           { gameEventPanelMemo }
           { BattlePanelMemo }
+          { storyChooseMemo }
           <DebugPanel className="absolute bottom-0 left-0 p-" onEnvironmentChange={applyEnvironment}></DebugPanel>
         </div>
         <div className="w-1/4 ml-2 flex flex-col border rounded-md p-4">

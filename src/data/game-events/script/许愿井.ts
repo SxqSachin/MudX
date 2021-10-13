@@ -29,6 +29,7 @@ const e: GameEvent = {
         condition: env => {
           return !!env.player.items['gold-icon']?.length;
         },
+        blurOnCheckFailed: true,
         next: env => _e2,
       },
       {

@@ -27,6 +27,7 @@ export type GameEventFork = {
 export enum GameEventNextType {
   GAME_EVENT_END = "EVENT_END",
   PUSH_STORY = "PUSH_STORY",
+  STORY_END = "STORY_END",
   START_NEW_STORY = "START_NEW_STORY",
 }
 
@@ -39,6 +40,7 @@ export type GameEventOption = {
   note?: string;
 
   condition?: ConditionExpr | boolean | ((env: GameEnvironment) => boolean);
+  blurOnCheckFailed?: boolean;
 
   onChoose?: GameAction | GameAction[];
 
@@ -48,9 +50,9 @@ export type GameEventOption = {
 // 一组事件的合计
 export type StoryEvent = {
   page: number;
-  event: GameEvent;
+  event: GameEventID;
 };
-export type Story = {
+export interface Story {
   title: string;
   description: string;
 

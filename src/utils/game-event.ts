@@ -7,83 +7,53 @@ import { GameEvent, GameEventNextType, GameEventOption, Story } from "../types/g
 function getStoryNextEvent(story: Story): GameEvent {
   let { curPage } = story;
 
-  return story.pages[curPage + 1].event;
+  if (story.curPage >= story.totalPage) {
+    return storyEndEvent();
+  }
+
+  return GameEvents.get(story.pages[curPage - 1].event);
 }
 
-export const doPushStory = (gameEnvironment: GameEnvironment) => {
-  let { curPage } = gameEnvironment.story;
-
-  curPage += 1;
-  gameEnvironment.story.curPage = curPage;
-  gameEnvironment.event = gameEnvironment.story.pages[curPage].event;
-
-  return gameEnvironment;
-};
-const doEndEvent = (gameEnvironment: GameEnvironment) => {
-  gameEnvironment.event = endEvent();
-
-  return gameEnvironment;
-};
-
-export function isOptionWillPushStory(option: GameEventOption, gameEnvironment: GameEnvironment): boolean {
+export function getOptionNextType(option: GameEventOption, gameEnvironment: GameEnvironment): string {
   if (typeof option.next === "string") {
-    switch (option.next) {
-      case GameEventNextType.PUSH_STORY:
-        return true;
-      default:
-        break;
-    }
+    return option.next;
   } else {
     const res = option.next(gameEnvironment);
 
     if (typeof res === "string") {
-      switch (res) {
-        case GameEventNextType.PUSH_STORY:
-          return true;
-        default:
-          break;
-      }
+      return res;
     }
+
+    return res.id;
+  }
+}
+
+export function isOptionWillEndStory(option: GameEventOption, gameEnvironment: GameEnvironment): boolean {
+  const nextType = getOptionNextType(option, gameEnvironment);
+  if (nextType === GameEventNextType.STORY_END) {
+    return true;
+  }
+
+  if (nextType === GameEventNextType.PUSH_STORY && gameEnvironment.story.curPage >= gameEnvironment.story.totalPage) {
+    return true;
   }
 
   return false;
 }
 
+export function isOptionWillPushStory(option: GameEventOption, gameEnvironment: GameEnvironment): boolean {
+  return getOptionNextType(option, gameEnvironment) === GameEventNextType.PUSH_STORY;
+}
+
 export function calcOptionNextEvent(option: GameEventOption, gameEnvironment: GameEnvironment): GameEvent {
   let nextEvent: GameEvent;
   if (typeof option.next === "string") {
-    switch (option.next) {
-      case GameEventNextType.PUSH_STORY:
-        nextEvent = getStoryNextEvent(gameEnvironment.story)
-        break;
-      case GameEventNextType.GAME_EVENT_END:
-        nextEvent = endEvent();
-        break;
-      case GameEventNextType.START_NEW_STORY:
-        nextEvent = storyEndEvent();
-        break;
-      default:
-        nextEvent = GameEvents.get(option.next);
-        break;
-    }
+    nextEvent = GameEvents.get(option.next);
   } else {
     const res = option.next(gameEnvironment);
 
     if (typeof res === "string") {
-      switch (res) {
-        case GameEventNextType.PUSH_STORY:
-          nextEvent = getStoryNextEvent(gameEnvironment.story);
-          break;
-        case GameEventNextType.GAME_EVENT_END:
-          nextEvent = endEvent();
-          break;
-        case GameEventNextType.START_NEW_STORY:
-          nextEvent = storyEndEvent();
-          break;
-        default:
-          nextEvent = GameEvents.get(res);
-          break;
-      }
+      nextEvent = GameEvents.get(res);
     } else {
       nextEvent = res;
     }

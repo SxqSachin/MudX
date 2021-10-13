@@ -39,7 +39,7 @@ const GameEvents = {
   createStory: (title: string, description: string, length: number): Story => {
     return {
       totalPage: length,
-      curPage: 0,
+      curPage: 1,
       title,
       description,
       pages: (() => {
@@ -60,7 +60,7 @@ const GameEvents = {
 
           res.push({
             page: i,
-            event,
+            event: event.id,
           })
         }
 

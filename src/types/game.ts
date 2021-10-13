@@ -13,5 +13,5 @@ export type GameEnvironment = {
   panels: Set<GamePanelType>;
 }
 
-export type GameState = "EVENT" | "BATTLE";
-export type GamePanelType = "EVENT" | "BATTLE" | "UNIT_STATUS" | "DEBUG";
+export type GameState = "EVENT" | "BATTLE" | "CHOOSE_STORY";
+export type GamePanelType = "EVENT" | "BATTLE" | "UNIT_STATUS" | "DEBUG" | "STORY_CHOOSE";

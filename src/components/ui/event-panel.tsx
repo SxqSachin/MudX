@@ -5,6 +5,7 @@ import { GameEnvironmentAtom } from "../../store";
 import { DataCallback } from "../../types";
 import { GameEvent, GameEventFork, GameEventOption } from "../../types/game-event";
 import { isEmpty, toArray } from "../../utils";
+import { getRandomString } from "../../utils/random";
 
 type GameEventPanelParam = {
   event: GameEvent,
@@ -90,7 +91,11 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
       {
         toArray(fork.options).map((option, index) => {
           const enabledBtn = <button className="border border-black rounded-md px-6 py-4" key={option.name + option.id + index} onClick={() => handleChooseOption(option)}>{option.name}</button>;
-          const disabledBtn = <button className="border border-black bg-gray-500 text-white rounded-md px-6 py-4 cursor-not-allowed" key={option.name + option.id + index} >{option.name}</button>;
+
+          const disabledBtn =
+            option.blurOnCheckFailed
+              ? <button className="border border-black bg-gray-500 text-white rounded-md px-6 py-4 cursor-not-allowed filter blur-sm" key={option.name + option.id + index} >{getRandomString().substr(0, 6)}</button>
+              : <button className="border border-black bg-gray-500 text-white rounded-md px-6 py-4 cursor-not-allowed" key={option.name + option.id + index} >{option.name}</button>;
 
           switch (typeof option.condition) {
             case 'undefined':
