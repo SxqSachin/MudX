@@ -19,28 +19,32 @@ export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
 
   const enterBattle = () => {
     gameEnvironment.panels.delete('EVENT');
-    if (!gameEnvironment.panels.has('BATTLE')) {
-      gameEnvironment.panels.add('BATTLE');
-    }
+    gameEnvironment.panels.add('BATTLE');
 
     onEnvironmentChange(gameEnvironment);
   }
 
   const leaveBattle = () => {
     gameEnvironment.panels.delete('BATTLE');
-    if (!gameEnvironment.panels.has('EVENT')) {
-      gameEnvironment.panels.add('EVENT');
-    }
+    gameEnvironment.panels.add('EVENT');
 
     onEnvironmentChange(gameEnvironment);
   }
 
+  const chooseStory = () => {
+    gameEnvironment.panels.delete('BATTLE');
+    gameEnvironment.panels.delete('EVENT');
+    gameEnvironment.panels.add('STORY_CHOOSE');
+
+    onEnvironmentChange(gameEnvironment);
+  }
 
   return (
     <div className={"w-full " + className}>
       <button className="btn" onClick={() => increaseHP(1)}> Increase HP </button>
       <button className="btn" onClick={enterBattle}> EnterBattle </button>
       <button className="btn" onClick={leaveBattle}> LeaveBattle </button>
+      <button className="btn" onClick={chooseStory}> ChooseStory </button>
     </div>
   );
 }

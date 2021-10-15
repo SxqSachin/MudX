@@ -1,8 +1,7 @@
 import { useEffect, } from "react";
-import { GameEvents } from "../../data";
 import { DataCallback, } from "../../types";
-import { BattleAction } from "../../types/battle";
 import { Story } from "../../types/game-event";
+import { StoryUtils } from "../../utils/story";
 
 type StoryChoosePanelParam = {
   onChooseStory: DataCallback<Story>,
@@ -12,7 +11,11 @@ export function StoryChoosePanel({onChooseStory}: StoryChoosePanelParam) {
   }, []);
 
   const handleChooseStory = () => {
-    const newStory: Story = GameEvents.createStory('test', 'cc', 10);
+    const newStory: Story = StoryUtils.createStory({
+      title: "test",
+      description: "cc",
+      pageNum: 10,
+    });
 
     onChooseStory(newStory);
   }

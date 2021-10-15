@@ -10,6 +10,7 @@ import { GameEvents, } from "../../data";
 import { Unit } from "../../models/Unit";
 import { GameEnvironmentAtom, } from "../../store";
 import { GameEnvironment, } from "../../types/game";
+import { StoryUtils } from "../../utils/story";
 import { BattlePanelHOC, StoryChoosePanelHOC } from "./hoc";
 import { handleChooseOption, handleItemAction } from "./logic";
 
@@ -30,7 +31,12 @@ function App() {
   }
 
   useEffect(() => {
-    gameEnvironment.story = GameEvents.createStory('新故事', '这是一个新故事', 3);
+
+    gameEnvironment.story = StoryUtils.createStory({
+      title: "新故事",
+      description: "这是一个新故事",
+      pageNum: 3,
+    });
     gameEnvironment.event = GameEvents.get(gameEnvironment.story.pages[0].event);
     gameEnvironment.panels.add('EVENT');
 

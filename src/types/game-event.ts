@@ -3,6 +3,11 @@ import { ConditionExpr } from "./condition";
 import { GameEnvironment } from "./game";
 import { IUnit } from "./Unit";
 
+export type GameMap = string;
+export enum GameMapType {
+  ANY = "GAME_MAP_ANY",
+};
+
 export type GameEventID = string;
 export type GameEvent = {
   id: GameEventID;
@@ -15,6 +20,8 @@ export type GameEvent = {
 }
 
 export type GameEventFork = {
+  appearInMap?: GameMap | GameMap[] | GameMapType | GameMapType[];
+
   condition?: ConditionExpr | boolean | ((env: GameEnvironment) => boolean);
   description: string | (() => string);
 
@@ -58,6 +65,8 @@ export interface Story {
 
   totalPage: number;
   curPage: number;
+
+  map: GameMap | GameMapType;
 
   pages: StoryEvent[];
 }

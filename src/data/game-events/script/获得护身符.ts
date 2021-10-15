@@ -7,6 +7,21 @@ const e: GameEvent = {
 
   forks: [
     {
+      description: "你在神殿下得到了10个金币",
+      condition: env => env.story.map === 'temple',
+      onEnter: (gameEnv) => {
+        gameEnv.player.addItemByID("gold-icon", 10);
+
+        return gameEnv;
+      },
+      options: [
+        {
+          name: "好的",
+          next: GameEventNextType.GAME_EVENT_END,
+        },
+      ],
+    },
+    {
       description: "你得到了一个金币",
       condition: env => Dice.d6 > 3,
       onEnter: (gameEnv) => {

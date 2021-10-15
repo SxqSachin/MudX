@@ -36,38 +36,7 @@ const GameEvents = {
     return deepClone(EventMap.get(randomKey) ?? DEFAULT_GAME_EVENT);
   },
 
-  createStory: (title: string, description: string, length: number): Story => {
-    return {
-      totalPage: length,
-      curPage: 1,
-      title,
-      description,
-      pages: (() => {
-        const res: StoryEvent[] = [];
 
-        for (let i = 0; res.length < length; i++) {
-          const event = GameEvents.getRandom();
-
-          // if (res.findIndex(se => se.event.id === event.id) > 0) {
-          //   i--;
-          //   continue;
-          // }
-
-          if (event.ext?.test) {
-            i--;
-            continue;
-          }
-
-          res.push({
-            page: i,
-            event: event.id,
-          })
-        }
-
-        return res;
-      })(),
-    }
-  }
 };
 
 export { GameEvents };
