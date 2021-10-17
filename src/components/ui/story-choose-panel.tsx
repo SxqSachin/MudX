@@ -1,23 +1,28 @@
-import { useEffect, } from "react";
+import { useEffect, useState, } from "react";
+import { useRecoilValue } from "recoil";
+import { Stories } from "../../data";
+import { GameEnvironmentAtom } from "../../store";
 import { DataCallback, } from "../../types";
-import { Story } from "../../types/game-event";
-import { StoryUtils } from "../../utils/story";
+import { Story, StoryGenerator } from "../../types/game-event";
 
 type StoryChoosePanelParam = {
   onChooseStory: DataCallback<Story>,
 }
 export function StoryChoosePanel({onChooseStory}: StoryChoosePanelParam) {
+  const [storyGenerators, setStoryGenerators] = useState([] as StoryGenerator[]);
+  const gameEnvironment = useRecoilValue(GameEnvironmentAtom);
+
   useEffect(() => {
+    const generators = [];
+    for (let generator of Stories.getGenerators()) {
+      generators.push(generator);
+    }
+
+    setStoryGenerators(generators);
   }, []);
 
-  const handleChooseStory = () => {
-    const newStory: Story = StoryUtils.createStory({
-      title: "test",
-      description: "cc",
-      pageNum: 10,
-    });
-
-    onChooseStory(newStory);
+  const handleChooseStory = (story: Story) => {
+    onChooseStory(story);
   }
 
   return (
@@ -26,7 +31,20 @@ export function StoryChoosePanel({onChooseStory}: StoryChoosePanelParam) {
         <h2>选择一个剧本</h2>
       </div>
       <div>
-        <button className="btn" onClick={handleChooseStory}>草原</button>
+        {
+          storyGenerators.map(storyGenerator => {
+            const story = storyGenerator.generator(gameEnvironment);
+            return (
+              <button
+                key={story.id}
+                className="btn"
+                onClick={() => handleChooseStory(story)}
+              >
+                {story.title}
+              </button>
+            );
+          })
+        }
       </div>
     </div>
   )

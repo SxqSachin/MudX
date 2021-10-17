@@ -25,8 +25,12 @@ const DEFAULT_GAME_EVENT: GameEvent = {
 };
 
 const GameEvents = {
-  get: (id: GameEventID): GameEvent => {
-    return deepClone(EventMap.get(id) ?? DEFAULT_GAME_EVENT);
+  get: (id: GameEventID | GameEvent): GameEvent => {
+    if (typeof id === 'string') {
+      return deepClone(EventMap.get(id) ?? DEFAULT_GAME_EVENT);
+    }
+
+    return id;
   },
 
   getRandom: (): GameEvent => {

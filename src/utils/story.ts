@@ -1,5 +1,6 @@
 import { GameEvents } from "../data";
 import { GameMap, GameMapType, Story as StoryType, StoryEvent } from "../types/game-event";
+import { uuid } from "./uuid";
 
 export const StoryUtils = {
   createStory: ({ title, description, map, pageNum }: { title: string, description: string, pageNum: number, map?: GameMap }): StoryType => {
@@ -7,6 +8,7 @@ export const StoryUtils = {
       map = GameMapType.ANY
     }
     return {
+      id: uuid(),
       totalPage: pageNum,
       curPage: 1,
       title,

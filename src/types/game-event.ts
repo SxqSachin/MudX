@@ -1,7 +1,6 @@
-import { GameAction, SelfAction } from "./action";
+import { GameAction, } from "./action";
 import { ConditionExpr } from "./condition";
 import { GameEnvironment } from "./game";
-import { IUnit } from "./Unit";
 
 export type GameMap = string;
 export enum GameMapType {
@@ -57,9 +56,11 @@ export type GameEventOption = {
 // 一组事件的合计
 export type StoryEvent = {
   page: number;
-  event: GameEventID;
+  event: GameEventID | GameEvent;
 };
 export interface Story {
+  id: string;
+
   title: string;
   description: string;
 
@@ -69,4 +70,9 @@ export interface Story {
   map: GameMap | GameMapType;
 
   pages: StoryEvent[];
+}
+
+export type StoryGenerator = {
+  id: string;
+  generator: (env: GameEnvironment) => Story;
 }

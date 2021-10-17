@@ -4,16 +4,6 @@ import { storyEndEvent } from "../models/event/story-end";
 import { GameEnvironment } from "../types/game";
 import { GameEvent, GameEventNextType, GameEventOption, Story } from "../types/game-event";
 
-function getStoryNextEvent(story: Story): GameEvent {
-  let { curPage } = story;
-
-  if (story.curPage >= story.totalPage) {
-    return storyEndEvent();
-  }
-
-  return GameEvents.get(story.pages[curPage - 1].event);
-}
-
 export function getOptionNextType(option: GameEventOption, gameEnvironment: GameEnvironment): string {
   if (typeof option.next === "string") {
     return option.next;
