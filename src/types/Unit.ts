@@ -1,6 +1,7 @@
 import { DataCallback, DataProcessCallback, VoidCallback } from ".";
 import { Item } from "../models/Item";
 import { Skill } from "../models/Skill";
+import { GameEnvironment } from "./game";
 import { IItem, ItemData, ItemID } from "./Item";
 import { XID, XObject, XSerializable } from "./Object";
 import { ISkill, SkillData, SkillID } from "./Skill";
@@ -149,7 +150,7 @@ export type UnitData = XSerializable & {
   items: { [id in ItemID]: ItemData[] };
   skills: { [id in SkillID]: SkillData };
 
-  spoils?: (() => ItemID | ItemID[]) | ItemID | ItemID[];
+  spoils?: ((env: GameEnvironment) => ItemID | ItemID[]) | ItemID | ItemID[];
 }
 export type UnitStatusType = Exclude<keyof UnitData, 'items' | 'skills' | 'xid' | 'name' | 'spoils' | 'id'>;
 export type UnitStatus = { [status in UnitStatusType]: number };

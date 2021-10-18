@@ -1,4 +1,5 @@
 import { ElementType } from "react";
+import { Message } from "../core/message";
 import { Publisher, Subscriber } from "../core/subscribe";
 import { Items } from "../data";
 import { DataProcessCallback, VoidCallback } from "../types";
@@ -47,10 +48,11 @@ export class Unit implements IUnit {
     this.fire('beforeAttack', { source: this, target, damage: damageVal });
     target.fire('beforeAttacked', { source: this, target, damage: damageVal });
 
-    this.dealDamage(target, damageVal)
+    const resDamage = this.dealDamage(target, damageVal)
+    Message.push(`${this.data.name} 攻击了 ${target.data.name}，造成 ${resDamage} 点伤害 `);
 
-    this.fire('afterAttack', { source: this, target, damage: damageVal });
-    target.fire('afterAttacked', { source: this, target, damage: damageVal });
+    this.fire('afterAttack', { source: this, target, damage: resDamage });
+    target.fire('afterAttacked', { source: this, target, damage: resDamage });
   }
 
   dealDamage(target: IUnit, damage: number, info: DamageInfo = DefaultDamageInfo) {
@@ -60,6 +62,8 @@ export class Unit implements IUnit {
     }
 
     target.decreaseStatus('curHP', Math.max(damage, 0));
+
+    return damage;
   }
 
   learnSkill(skill: ISkill) {

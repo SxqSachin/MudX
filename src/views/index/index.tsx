@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRecoilState, } from "recoil";
 import { DebugPanel } from "../../components/ui/debug-panel";
 import { GameEventPanel } from "../../components/ui/event-panel";
+import { MessagePanel } from "../../components/ui/msg-panel";
 import { UnitInfoPanel } from "../../components/ui/unit-info-panel";
 
 import '../../data';
@@ -68,6 +69,7 @@ function App() {
         </div>
       </div>
       <div className="border mt-4 rounded-md h-1/3">
+        <MessagePanel></MessagePanel>
       </div>
     </div>
   );

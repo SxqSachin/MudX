@@ -28,7 +28,7 @@ const generator = (): Enemy => {
     phyDef: 0,
     powAtk: 0,
     powDef: 0,
-    spoils: [],
+    spoils: 'gold-icon',
   };
   return new Unit(unitData);
 };

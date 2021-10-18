@@ -56,8 +56,8 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     applyEnvironment(gameEnvironment);
 
     if (enemy.status.curHP <= 0) {
-      gameEnvironment.event = battleEndEvent()
-      await delay(1000);
+      gameEnvironment.event = battleEndEvent({ enemy }, gameEnvironment);
+      await delay(600);
       gameEnvironment.panels.add("EVENT").delete("BATTLE");
     }
 
