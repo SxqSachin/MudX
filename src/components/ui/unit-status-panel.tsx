@@ -13,7 +13,9 @@ export function UnitStatusPanel({ unit }: UnitStatusPanelParam) {
             <li className="mb-1" key={key}>
               <span> {i18n(key)} </span>
               <span className="float-right">
-                {unit.status[key as UnitStatusType]}
+                {
+                  // @ts-ignore
+                  unit[key] as UnitStatusType ?? unit.status[key as UnitStatusType]}
               </span>
             </li>
           );

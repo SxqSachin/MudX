@@ -45,3 +45,11 @@ export function toArray<T>(obj: T | T[]): T[] {
 // ====================
 
 export const noop: VoidCallback = () => void(0);
+
+export async function delay(ms: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  })
+}

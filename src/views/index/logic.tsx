@@ -1,4 +1,4 @@
-import { GameEvents, } from "../../data";
+import { Enemies, GameEvents, } from "../../data";
 import { endEvent } from "../../models/event/event-end";
 import { storyEndEvent } from "../../models/event/story-end";
 import { ItemAction } from "../../types/action";
@@ -24,7 +24,11 @@ export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option:
 
   const optionNextType = getOptionNextType(option, gameEnv);
   let gameEvent = calcOptionNextEvent(option, gameEnv);
-  if (optionNextType === GameEventNextType.PUSH_STORY) {
+
+  if (optionNextType === GameEventNextType.ENTER_BATTLE) {
+    gameEnv.enemy = Enemies.get(option.enemyID!)();
+    gameEnv.panels.add("BATTLE").delete("EVENT");
+  } else if (optionNextType === GameEventNextType.PUSH_STORY) {
     if (gameEnv.story.curPage >= gameEnv.story.totalPage) { // 故事读完了
       gameEvent = storyEndEvent();
     } else { // 推进到下一章节

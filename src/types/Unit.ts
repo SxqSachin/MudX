@@ -114,11 +114,15 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
   phyDef: number;
   powAtk: number;
   powDef: number;
+  speed: number;
 
   name: string;
 }
 
 export type UnitData = XSerializable & {
+  id: string;
+  level: number;
+
   name: string;
 
   maxHP: number;
@@ -144,9 +148,14 @@ export type UnitData = XSerializable & {
 
   items: { [id in ItemID]: ItemData[] };
   skills: { [id in SkillID]: SkillData };
+
+  spoils?: (() => ItemID | ItemID[]) | ItemID | ItemID[];
 }
-export type UnitStatusType = Exclude<keyof UnitData, 'items' | 'skills' | 'xid' | 'name'>;
+export type UnitStatusType = Exclude<keyof UnitData, 'items' | 'skills' | 'xid' | 'name' | 'spoils' | 'id'>;
 export type UnitStatus = { [status in UnitStatusType]: number };
 
 export type SourceUnit = IUnit;
 export type TargetUnit = IUnit;
+
+export interface Enemy extends IUnit {
+}

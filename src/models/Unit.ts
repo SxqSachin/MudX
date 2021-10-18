@@ -1,10 +1,11 @@
+import { ElementType } from "react";
 import { Publisher, Subscriber } from "../core/subscribe";
 import { Items } from "../data";
 import { DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, Enemy, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";
@@ -299,6 +300,7 @@ export class Unit implements IUnit {
     delete data.items;
     delete data.skills;
     delete data.name;
+    delete data.id;
 
     const status = data as UnitStatus;
 
@@ -322,6 +324,9 @@ export class Unit implements IUnit {
   get powDef() {
     return this.unitEntity.powDef;
   }
+  get speed() {
+    return this.status.speed + this.status.dexterity * 0.2;
+  }
 
   get name() {
     return this.unitEntity.name;
@@ -333,7 +338,9 @@ export class Unit implements IUnit {
 
   public static create(name: string): IUnit {
     const unitData: UnitData = {
+      id: uuid(),
       name,
+      level: 1,
       curHP: 10,
       curMP: 10,
       curSP: 10,
@@ -362,6 +369,7 @@ export class Unit implements IUnit {
 
   public static emptyStatus(): { [key in UnitStatusType]: number } {
     return {
+      level: 1,
       curHP: 0,
       curMP: 0,
       curSP: 0,

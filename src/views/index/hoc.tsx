@@ -1,10 +1,12 @@
 import { BattlePanel } from "../../components/ui/battle-panel";
 import { StoryChoosePanel } from "../../components/ui/story-choose-panel";
 import { GameEvents } from "../../data";
+import { battleEndEvent, } from "../../models/event/battle-end";
 import { DataCallback } from "../../types";
 import { BattleAction } from "../../types/battle";
 import { GameEnvironment } from "../../types/game";
 import { Story } from "../../types/game-event";
+import { delay } from "../../utils";
 
 type MainPanelParam = {
   gameEnvironment: GameEnvironment;
@@ -37,13 +39,26 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     return null;
   }
 
-  const handleBattleAction = (action: BattleAction) => {
+  const handleBattleAction = async (action: BattleAction) => {
     const { player, enemy } = gameEnvironment;
     if (!enemy) {
       return;
     }
+    if (action === 'ENTER_BATTLE') {
+      if (enemy.status.speed > player.status.speed) {
+        enemy.attack(player);
+      }
+    }
     if (action === 'ATTACK') {
       player.attack(enemy);
+    }
+
+    applyEnvironment(gameEnvironment);
+
+    if (enemy.status.curHP <= 0) {
+      gameEnvironment.event = battleEndEvent()
+      await delay(1000);
+      gameEnvironment.panels.add("EVENT").delete("BATTLE");
     }
 
     applyEnvironment(gameEnvironment);

@@ -1,6 +1,7 @@
 import { GameAction, } from "./action";
 import { ConditionExpr } from "./condition";
 import { GameEnvironment } from "./game";
+import { Enemy, IUnit } from "./Unit";
 
 export type GameMap = string;
 export enum GameMapType {
@@ -32,6 +33,7 @@ export type GameEventFork = {
 
 export enum GameEventNextType {
   GAME_EVENT_END = "EVENT_END",
+  ENTER_BATTLE = "ENTER_BATTLE",
   PUSH_STORY = "PUSH_STORY",
   STORY_END = "STORY_END",
   START_NEW_STORY = "START_NEW_STORY",
@@ -51,6 +53,8 @@ export type GameEventOption = {
   onChoose?: GameAction | GameAction[];
 
   next: GameEventNextType | GameEventID | ((environment: GameEnvironment) => GameEventID | GameEvent);
+
+  enemyID?: string;
 }
 
 // 一组事件的合计

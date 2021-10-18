@@ -12,7 +12,8 @@ type BattlePanelParam = {
 }
 export function BattlePanel({player, enemy, onAction}: BattlePanelParam) {
   useEffect(() => {
-  }, []);
+    onAction("ENTER_BATTLE");
+  }, [player, enemy]);
 
   const handleAction = (action: BattleAction) => {
     onAction(action);

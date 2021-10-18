@@ -1,1 +1,1 @@
-export type BattleAction = "ATTACK";
+export type BattleAction = "ATTACK" | "ENTER_BATTLE";

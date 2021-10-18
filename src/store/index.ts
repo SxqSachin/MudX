@@ -1,13 +1,13 @@
 import { atom } from "recoil";
 import { GameEnvironment, GamePanelType, GameState } from "../types/game";
 import { GameEvent, GameEventFork, Story } from "../types/game-event";
-import { IUnit } from "../types/Unit";
+import { Enemy, IUnit } from "../types/Unit";
 
 export const GameEnvironmentAtom = atom<GameEnvironment>({
   key: "GAME_ENVIRONMENT_ATOM",
   default: {
     player: undefined as any as IUnit,
-    enemy: undefined as any as IUnit,
+    enemy: undefined as any as Enemy,
 
     story: undefined as any as Story,
     event: undefined as any as GameEvent,
