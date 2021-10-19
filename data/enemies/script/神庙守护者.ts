@@ -1,6 +1,6 @@
-import { Unit } from "../../../models/Unit";
-import { Enemy, UnitData } from "../../../types/Unit";
-import { uuid } from "../../../utils/uuid";
+import { Unit } from "@/models/Unit";
+import { Enemy, UnitData } from "@/types/Unit";
+import { uuid } from "@/utils/uuid";
 
 const generator = (): Enemy => {
   const unitData: UnitData = {

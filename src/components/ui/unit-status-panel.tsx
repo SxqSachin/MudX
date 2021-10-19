@@ -1,5 +1,5 @@
 import { i18n } from "../../i18n";
-import { IUnit, UnitStatusType } from "../../types/Unit";
+import { IUnit, UnitStatusType } from "@/types/Unit";
 
 type UnitStatusPanelParam = {
   unit: IUnit;

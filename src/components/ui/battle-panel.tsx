@@ -1,7 +1,7 @@
 import { useEffect, } from "react";
-import { DataCallback, } from "../../types";
-import { BattleAction } from "../../types/battle";
-import { IUnit } from "../../types/Unit";
+import { DataCallback, } from "@/types";
+import { BattleAction } from "@/types/battle";
+import { IUnit } from "@/types/Unit";
 import { ProgressBar } from "../widget/progress-bar";
 
 type BattlePanelParam = {

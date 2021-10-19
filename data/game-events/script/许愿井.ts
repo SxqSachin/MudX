@@ -1,6 +1,6 @@
-import { simpleTextEvent } from "../../../models/event/simple-event";
-import { GameEvent, GameEventNextType } from "../../../types/game-event";
-import { getRandomString } from "../../../utils/random";
+import { simpleTextEvent } from "@/models/event/simple-event";
+import { GameEvent, GameEventNextType } from "@/types/game-event";
+import { getRandomString } from "@/utils/random";
 
 const _e2: GameEvent = {
   id: "许愿井_2",

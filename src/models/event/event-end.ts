@@ -1,4 +1,4 @@
-import { GameEvent, GameEventNextType } from "../../types/game-event";
+import { GameEvent, GameEventNextType } from "@/types/game-event";
 
 export function endEvent(): GameEvent {
   return {

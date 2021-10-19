@@ -1,9 +1,9 @@
 import { useEffect, useState, } from "react";
 import { useRecoilValue } from "recoil";
-import { Stories } from "../../data";
+import { Stories } from "@data";
 import { GameEnvironmentAtom } from "../../store";
-import { DataCallback, } from "../../types";
-import { Story, StoryGenerator } from "../../types/game-event";
+import { DataCallback, } from "@/types";
+import { Story, StoryGenerator } from "@/types/game-event";
 
 type StoryChoosePanelParam = {
   onChooseStory: DataCallback<Story>,

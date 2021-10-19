@@ -1,7 +1,7 @@
 import scriptList from "./script";
-import { GameEvent, GameEventID, Story, StoryEvent } from "../../types/game-event";
-import { deepClone } from "../../utils";
-import { storyEndEvent } from "../../models/event/story-end";
+import { GameEvent, GameEventID, Story, StoryEvent } from "@/types/game-event";
+import { deepClone } from "@/utils";
+import { storyEndEvent } from "@/models/event/story-end";
 
 const EventMap: Map<string, GameEvent> = new Map();
 

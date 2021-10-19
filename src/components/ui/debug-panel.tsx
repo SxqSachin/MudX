@@ -1,7 +1,7 @@
 import { useRecoilValue, } from "recoil";
 import { GameEnvironmentAtom } from "../../store";
-import { DataCallback, } from "../../types";
-import { GameEnvironment } from "../../types/game";
+import { DataCallback, } from "@/types";
+import { GameEnvironment } from "@/types/game";
 
 
 type DebugPanelParam = {

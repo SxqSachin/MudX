@@ -1,4 +1,4 @@
-import { GameEvents } from "../data";
+import { GameEvents } from "@data";
 import { GameMap, GameMapType, Story as StoryType, StoryEvent } from "../types/game-event";
 import { uuid } from "./uuid";
 

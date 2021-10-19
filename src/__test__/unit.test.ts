@@ -1,7 +1,7 @@
 import assert from "assert";
 import { XStorage } from "../core/storage";
-import { Items } from "../data";
-import { Skills } from "../data/skills";
+import { Items } from "@data";
+import { Skills } from "@data/skills";
 import { Item } from "../models/Item";
 import { Unit } from "../models/Unit";
 import { IUnit, UnitData } from "../types/Unit";

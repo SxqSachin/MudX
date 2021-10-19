@@ -1,4 +1,4 @@
-import { GameEvents } from "../data";
+import { GameEvents } from "@data";
 import { endEvent } from "../models/event/event-end";
 import { storyEndEvent } from "../models/event/story-end";
 import { GameEnvironment } from "../types/game";

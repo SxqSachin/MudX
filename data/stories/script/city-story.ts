@@ -1,5 +1,5 @@
 import { GameEvents } from "../..";
-import { StoryEvent, StoryGenerator } from "../../../types/game-event";
+import { StoryEvent, StoryGenerator } from "@/types/game-event";
 
 const generator: StoryGenerator = {
   id: "city-story",

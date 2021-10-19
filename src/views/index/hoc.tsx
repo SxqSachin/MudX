@@ -1,13 +1,13 @@
 import { BattlePanel } from "../../components/ui/battle-panel";
 import { StoryChoosePanel } from "../../components/ui/story-choose-panel";
 import { Message } from "../../core/message";
-import { GameEvents } from "../../data";
-import { battleEndEvent, } from "../../models/event/battle-end";
-import { DataCallback, VoidCallback } from "../../types";
-import { BattleAction } from "../../types/battle";
-import { GameEnvironment } from "../../types/game";
-import { Story } from "../../types/game-event";
-import { delay } from "../../utils";
+import { GameEvents } from "@data";
+import { battleEndEvent, } from "@/models/event/battle-end";
+import { DataCallback, VoidCallback } from "@/types";
+import { BattleAction } from "@/types/battle";
+import { GameEnvironment } from "@/types/game";
+import { Story } from "@/types/game-event";
+import { delay } from "@/utils";
 
 type MainPanelParam = {
   gameEnvironment: GameEnvironment;

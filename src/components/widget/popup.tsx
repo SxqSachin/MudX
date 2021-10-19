@@ -1,5 +1,5 @@
 import { ReactChild, } from "react";
-import { VoidCallback } from "../../types";
+import { VoidCallback } from "@/types";
 
 export type PopupParam = {
   title?: string;

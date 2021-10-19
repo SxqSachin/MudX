@@ -1,11 +1,11 @@
 import scriptList from './script';
 import jsonList from './json';
-import { deepClone, toArray } from '../../utils';
-import { Action } from '../../types/action';
-import { Item } from '../../models/Item';
-import { IItem, ItemData, ItemID } from '../../types/Item';
-import { EMPTY_XID } from '../../types/Object';
-import { UnitStatusType } from '../../types/Unit';
+import { deepClone, toArray } from '@/utils';
+import { Action } from '@/types/action';
+import { Item } from '@/models/Item';
+import { IItem, ItemData, ItemID } from '@/types/Item';
+import { EMPTY_XID } from '@/types/Object';
+import { UnitStatusType } from '@/types/Unit';
 
 const ItemMap: Map<string, Item> = new Map();
 const ItemDataMap: Map<string, ItemData> = new Map();

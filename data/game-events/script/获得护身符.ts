@@ -1,5 +1,5 @@
-import { GameEvent, GameEventNextType } from "../../../types/game-event";
-import { Dice, getRandomString } from "../../../utils/random";
+import { GameEvent, GameEventNextType } from "@/types/game-event";
+import { Dice, getRandomString } from "@/utils/random";
 
 const e: GameEvent = {
   id: "__game-event-1",

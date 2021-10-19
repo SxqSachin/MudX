@@ -4,7 +4,6 @@ import { Message, MessageData } from '../../core/message';
 import moment from 'moment'
 
 const MsgPanelWrapper = styled.div`
-  min-height: 400px;
 `;
 
 export function MessagePanel() {

@@ -1,13 +1,13 @@
 import { Message } from "../../core/message";
-import { Enemies, GameEvents, } from "../../data";
-import { endEvent } from "../../models/event/event-end";
-import { storyEndEvent } from "../../models/event/story-end";
-import { ItemAction } from "../../types/action";
-import { GameEnvironment } from "../../types/game";
-import { GameEventNextType, GameEventOption } from "../../types/game-event";
-import { IItem } from "../../types/Item";
-import { toArray } from "../../utils";
-import { calcOptionNextEvent, getOptionNextType } from "../../utils/game-event";
+import { Enemies, GameEvents, } from "@data";
+import { endEvent } from "@/models/event/event-end";
+import { storyEndEvent } from "@/models/event/story-end";
+import { ItemAction } from "@/types/action";
+import { GameEnvironment } from "@/types/game";
+import { GameEventNextType, GameEventOption } from "@/types/game-event";
+import { IItem } from "@/types/Item";
+import { toArray } from "@/utils";
+import { calcOptionNextEvent, getOptionNextType } from "@/utils/game-event";
 
 export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option: GameEventOption): GameEnvironment => {
   let gameEnv = gameEnvironment;

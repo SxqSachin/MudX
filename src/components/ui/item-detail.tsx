@@ -1,5 +1,5 @@
-import { ItemAction } from "../../types/action";
-import { IItem } from "../../types/Item";
+import { ItemAction } from "@/types/action";
+import { IItem } from "@/types/Item";
 import { Popup, PopupParam } from "../widget/popup";
 
 type ItemDetailUIParam = {

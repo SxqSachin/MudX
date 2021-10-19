@@ -1,7 +1,7 @@
-import { DataCallback, ReturnCallback } from "../../types";
-import { Story, StoryGenerator } from "../../types/game-event";
-import { Enemy } from "../../types/Unit";
-import { deepClone } from "../../utils";
+import { DataCallback, ReturnCallback } from "@/types";
+import { Story, StoryGenerator } from "@/types/game-event";
+import { Enemy } from "@/types/Unit";
+import { deepClone } from "@/utils";
 import scriptSssets from "./script";
 
 const generatorMap: Map<string, ReturnCallback<Enemy>> = new Map();

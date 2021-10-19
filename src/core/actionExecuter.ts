@@ -1,4 +1,4 @@
-import { Skills } from "../data";
+import { Skills } from "@data";
 import { Action, SelfAction } from "../types/action";
 import { IUnit } from "../types/Unit";
 

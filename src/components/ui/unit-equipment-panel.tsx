@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ItemAction } from "../../types/action";
-import { IItem } from "../../types/Item";
-import { IUnit } from "../../types/Unit";
-import { isEmpty } from "../../utils";
+import { ItemAction } from "@/types/action";
+import { IItem } from "@/types/Item";
+import { IUnit } from "@/types/Unit";
+import { isEmpty } from "@/utils";
 import { ItemDetailPopup } from "./item-detail";
 
 type UnitEquipmentPanelParam = {

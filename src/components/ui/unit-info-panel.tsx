@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ItemAction } from "../../types/action";
-import { IItem } from "../../types/Item";
-import { IUnit } from "../../types/Unit";
+import { ItemAction } from "@/types/action";
+import { IItem } from "@/types/Item";
+import { IUnit } from "@/types/Unit";
 import { UnitEquipmentPanel } from "./unit-equipment-panel";
 import { UnitItemPanel } from "./unit-item-panel";
 import { UnitStatusPanel } from "./unit-status-panel";

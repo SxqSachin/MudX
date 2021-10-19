@@ -5,13 +5,13 @@ import { GameEventPanel } from "../../components/ui/event-panel";
 import { MessagePanel } from "../../components/ui/msg-panel";
 import { UnitInfoPanel } from "../../components/ui/unit-info-panel";
 
-import '../../data';
+import '@data';
 
-import { GameEvents, } from "../../data";
-import { Unit } from "../../models/Unit";
+import { GameEvents, } from "@data";
+import { Unit } from "@/models/Unit";
 import { GameEnvironmentAtom, } from "../../store";
-import { GameEnvironment, } from "../../types/game";
-import { StoryUtils } from "../../utils/story";
+import { GameEnvironment, } from "@/types/game";
+import { StoryUtils } from "@/utils/story";
 import { BattlePanelHOC, StoryChoosePanelHOC } from "./hoc";
 import { handleChooseOption, handleItemAction } from "./logic";
 

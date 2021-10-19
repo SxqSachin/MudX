@@ -1,7 +1,7 @@
 import { ElementType } from "react";
 import { Message } from "../core/message";
 import { Publisher, Subscriber } from "../core/subscribe";
-import { Items } from "../data";
+import { Items } from "@data";
 import { DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";

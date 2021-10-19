@@ -1,9 +1,9 @@
 import scriptSkillList from './script';
 import jsonSkillList from './json';
-import { Skill } from '../../models/Skill';
-import { ISkill, SkillData, SkillID } from '../../types/Skill';
-import { deepClone, toArray } from '../../utils';
-import { Action, SelfAction } from '../../types/action';
+import { Skill } from '@/models/Skill';
+import { ISkill, SkillData, SkillID } from '@/types/Skill';
+import { deepClone, toArray } from '@/utils';
+import { Action, SelfAction } from '@/types/action';
 
 const SkillMap: Map<string, Skill> = new Map();
 

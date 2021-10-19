@@ -1,6 +1,6 @@
-import { addPlayerHPOption, removePlayerHPOption } from "../../../models/game-event-option";
-import { GameEvent } from "../../../types/game-event";
-import { getRandomString } from "../../../utils/random";
+import { addPlayerHPOption, removePlayerHPOption } from "@/models/game-event-option";
+import { GameEvent } from "@/types/game-event";
+import { getRandomString } from "@/utils/random";
 
 const event: GameEvent = Object.freeze({
   id: "test-center",

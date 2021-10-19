@@ -1,5 +1,5 @@
-import { Story, StoryGenerator } from "../../types/game-event";
-import { deepClone } from "../../utils";
+import { Story, StoryGenerator } from "@/types/game-event";
+import { deepClone } from "@/utils";
 import scriptStoryAssets from "./script";
 
 const StoryMap: Map<string, Story> = new Map();

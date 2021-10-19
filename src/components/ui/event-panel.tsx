@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { runExpr } from "../../core/expr";
 import { GameEnvironmentAtom } from "../../store";
-import { DataCallback } from "../../types";
-import { GameEvent, GameEventFork, GameEventOption } from "../../types/game-event";
-import { isEmpty, toArray } from "../../utils";
-import { getRandomString } from "../../utils/random";
+import { DataCallback } from "@/types";
+import { GameEvent, GameEventFork, GameEventOption } from "@/types/game-event";
+import { isEmpty, toArray } from "@/utils";
+import { getRandomString } from "@/utils/random";
 
 type GameEventPanelParam = {
   event: GameEvent,

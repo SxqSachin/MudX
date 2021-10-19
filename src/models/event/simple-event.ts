@@ -1,5 +1,5 @@
-import { GameAction } from "../../types/action";
-import { GameEvent, GameEventNextType } from "../../types/game-event";
+import { GameAction } from "@/types/action";
+import { GameEvent, GameEventNextType } from "@/types/game-event";
 
 export function simpleTextEvent(title: string, description: string, optionTitle: string): GameEvent {
   return {

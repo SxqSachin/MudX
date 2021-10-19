@@ -1,6 +1,6 @@
-import { ItemData } from "../../../types/Item";
-import { EMPTY_XID } from "../../../types/Object";
-import { IUnit } from "../../../types/Unit";
+import { ItemData } from "@/types/Item";
+import { EMPTY_XID } from "@/types/Object";
+import { IUnit } from "@/types/Unit";
 
 export const item: ItemData = {
   xid: EMPTY_XID,

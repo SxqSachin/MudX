@@ -1,4 +1,4 @@
-import { SkillData } from "../../../types/Skill";
+import { SkillData } from "@/types/Skill";
 
 export const duocui: SkillData = {
   colddown: 10,
