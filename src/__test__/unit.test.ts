@@ -10,6 +10,8 @@ import { uuid } from "../utils/uuid";
 describe('Unit Test', () => {
   it('Create', () => {
     const unitData: UnitData = {
+      level: 1,
+      id: '12',
       name: 'test',
       curHP: 10,
       curMP: 10,
