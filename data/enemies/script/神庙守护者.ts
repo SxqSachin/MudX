@@ -1,8 +1,10 @@
+import { Enemy } from "@/models/Enemy";
 import { Unit } from "@/models/Unit";
-import { Enemy, UnitData } from "@/types/Unit";
+import { IEnemy } from "@/types/enemy";
+import { UnitData } from "@/types/Unit";
 import { uuid } from "@/utils/uuid";
 
-const generator = (): Enemy => {
+const generator = (): IEnemy => {
   const unitData: UnitData = {
     name: "神庙守护者",
     id: "神庙守护者",
@@ -30,7 +32,7 @@ const generator = (): Enemy => {
     powDef: 0,
     spoils: 'gold-icon',
   };
-  return new Unit(unitData);
+  return new Enemy(unitData);
 };
 
 export default {

@@ -1,7 +1,7 @@
 import { GameAction, } from "./action";
 import { ConditionExpr } from "./condition";
 import { GameEnvironment } from "./game";
-import { Enemy, IUnit } from "./Unit";
+import { IUnit } from "./Unit";
 
 export type GameMap = string;
 export enum GameMapType {

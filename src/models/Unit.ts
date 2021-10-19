@@ -6,7 +6,7 @@ import { DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { DamageInfo, Enemy, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";

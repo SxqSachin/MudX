@@ -157,6 +157,3 @@ export type UnitStatus = { [status in UnitStatusType]: number };
 
 export type SourceUnit = IUnit;
 export type TargetUnit = IUnit;
-
-export interface Enemy extends IUnit {
-}

@@ -3,11 +3,11 @@ import { addPlayerHPOption, } from "@/models/game-event-option";
 import { GameEnvironment } from "@/types/game";
 import { GameEvent, GameEventNextType } from "@/types/game-event";
 import { IItem, ItemID } from "@/types/Item";
-import { Enemy } from "@/types/Unit";
+import { IEnemy } from "@/types/enemy";
 import { toArray } from "@/utils";
 import { uuid } from "@/utils/uuid";
 
-type BattleEndEventParam = { title?: string, description?: string, optionTitle?: string, enemy?: Enemy };
+type BattleEndEventParam = { title?: string, description?: string, optionTitle?: string, enemy?: IEnemy };
 export function battleEndEvent({ title, description, optionTitle, enemy}: BattleEndEventParam = {}, env: GameEnvironment): GameEvent {
   !title && (title = '战斗结束');
   !description && (description = '你战胜了对手');
