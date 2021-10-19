@@ -28,7 +28,7 @@ function App() {
     forceUpdate();
 
     // @ts-ignore
-    global.env = env;
+    window.env = env;
   }
 
   useEffect(() => {

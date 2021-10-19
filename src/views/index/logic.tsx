@@ -1,3 +1,4 @@
+import { Message } from "../../core/message";
 import { Enemies, GameEvents, } from "../../data";
 import { endEvent } from "../../models/event/event-end";
 import { storyEndEvent } from "../../models/event/story-end";

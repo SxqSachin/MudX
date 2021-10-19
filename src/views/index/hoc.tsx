@@ -1,8 +1,9 @@
 import { BattlePanel } from "../../components/ui/battle-panel";
 import { StoryChoosePanel } from "../../components/ui/story-choose-panel";
+import { Message } from "../../core/message";
 import { GameEvents } from "../../data";
 import { battleEndEvent, } from "../../models/event/battle-end";
-import { DataCallback } from "../../types";
+import { DataCallback, VoidCallback } from "../../types";
 import { BattleAction } from "../../types/battle";
 import { GameEnvironment } from "../../types/game";
 import { Story } from "../../types/game-event";
@@ -39,21 +40,32 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     return null;
   }
 
+  const battleActionMap: { [action in BattleAction]: VoidCallback } = {
+    ATTACK: () => {
+      player.attack(enemy);
+    },
+    ENTER_BATTLE: async () => {
+      Message.push("=========================")
+      Message.push("进入战斗");
+      await delay(620);
+      const isPlayerFirst = enemy.status.speed <= player.status.speed;
+      Message.push(`速度对比：玩家(${player.status.speed}) vs 对方(${enemy.status.speed})。${isPlayerFirst?"玩家":"对方"}先手。`);
+      await delay(620);
+      if (!isPlayerFirst) {
+        enemy.attack(player);
+      }
+
+      applyEnvironment(gameEnvironment);
+    },
+  }
+
   const handleBattleAction = async (action: BattleAction) => {
     const { player, enemy } = gameEnvironment;
     if (!enemy) {
       return;
     }
-    if (action === 'ENTER_BATTLE') {
-      if (enemy.status.speed > player.status.speed) {
-        enemy.attack(player);
-      }
-    }
-    if (action === 'ATTACK') {
-      player.attack(enemy);
-    }
 
-    applyEnvironment(gameEnvironment);
+    await battleActionMap[action]();
 
     if (enemy.status.curHP <= 0) {
       gameEnvironment.event = battleEndEvent({ enemy }, gameEnvironment);

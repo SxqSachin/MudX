@@ -1,4 +1,4 @@
-const storage = global.localStorage;
+const storage = window.localStorage;
 
 class _XStorage implements Storage {
   [name: string]: any;

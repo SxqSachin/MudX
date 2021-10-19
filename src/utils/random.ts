@@ -66,4 +66,4 @@ Object.defineProperty(Dice, 'd100', {
 });
 
 //@ts-ignore
-global.Dice = Dice;
+window.Dice = Dice;
