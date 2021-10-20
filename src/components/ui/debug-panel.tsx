@@ -2,6 +2,7 @@ import { useRecoilValue, } from "recoil";
 import { GameEnvironmentAtom } from "../../store";
 import { DataCallback, } from "@/types";
 import { GameEnvironment } from "@/types/game";
+import { Enemies } from "@data/enemies";
 
 
 type DebugPanelParam = {
@@ -20,6 +21,7 @@ export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
   const enterBattle = () => {
     gameEnvironment.panels.delete('EVENT');
     gameEnvironment.panels.add('BATTLE');
+    gameEnvironment.enemy = Enemies.getGenerator('dummy')(gameEnvironment);
 
     onEnvironmentChange(gameEnvironment);
   }

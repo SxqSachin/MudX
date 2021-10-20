@@ -2,11 +2,11 @@ import { ElementType } from "react";
 import { Message } from "../core/message";
 import { Publisher, Subscriber } from "../core/subscribe";
 import { Items } from "@data";
-import { DataProcessCallback, VoidCallback } from "../types";
+import { AsyncDataProcessCallback, DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSimpleEventData, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
 import { deepClone } from "../utils";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";
@@ -39,7 +39,7 @@ export class Unit implements IUnit {
     this._reinitSkills();
   }
 
-  attack(target: IUnit) {
+  async attack(target: IUnit) {
     const damage = this.phyAtk;
     const targetDef = target.phyDef;
 
@@ -48,17 +48,17 @@ export class Unit implements IUnit {
     this.fire('beforeAttack', { source: this, target, damage: damageVal });
     target.fire('beforeAttacked', { source: this, target, damage: damageVal });
 
-    const resDamage = this.dealDamage(target, damageVal)
+    const resDamage = await this.dealDamage(target, damageVal)
     Message.push(`${this.data.name} 攻击了 ${target.data.name}，造成 ${resDamage} 点伤害 `);
 
     this.fire('afterAttack', { source: this, target, damage: resDamage });
     target.fire('afterAttacked', { source: this, target, damage: resDamage });
   }
 
-  dealDamage(target: IUnit, damage: number, info: DamageInfo = DefaultDamageInfo) {
+  async dealDamage(target: IUnit, damage: number, info: DamageInfo = DefaultDamageInfo) {
     if (info?.triggerEvent) {
-      damage = this.fire('dealDamage', { source: this, target, damage })?.damage ?? damage;
-      damage = target.fire('takeDamage', { source: this, target, damage })?.damage ?? damage;
+      damage = (await this.fire('dealDamage', { source: this, target, damage }))?.damage ?? damage;
+      damage = (await target.fire('takeDamage', { source: this, target, damage }))?.damage ?? damage;
     }
 
     target.decreaseStatus('curHP', Math.max(damage, 0));
@@ -262,22 +262,24 @@ export class Unit implements IUnit {
     return this;
   }
 
-  on(event: 'beforeAttack' | 'afterAttack', listener: DataProcessCallback<UnitAttackEventData>): VoidCallback;
-  on(event: 'beforeAttacked' | 'afterAttacked', listener: DataProcessCallback<UnitAttackedEventData>): VoidCallback;
-  on(event: 'dealDamage' | 'takeDamage', listener: DataProcessCallback<UnitDamageEventData>): VoidCallback;
-  on(event: 'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', listener: DataProcessCallback<UnitItemEventData>): VoidCallback;
-  on(event: 'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', listener: DataProcessCallback<UnitSkillEventData>): VoidCallback;
-  on(event: UnitEventType, listener: DataProcessCallback<UnitEventData>): VoidCallback {
+  on(event: 'beforeAttack' | 'afterAttack', listener: AsyncDataProcessCallback<UnitAttackEventData>): VoidCallback;
+  on(event: 'beforeAttacked' | 'afterAttacked', listener: AsyncDataProcessCallback<UnitAttackedEventData>): VoidCallback;
+  on(event: 'dealDamage' | 'takeDamage', listener: AsyncDataProcessCallback<UnitDamageEventData>): VoidCallback;
+  on(event: 'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', listener: AsyncDataProcessCallback<UnitItemEventData>): VoidCallback;
+  on(event: 'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', listener: AsyncDataProcessCallback<UnitSkillEventData>): VoidCallback;
+  on(event: 'roundStart' | 'roundEnd' | 'aiRoundStart', listener: AsyncDataProcessCallback<UnitSimpleEventData>): VoidCallback;
+  on(event: UnitEventType, listener: AsyncDataProcessCallback<UnitEventData>): VoidCallback {
     return this._subscriber.subscribe(this._publisher, event, listener);
   }
 
-  fire(event: 'beforeAttack' | 'afterAttack', data: UnitAttackEventData): UnitAttackEventData;
-  fire(event: 'beforeAttacked' | 'afterAttacked', data: UnitAttackedEventData): UnitAttackedEventData;
-  fire(event: 'dealDamage' | 'takeDamage', data: UnitDamageEventData): UnitAttackedEventData;
-  fire(event: 'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', data: UnitItemEventData): UnitItemEventData;
-  fire(event: 'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', data: UnitSkillEventData): UnitSkillEventData;
-  fire(event: UnitEventType, data: UnitEventData): UnitEventData {
-    return this._publisher.publish(event, data);
+  async fire(event: 'beforeAttack' | 'afterAttack', data: UnitAttackEventData): Promise<UnitAttackEventData>;
+  async fire(event: 'beforeAttacked' | 'afterAttacked', data: UnitAttackedEventData): Promise<UnitAttackedEventData>;
+  async fire(event: 'dealDamage' | 'takeDamage', data: UnitDamageEventData): Promise<UnitAttackedEventData>;
+  async fire(event: 'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', data: UnitItemEventData): Promise<UnitItemEventData>;
+  async fire(event: 'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', data: UnitSkillEventData): Promise<UnitSkillEventData>;
+  async fire(event: 'roundStart' | 'roundEnd' | 'aiRoundStart', data: UnitSimpleEventData): Promise<UnitSimpleEventData>;
+  async fire(event: UnitEventType, data: UnitEventData): Promise<UnitEventData> {
+    return await this._publisher.publish(event, data);
   }
 
   private _reinitItems() {

@@ -1,4 +1,4 @@
-import { DataProcessCallback, VoidCallback } from "../types"
+import { AsyncDataProcessCallback, DataProcessCallback, VoidCallback } from "../types"
 import { XID } from "../types/Object";
 import { uuid } from "../utils/uuid";
 
@@ -15,12 +15,12 @@ export class Subscriber<EVENT, DATA> {
     this._xid = uuid();
   }
 
-  subscribe(publisher: Publisher<EVENT, DATA>, event: XEvent<EVENT>, listener: DataProcessCallback<DATA>): VoidCallback {
+  subscribe(publisher: Publisher<EVENT, DATA>, event: XEvent<EVENT>, listener: AsyncDataProcessCallback<DATA>): VoidCallback {
     return publisher.addSubscribe(this, event, listener);
   }
 }
 
-type SubscribeEventObject<EVENT, DATA> = {event: XEvent<EVENT>, xid: EventDataXID, listener: DataProcessCallback<XEventData<DATA>>};
+type SubscribeEventObject<EVENT, DATA> = {event: XEvent<EVENT>, xid: EventDataXID, listener: AsyncDataProcessCallback<XEventData<DATA>>};
 export class Publisher<EVENT, DATA> {
   private _subscriberMap!: Map<SubscriberXID, SubscribeEventObject<EVENT, DATA>[]>;
 
@@ -28,13 +28,13 @@ export class Publisher<EVENT, DATA> {
     this._subscriberMap = new Map();
   }
 
-  publish(event: XEvent<EVENT>, data: XEventData<DATA>): DATA {
+  async publish(event: XEvent<EVENT>, data: XEventData<DATA>): Promise<DATA> {
     let curData = data;
 
-    this._subscriberMap.forEach(subscribeData => {
-      subscribeData.forEach(eventData => {
+    this._subscriberMap.forEach(async subscribeData => {
+      subscribeData.forEach(async eventData => {
         if (eventData.event === event) {
-          const curProcessRes = eventData.listener(curData);
+          const curProcessRes = await eventData.listener(curData);
           curData = curProcessRes ?? curData;
         }
       })
@@ -43,7 +43,7 @@ export class Publisher<EVENT, DATA> {
     return curData;
   }
 
-  addSubscribe(subscribe: Subscriber<EVENT, DATA>, event: XEvent<EVENT>, listener: DataProcessCallback<XEventData<DATA>>): VoidCallback {
+  addSubscribe(subscribe: Subscriber<EVENT, DATA>, event: XEvent<EVENT>, listener: AsyncDataProcessCallback<XEventData<DATA>>): VoidCallback {
     const subscribeXID = subscribe.xid;
     const listenerXID = uuid();
 

@@ -1,4 +1,4 @@
-import { DataCallback, DataProcessCallback, VoidCallback } from ".";
+import { AsyncDataProcessCallback, DataCallback, DataProcessCallback, VoidCallback } from ".";
 import { Item } from "../models/Item";
 import { Skill } from "../models/Skill";
 import { GameEnvironment } from "./game";
@@ -13,7 +13,8 @@ export type UnitEventType =
   'addItem' | 'removeItem' |
   'equipItem' | 'unequipItem' |
   'learnSkill' | 'forgetSkill' |
-  'castSkill' | 'beSkillTarget'
+  'castSkill' | 'beSkillTarget' |
+  'roundStart' | 'roundEnd' | 'aiRoundStart'
   ;
 ;
 
@@ -32,27 +33,29 @@ export type UnitDamageEventData = Omit<UnitEventData, 'item' | 'skill'>;
 
 export type UnitItemEventData = Pick<UnitEventData, 'item'>;
 export type UnitSkillEventData = Pick<UnitEventData, 'source' | 'target' | 'skill'>;
-const a: UnitSkillEventData = {} as UnitSkillEventData;
+export type UnitSimpleEventData = Pick<UnitEventData, 'source' | 'target'>;
 
-type _T1<T, T2> = (event: T, data: T2) => T2 | null;
+type _T1<T, T2> = (event: T, data: T2) => Promise<T2 | null>;
 export type UnitFireEventFunc =
   _T1<'beforeAttack' | 'afterAttack', UnitAttackEventData> &
   _T1<'beforeAttacked' | 'afterAttacked', UnitAttackedEventData> &
   _T1<'dealDamage' | 'takeDamage', UnitDamageEventData> &
   _T1<'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', UnitItemEventData> &
-  _T1<'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', UnitSkillEventData>
+  _T1<'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', UnitSkillEventData> &
+  _T1<'roundStart' | 'roundEnd' | 'aiRoundStart', UnitSimpleEventData>
   ;
   // (event: UnitEventType, data: UnitEventData) => void |
   // ((event: 'beforeAttack' | 'doAttack' | 'afterAttack', data: UnitAttackEventData) => void) |
   // ((event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', data: UnitAttackedEventData) => void);
 
-type _T2<T, T2> = (event: T, listener: DataProcessCallback<T2>) => VoidCallback;
+type _T2<T, T2> = (event: T, listener: AsyncDataProcessCallback<T2>) => VoidCallback;
 export type UnitEventListener =
   _T2<'beforeAttack' | 'afterAttack', UnitAttackEventData> &
   _T2<'beforeAttacked' | 'afterAttacked', UnitAttackedEventData> &
   _T2<'dealDamage' | 'takeDamage', UnitDamageEventData> &
   _T2<'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', UnitItemEventData> &
-  _T2<'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', UnitSkillEventData>
+  _T2<'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', UnitSkillEventData> &
+  _T2<'roundStart' | 'roundEnd' | 'aiRoundStart', UnitSimpleEventData>
   ;
   // ((event: 'beforeAttack' | 'doAttack' | 'afterAttack', listener: DataCallback<UnitAttackEventData>) => VoidCallback) |
   // ((event: 'beforeAttacked' | 'beAttacked' | 'afterAttacked', listener: DataCallback<UnitAttackedEventData>) => VoidCallback);

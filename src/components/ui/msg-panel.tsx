@@ -22,7 +22,7 @@ export function MessagePanel() {
       {
         [...msgList].reverse().map((msg, index) => {
           return (
-            <p key={msg.timestamp + index}><span>{moment(msg.timestamp).format('HH:mm:ss')}</span> <span className="ml-8">{msg.msg}</span></p>
+            <p key={msg.timestamp + index + msg.msg}><span>{moment(msg.timestamp).format('HH:mm:ss')}</span> <span className="ml-8">{msg.msg}</span></p>
           )
         })
       }
