@@ -42,7 +42,7 @@ function App() {
     gameEnvironment.panels.add('EVENT');
 
     const player = Unit.create('player');
-    const enemy = Enemies.get('神庙守护者')(gameEnvironment);
+    const enemy = Enemies.getGenerator('神庙守护者')(gameEnvironment);
 
     gameEnvironment.player = player;
     gameEnvironment.enemy = enemy;

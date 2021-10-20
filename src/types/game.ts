@@ -16,3 +16,5 @@ export type GameEnvironment = {
 
 export type GameState = "EVENT" | "BATTLE" | "CHOOSE_STORY";
 export type GamePanelType = "EVENT" | "BATTLE" | "UNIT_STATUS" | "DEBUG" | "STORY_CHOOSE";
+
+export type EnvObjectGenerator<T> = (env: GameEnvironment) => T;

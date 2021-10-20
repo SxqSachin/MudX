@@ -27,7 +27,7 @@ export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option:
   let gameEvent = calcOptionNextEvent(option, gameEnv);
 
   if (optionNextType === GameEventNextType.ENTER_BATTLE) {
-    gameEnv.enemy = Enemies.get(option.enemyID!)();
+    gameEnv.enemy = Enemies.getGenerator(option.enemyID!)(gameEnv);
     gameEnv.panels.add("BATTLE").delete("EVENT");
   } else if (optionNextType === GameEventNextType.PUSH_STORY) {
     if (gameEnv.story.curPage >= gameEnv.story.totalPage) { // 故事读完了
