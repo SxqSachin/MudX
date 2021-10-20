@@ -69,13 +69,14 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     return null;
   }
   const battleActionMap: { [action in BattleAction]: VoidCallback } = {
-    ATTACK: async () => {
+    ATTACK: async function() {
       player.attack(enemy);
 
       await delay(1000);
-      setLastRoundType("ENEMY");
+
+      await this.PLAYER_ROUND_END();
     },
-    ENTER_BATTLE: async () => {
+    ENTER_BATTLE: async function() {
       Message.push("=========================")
       Message.push("进入战斗");
       await delay(620);
@@ -91,7 +92,7 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
 
       applyEnvironment(gameEnvironment);
     },
-    ROUND_START: async () => {
+    ROUND_START: async function() {
       setCurRoundNum(curRoundNum + 1);
       if (!gameEnvironment.battle) {
         gameEnvironment.battle = {
@@ -102,28 +103,31 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
         gameEnvironment.battle.round += 1;
       }
     },
-    ROUND_END: async () => {
+    ROUND_END: async function() {
     },
-    PLAYER_ROUND_START: async () => {
+    PLAYER_ROUND_START: async function() {
       await player.fire("roundStart", {source: player, target: enemy})
       Message.push("玩家回合开始");
     },
-    PLAYER_ROUND_END: async () => {
+    PLAYER_ROUND_END: async function() {
       await player.fire("roundEnd", {source: player, target: enemy})
       Message.push("玩家回合结束");
+
+      await this.ENEMY_ROUND_START();
     },
-    ENEMY_ROUND_START: async () => {
+    ENEMY_ROUND_START: async function() {
       await enemy.fire("roundStart", {source: enemy, target: player})
       Message.push("敌方回合开始");
 
       await enemy.fire("aiRoundStart", {source: enemy, target: player})
 
       await delay(1000);
-      setLastRoundType("PLAYER");
+      await this.ENEMY_ROUND_END();
     },
-    ENEMY_ROUND_END: async () => {
+    ENEMY_ROUND_END: async function() {
       await enemy.fire("roundEnd", {source: enemy, target: player})
       Message.push("敌方回合结束");
+      await this.PLAYER_ROUND_START();
     },
   }
 
