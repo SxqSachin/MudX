@@ -1,9 +1,10 @@
+import { IEnemy } from "./enemy";
 import { GameEvent, GameEventFork, Story } from "./game-event";
 import { IUnit } from "./Unit";
 
 export type GameEnvironment = {
   player: IUnit;
-  enemy?: IUnit;
+  enemy?: IEnemy;
 
   story: Story;
   event: GameEvent;

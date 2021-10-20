@@ -1,6 +1,6 @@
-import { BattlePanel } from "../../components/ui/battle-panel";
-import { StoryChoosePanel } from "../../components/ui/story-choose-panel";
-import { Message } from "../../core/message";
+import { BattlePanel } from "@/components/ui/battle-panel";
+import { StoryChoosePanel } from "@/components/ui/story-choose-panel";
+import { Message } from "@/core/message";
 import { GameEvents } from "@data";
 import { battleEndEvent, } from "@/models/event/battle-end";
 import { DataCallback, VoidCallback } from "@/types";
@@ -8,6 +8,8 @@ import { BattleAction } from "@/types/battle";
 import { GameEnvironment } from "@/types/game";
 import { Story } from "@/types/game-event";
 import { delay } from "@/utils";
+import { GameEventPanel } from "@/components/ui/event-panel";
+import { handleChooseOption } from "../logic";
 
 type MainPanelParam = {
   gameEnvironment: GameEnvironment;
@@ -77,4 +79,14 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
   }
 
   return <BattlePanel player={player} enemy={enemy} onAction={handleBattleAction}></BattlePanel>
+}
+
+export const GameEventPanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelParam) => {
+  const { panels } = gameEnvironment;
+
+  if (!panels.has("EVENT")) {
+    return null;
+  }
+
+  return <GameEventPanel event={gameEnvironment.event} onChooseOption={option => applyEnvironment(handleChooseOption(gameEnvironment)(option))}></GameEventPanel>
 }

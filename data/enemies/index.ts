@@ -3,6 +3,7 @@ import { Story, StoryGenerator } from "@/types/game-event";
 import { IEnemy } from "@/types/enemy";
 import { deepClone } from "@/utils";
 import scriptSssets from "./script";
+import { GameEnvironment } from "@/types/game";
 
 const generatorMap: Map<string, ReturnCallback<IEnemy>> = new Map();
 
@@ -14,8 +15,8 @@ scriptSssets.forEach(generator => {
 });
 
 const Enemies = {
-  get: (id: string): ReturnCallback<IEnemy> => {
-    return generatorMap.get(id) as any as ReturnCallback<IEnemy>;
+  get: (id: string): (env?: GameEnvironment) => IEnemy => {
+    return generatorMap.get(id) as any as (env?: GameEnvironment) => IEnemy;
   },
 }
 

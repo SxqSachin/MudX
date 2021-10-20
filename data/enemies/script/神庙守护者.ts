@@ -1,10 +1,11 @@
 import { Enemy } from "@/models/Enemy";
 import { Unit } from "@/models/Unit";
 import { IEnemy } from "@/types/enemy";
+import { GameEnvironment } from "@/types/game";
 import { UnitData } from "@/types/Unit";
 import { uuid } from "@/utils/uuid";
 
-const generator = (): IEnemy => {
+const generator = (env?: GameEnvironment) : IEnemy => {
   const unitData: UnitData = {
     name: "神庙守护者",
     id: "神庙守护者",
