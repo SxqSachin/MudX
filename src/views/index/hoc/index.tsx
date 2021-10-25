@@ -12,6 +12,7 @@ import { GameEventPanel } from "@/components/ui/event-panel";
 import { handleChooseOption } from "../logic";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useRecoilValue } from "recoil";
 
 type MainPanelParam = {
   gameEnvironment: GameEnvironment;
@@ -35,39 +36,14 @@ export const StoryChoosePanelHOC = ({gameEnvironment, applyEnvironment}: MainPan
 }
 
 export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelParam) => {
-  const { player, enemy, panels } = gameEnvironment;
+  const { player, enemy: gEnemy, panels } = gameEnvironment;
+
+  const enemy = gEnemy!;
 
   const [lastRoundType, setLastRoundType] = useState<"PLAYER" | "ENEMY" | "">("");
   const [curRoundType, setCurRoundType] = useState<"PLAYER" | "ENEMY" | "">("");
   const [curRoundNum, setCurRoundNum] = useState(0);
 
-  useEffect(() => {
-    if (!lastRoundType) {
-      return;
-    }
-    (async () => {
-      battleActionMap['ROUND_END']();
-
-      if (lastRoundType === 'PLAYER') {
-        battleActionMap['ENEMY_ROUND_END']();
-      } else if (lastRoundType === 'ENEMY') {
-        battleActionMap['PLAYER_ROUND_END']();
-      }
-
-      await delay(1000);
-
-      battleActionMap['ROUND_START']();
-      if (lastRoundType === 'PLAYER') {
-        battleActionMap['PLAYER_ROUND_START']();
-      } else if (lastRoundType === 'ENEMY') {
-        battleActionMap['ENEMY_ROUND_START']();
-      }
-    })();
-  }, [lastRoundType]);
-
-  if (!enemy) {
-    return null;
-  }
   const battleActionMap: { [action in BattleAction]: VoidCallback } = {
     ATTACK: async function() {
       player.attack(enemy);
@@ -75,6 +51,8 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
       await delay(1000);
 
       await this.PLAYER_ROUND_END();
+    },
+    LEAVE_BATTLE: async function () {
     },
     ENTER_BATTLE: async function() {
       Message.push("=========================")
@@ -131,6 +109,14 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     },
   }
 
+  useEffect(() => {
+    if (panels.has("BATTLE")) {
+      battleActionMap.ENTER_BATTLE();
+    } else {
+      battleActionMap.LEAVE_BATTLE();
+    }
+  }, [panels.has("BATTLE")])
+
   const handleBattleAction = async (action: BattleAction) => {
     const { player, enemy } = gameEnvironment;
     if (!enemy) {
@@ -146,6 +132,10 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     }
 
     applyEnvironment(gameEnvironment);
+  }
+
+  if (!enemy) {
+    return null;
   }
 
   if (!panels.has('BATTLE')) {
