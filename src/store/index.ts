@@ -1,3 +1,5 @@
+import { Enemy } from "@/models/Enemy";
+import { Unit } from "@/models/Unit";
 import { BattleData } from "@/types/battle";
 import { IEnemy } from "@/types/enemy";
 import { atom } from "recoil";
@@ -8,12 +10,12 @@ import { IUnit } from "../types/Unit";
 export const GameEnvironmentAtom = atom<GameEnvironment>({
   key: "GAME_ENVIRONMENT_ATOM",
   default: {
-    player: undefined as any as IUnit,
-    enemy: undefined as any as IEnemy,
+    player: Unit.create('') as any as IUnit,
+    enemy: Enemy.create('') as any as IEnemy,
 
-    story: undefined as any as Story,
-    event: undefined as any as GameEvent,
-    fork: undefined as any as GameEventFork,
+    story: {} as any as Story,
+    event: {} as any as GameEvent,
+    fork: {} as any as GameEventFork,
 
     panels: new Set() as any as Set<GamePanelType>,
     battle: {} as any as BattleData,

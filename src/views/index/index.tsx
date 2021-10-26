@@ -24,6 +24,7 @@ function App() {
   }
 
   const applyEnvironment = (env: GameEnvironment) => {
+    console.log(env.battle);
     setGameEnvironment(gameEnvironment);
     forceUpdate();
 

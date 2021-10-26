@@ -119,6 +119,20 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     }
   }, [panels.has("BATTLE")])
 
+  useEffect(() => {
+    switch (battle.curRoundOwner) {
+      case 'PLAYER':
+        gameEnvironment.battle.curRoundOwner = 'PLAYER';
+        applyEnvironment(gameEnvironment);
+        break;
+      case 'ENEMY':
+        gameEnvironment.battle.curRoundOwner = 'ENEMY';
+        applyEnvironment(gameEnvironment);
+        break;
+    }
+
+  }, [battle.curRoundOwner])
+
   const handleBattleAction = async (action: BattleAction) => {
     const { player, enemy } = gameEnvironment;
     if (!enemy) {
