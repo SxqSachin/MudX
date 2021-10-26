@@ -8,5 +8,5 @@ export type BattleAction = "ENTER_BATTLE" | "LEAVE_BATTLE"
 export type BattleData = {
   isInBattle: boolean;
   round: number;
-  curRoundOwner: 'PLAYER' | 'ENEMY';
+  curRoundOwner: 'PLAYER' | 'ENEMY' | 'NONE';
 }

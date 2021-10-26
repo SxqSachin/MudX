@@ -54,14 +54,14 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
       gameEnvironment.battle = {
         isInBattle: false,
         round: 0,
-        curRoundOwner: 'PLAYER',
+        curRoundOwner: 'NONE',
       }
     },
     ENTER_BATTLE: async function() {
       gameEnvironment.battle = {
         isInBattle: true,
         round: 1,
-        curRoundOwner: 'PLAYER',
+        curRoundOwner: 'NONE',
       }
 
       Message.push("=========================")
@@ -84,6 +84,14 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
       applyEnvironment(gameEnvironment);
     },
     ROUND_END: async function() {
+      if (gameEnvironment.battle.curRoundOwner === 'ENEMY') {
+        gameEnvironment.battle.curRoundOwner = 'PLAYER';
+      } else {
+        gameEnvironment.battle.curRoundOwner = 'ENEMY';
+      }
+
+      applyEnvironment(gameEnvironment);
+      await delay(1000);
     },
     PLAYER_ROUND_START: async function() {
       await player.fire("roundStart", {source: player, target: enemy})
@@ -92,8 +100,7 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     PLAYER_ROUND_END: async function() {
       await player.fire("roundEnd", {source: player, target: enemy})
       Message.push("玩家回合结束");
-
-      await this.ENEMY_ROUND_START();
+      await this.ROUND_END();
     },
     ENEMY_ROUND_START: async function() {
       await enemy.fire("roundStart", {source: enemy, target: player})
@@ -107,7 +114,7 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     ENEMY_ROUND_END: async function() {
       await enemy.fire("roundEnd", {source: enemy, target: player})
       Message.push("敌方回合结束");
-      await this.PLAYER_ROUND_START();
+      await this.ROUND_END();
     },
   }
 
@@ -120,18 +127,25 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
   }, [panels.has("BATTLE")])
 
   useEffect(() => {
-    switch (battle.curRoundOwner) {
+    console.log(battle.curRoundOwner);
+    switch (gameEnvironment.battle.curRoundOwner) {
       case 'PLAYER':
         gameEnvironment.battle.curRoundOwner = 'PLAYER';
         applyEnvironment(gameEnvironment);
+        battleActionMap.ROUND_START();
+        battleActionMap.PLAYER_ROUND_START();
         break;
       case 'ENEMY':
         gameEnvironment.battle.curRoundOwner = 'ENEMY';
         applyEnvironment(gameEnvironment);
+        battleActionMap.ROUND_START();
+        battleActionMap.ENEMY_ROUND_START();
+        break;
+      case 'NONE':
+      default:
         break;
     }
-
-  }, [battle.curRoundOwner])
+  }, [gameEnvironment.battle.curRoundOwner])
 
   const handleBattleAction = async (action: BattleAction) => {
     const { player, enemy } = gameEnvironment;
