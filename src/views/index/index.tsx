@@ -62,11 +62,13 @@ function App() {
           <GameEventPanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></GameEventPanelHOC>
           <StoryChoosePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></StoryChoosePanelHOC>
           <BattlePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></BattlePanelHOC>
-          <DebugPanel className="absolute bottom-0 left-0 p-" onEnvironmentChange={applyEnvironment}></DebugPanel>
         </div>
         <div className="w-1/4 ml-2 flex flex-col border rounded-md p-4">
           <UnitInfoPanel unit={gameEnvironment.player} onItemAction={(action, item) => applyEnvironment(handleItemAction(gameEnvironment)(action, item))}></UnitInfoPanel>
         </div>
+      </div>
+      <div>
+        <DebugPanel className="mt-4" onEnvironmentChange={applyEnvironment}></DebugPanel>
       </div>
       <div className="border mt-4 rounded-md h-1/3">
         <MessagePanel></MessagePanel>

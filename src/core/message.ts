@@ -1,4 +1,4 @@
-import { DataProcessCallback } from "../types";
+import { AsyncDataProcessCallback, DataProcessCallback } from "../types";
 import { Subscriber, Publisher } from "./subscribe"
 
 export type MessageData = {
@@ -9,7 +9,7 @@ const subscribe = new Subscriber<'MSG', MessageData>();
 const publisher = new Publisher<'MSG', MessageData>();
 
 export const Message = {
-  subscribe(callback: DataProcessCallback<MessageData>){
+  subscribe(callback: AsyncDataProcessCallback<MessageData>){
     return subscribe.subscribe(publisher, 'MSG', callback);
   },
 

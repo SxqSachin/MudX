@@ -36,9 +36,7 @@ export const StoryChoosePanelHOC = ({gameEnvironment, applyEnvironment}: MainPan
 }
 
 export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelParam) => {
-  const { player, enemy: gEnemy, panels } = gameEnvironment;
-
-  const enemy = gEnemy!;
+  const { player, enemy, panels, battle } = gameEnvironment;
 
   const [lastRoundType, setLastRoundType] = useState<"PLAYER" | "ENEMY" | "">("");
   const [curRoundType, setCurRoundType] = useState<"PLAYER" | "ENEMY" | "">("");
@@ -53,8 +51,19 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
       await this.PLAYER_ROUND_END();
     },
     LEAVE_BATTLE: async function () {
+      gameEnvironment.battle = {
+        isInBattle: false,
+        round: 0,
+        curRoundOwner: 'PLAYER',
+      }
     },
     ENTER_BATTLE: async function() {
+      gameEnvironment.battle = {
+        isInBattle: true,
+        round: 1,
+        curRoundOwner: 'PLAYER',
+      }
+
       Message.push("=========================")
       Message.push("进入战斗");
       await delay(620);
@@ -62,24 +71,17 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
       Message.push(`速度对比：玩家(${player.status.speed}) vs 对方(${enemy.status.speed})。${isPlayerFirst?"玩家":"对方"}先手。`);
       await delay(620);
 
-      if (!isPlayerFirst) {
-        setLastRoundType("ENEMY");
-      } else {
-        setLastRoundType("PLAYER");
-      }
+      const roundOwner = isPlayerFirst ? 'PLAYER' : 'ENEMY';
+      gameEnvironment.battle.curRoundOwner = roundOwner;
+
+      setLastRoundType(roundOwner);
 
       applyEnvironment(gameEnvironment);
     },
     ROUND_START: async function() {
-      setCurRoundNum(curRoundNum + 1);
-      if (!gameEnvironment.battle) {
-        gameEnvironment.battle = {
-          isInBattle: true,
-          round: 1
-        }
-      } else {
-        gameEnvironment.battle.round += 1;
-      }
+      gameEnvironment.battle.round += 1;
+
+      applyEnvironment(gameEnvironment);
     },
     ROUND_END: async function() {
     },
@@ -132,10 +134,6 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     }
 
     applyEnvironment(gameEnvironment);
-  }
-
-  if (!enemy) {
-    return null;
   }
 
   if (!panels.has('BATTLE')) {

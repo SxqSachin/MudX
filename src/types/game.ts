@@ -5,9 +5,9 @@ import { IUnit } from "./Unit";
 
 export type GameEnvironment = {
   player: IUnit;
-  enemy?: IEnemy;
+  enemy: IEnemy;
 
-  battle?: BattleData;
+  battle: BattleData;
 
   story: Story;
   event: GameEvent;

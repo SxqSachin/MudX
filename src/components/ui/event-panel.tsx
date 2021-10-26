@@ -83,11 +83,11 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
   }
 
   return (
-    <div>
+    <div className="h-full relative">
       <h2>{event.name}<span>({gameEnvironment.story.curPage}/{ gameEnvironment.story.totalPage})</span></h2>
       <hr className="my-4"/>
       <p>{desc}</p>
-      <div className="flex flex-row w-full justify-around">
+      <div className="flex flex-row w-full justify-around absolute bottom-0 mb-8">
       {
         toArray(fork.options).map((option, index) => {
           const enabledBtn = <button className="border border-black rounded-md px-6 py-4" key={option.name + option.id + index} onClick={() => handleChooseOption(option)}>{option.name}</button>;

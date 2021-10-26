@@ -13,12 +13,12 @@ export const duocui: SkillData = {
   ],
   onLearn: [
     self => {
-      self.on('dealDamage', data => {
+      self.on('dealDamage', async data => {
         self.dealDamage(data.target, 5, {
           triggerEvent: false,
         });
       })
-      self.on('takeDamage', data => {
+      self.on('takeDamage', async data => {
         self.increaseStatus('curHP', 0);
       })
     }

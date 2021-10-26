@@ -10,7 +10,7 @@ export function MessagePanel() {
   const [msgList, setMsgList] = useState<MessageData[]>([]);
 
   useEffect(() => {
-    Message.subscribe(newMsg => {
+    Message.subscribe(async newMsg => {
       setMsgList(old => {
         return [...old, newMsg]
       });

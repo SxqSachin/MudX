@@ -19,13 +19,7 @@ export const shield: ItemData = {
       val: 2,
     },
     (self: IUnit) => {
-      self.on('takeDamage', data => {
-        // if (Dice.d6 > 3) {
-        //   // const damage = data.damage;
-        //   // console.log('damaged', damage);
-        //   // self.increaseStatus('curHP', 1);
-        // }
-
+      self.on('takeDamage', async data => {
         if (data.damage) {
           data.damage -= 1;
         }
