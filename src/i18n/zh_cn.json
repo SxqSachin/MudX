@@ -19,5 +19,7 @@
   "phyAtk": "物理攻击",
   "phyDef": "物理防御",
   "powAtk": "魔法攻击",
-  "powDef": "魔法防御"
+  "powDef": "魔法防御",
+
+  "btn_attack": "普通攻击"
 }

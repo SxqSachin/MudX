@@ -77,9 +77,9 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
         gameEnvironment.battle.curRoundOwner = 'ENEMY';
       }
 
-      await delay(1000);
-
       applyEnvironment(gameEnvironment);
+
+      await delay(1000);
     },
     PLAYER_ROUND_START: async function() {
       await player.fire("roundStart", {source: player, target: enemy})
@@ -87,8 +87,12 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     },
     PLAYER_ROUND_END: async function() {
       await player.fire("roundEnd", {source: player, target: enemy})
-      Message.push("玩家回合结束");
+
       await this.ROUND_END();
+
+      await delay(1000);
+
+      Message.push("玩家回合结束");
     },
     ENEMY_ROUND_START: async function() {
       await enemy.fire("roundStart", {source: enemy, target: player})
@@ -111,9 +115,6 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     ATTACK: async function() {
       await player.attack(enemy);
       applyEnvironment(gameEnvironment);
-
-      await delay(1000);
-
       await this.PLAYER_ROUND_END();
     },
   }
@@ -165,11 +166,15 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     applyEnvironment(gameEnvironment);
   }
 
+  const calcBtnState = (action: string) => {
+    return gameEnvironment.battle.curRoundOwner === 'PLAYER';
+  }
+
   if (!panels.has('BATTLE')) {
     return null;
   }
 
-  return <BattlePanel player={player} enemy={enemy} onAction={handleBattleAction}></BattlePanel>
+  return <BattlePanel calcBtnState={calcBtnState} player={player} enemy={enemy} onAction={handleBattleAction}></BattlePanel>
 }
 
 export const GameEventPanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelParam) => {
