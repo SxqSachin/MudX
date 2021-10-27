@@ -84,9 +84,9 @@ export type DamageInfo = {
 // IUnit只是Entity的壳子，用于对数据进行操作
 export type UnitSelf = IUnit;
 export interface IUnit extends XObject, XSerializable, UnitEvent {
-  attack(target: IUnit): void;
+  attack(target: IUnit): Promise<void>;
 
-  dealDamage(target: IUnit, damage: number, info?: DamageInfo): void;
+  dealDamage(target: IUnit, damage: number, info?: DamageInfo): Promise<number>;
 
   learnSkill(skill: ISkill): UnitSelf;
   forgetSkill(skill: ISkill): UnitSelf;

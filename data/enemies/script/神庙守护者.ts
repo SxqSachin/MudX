@@ -36,7 +36,7 @@ const generator = (env?: GameEnvironment) : IEnemy => {
   const unit = new Enemy(unitData);
 
   unit.on('aiRoundStart', async data => {
-    data.source.attack(data.target);
+    await data.source.attack(data.target);
 
     return data;
   });

@@ -14,6 +14,7 @@ import { GameEnvironment, } from "@/types/game";
 import { StoryUtils } from "@/utils/story";
 import { BattlePanelHOC, GameEventPanelHOC, StoryChoosePanelHOC } from "./hoc";
 import { handleChooseOption, handleItemAction } from "./logic";
+import { deepClone } from "@/utils";
 
 function App() {
   const [, setForceUpdate] = useState([]);
@@ -24,8 +25,7 @@ function App() {
   }
 
   const applyEnvironment = (env: GameEnvironment) => {
-    console.log(env.battle);
-    setGameEnvironment(gameEnvironment);
+    setGameEnvironment(env);
     forceUpdate();
 
     // @ts-ignore

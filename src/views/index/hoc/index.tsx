@@ -38,18 +38,7 @@ export const StoryChoosePanelHOC = ({gameEnvironment, applyEnvironment}: MainPan
 export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelParam) => {
   const { player, enemy, panels, battle } = gameEnvironment;
 
-  const [lastRoundType, setLastRoundType] = useState<"PLAYER" | "ENEMY" | "">("");
-  const [curRoundType, setCurRoundType] = useState<"PLAYER" | "ENEMY" | "">("");
-  const [curRoundNum, setCurRoundNum] = useState(0);
-
   const battleActionMap: { [action in BattleAction]: VoidCallback } = {
-    ATTACK: async function() {
-      player.attack(enemy);
-
-      await delay(1000);
-
-      await this.PLAYER_ROUND_END();
-    },
     LEAVE_BATTLE: async function () {
       gameEnvironment.battle = {
         isInBattle: false,
@@ -74,8 +63,6 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
       const roundOwner = isPlayerFirst ? 'PLAYER' : 'ENEMY';
       gameEnvironment.battle.curRoundOwner = roundOwner;
 
-      setLastRoundType(roundOwner);
-
       applyEnvironment(gameEnvironment);
     },
     ROUND_START: async function() {
@@ -86,12 +73,13 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     ROUND_END: async function() {
       if (gameEnvironment.battle.curRoundOwner === 'ENEMY') {
         gameEnvironment.battle.curRoundOwner = 'PLAYER';
-      } else {
+      } else if (gameEnvironment.battle.curRoundOwner === 'PLAYER') {
         gameEnvironment.battle.curRoundOwner = 'ENEMY';
       }
 
-      applyEnvironment(gameEnvironment);
       await delay(1000);
+
+      applyEnvironment(gameEnvironment);
     },
     PLAYER_ROUND_START: async function() {
       await player.fire("roundStart", {source: player, target: enemy})
@@ -106,7 +94,10 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
       await enemy.fire("roundStart", {source: enemy, target: player})
       Message.push("敌方回合开始");
 
+      await delay(1000);
+
       await enemy.fire("aiRoundStart", {source: enemy, target: player})
+      applyEnvironment(gameEnvironment);
 
       await delay(1000);
       await this.ENEMY_ROUND_END();
@@ -115,6 +106,15 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
       await enemy.fire("roundEnd", {source: enemy, target: player})
       Message.push("敌方回合结束");
       await this.ROUND_END();
+    },
+
+    ATTACK: async function() {
+      await player.attack(enemy);
+      applyEnvironment(gameEnvironment);
+
+      await delay(1000);
+
+      await this.PLAYER_ROUND_END();
     },
   }
 
@@ -127,24 +127,25 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
   }, [panels.has("BATTLE")])
 
   useEffect(() => {
-    console.log(battle.curRoundOwner);
-    switch (gameEnvironment.battle.curRoundOwner) {
-      case 'PLAYER':
-        gameEnvironment.battle.curRoundOwner = 'PLAYER';
-        applyEnvironment(gameEnvironment);
-        battleActionMap.ROUND_START();
-        battleActionMap.PLAYER_ROUND_START();
-        break;
-      case 'ENEMY':
-        gameEnvironment.battle.curRoundOwner = 'ENEMY';
-        applyEnvironment(gameEnvironment);
-        battleActionMap.ROUND_START();
-        battleActionMap.ENEMY_ROUND_START();
-        break;
-      case 'NONE':
-      default:
-        break;
-    }
+    (async () => {
+      switch (gameEnvironment.battle.curRoundOwner) {
+        case 'PLAYER':
+          gameEnvironment.battle.curRoundOwner = 'PLAYER';
+          applyEnvironment(gameEnvironment);
+          await battleActionMap.ROUND_START();
+          await battleActionMap.PLAYER_ROUND_START();
+          break;
+        case 'ENEMY':
+          gameEnvironment.battle.curRoundOwner = 'ENEMY';
+          applyEnvironment(gameEnvironment);
+          await battleActionMap.ROUND_START();
+          await battleActionMap.ENEMY_ROUND_START();
+          break;
+        case 'NONE':
+        default:
+          break;
+      }
+    })();
   }, [gameEnvironment.battle.curRoundOwner])
 
   const handleBattleAction = async (action: BattleAction) => {

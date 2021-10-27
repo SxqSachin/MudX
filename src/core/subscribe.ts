@@ -30,15 +30,14 @@ export class Publisher<EVENT, DATA> {
 
   async publish(event: XEvent<EVENT>, data: XEventData<DATA>): Promise<DATA> {
     let curData = data;
-
-    this._subscriberMap.forEach(async subscribeData => {
-      subscribeData.forEach(async eventData => {
+    for (const subscribeData of this._subscriberMap.values()) {
+      for (const eventData of subscribeData) {
         if (eventData.event === event) {
           const curProcessRes = await eventData.listener(curData);
           curData = curProcessRes ?? curData;
         }
-      })
-    })
+      }
+    }
 
     return curData;
   }
