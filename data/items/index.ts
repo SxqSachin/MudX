@@ -113,6 +113,9 @@ const Items = {
   },
   has: (itemID: ItemID): boolean => {
     return ItemDataMap.has(itemID);
+  },
+  keys: (): ItemID[] => {
+    return [...ItemDataMap.keys()];
   }
 }
 

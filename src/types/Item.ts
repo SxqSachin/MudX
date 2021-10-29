@@ -1,4 +1,6 @@
+import { DataCallback } from ".";
 import { Action, SelfAction } from "./action";
+import { EnvObjectGenerator } from "./game";
 import { XSerializable } from "./Object";
 import { IUnit } from "./Unit";
 
@@ -44,18 +46,17 @@ export interface IItem {
   onUnequip(self: IUnit): void;
 }
 
-export type PriceList = { [itemID in ItemID]: ItemPrice };
+export type PriceList = { [itemID in ItemID]: ShopkeeperItemPrice };
+export type ShopkeeperItemPrice = {
+  enterPrice: ItemPrice;
+  salePrice: ItemPrice;
+}
 export type ItemPrice = {
-  enterPrice: {
-    subject: ItemID;
-    amount: number;
-  },
-  salePrice: {
-    subject: ItemID;
-    amount: number;
-  },
+  subject: ItemID;
+  amount: number;
 }
 export type TradeData = {
-  shopkeeper: IUnit;
+  shopkeeper: EnvObjectGenerator<IUnit>;
+  onDealDone: DataCallback<IUnit>;
   priceList: PriceList;
 }

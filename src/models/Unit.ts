@@ -1,7 +1,7 @@
 import { ElementType } from "react";
 import { Message } from "../core/message";
 import { Publisher, Subscriber } from "../core/subscribe";
-import { Items } from "@data";
+import { Items } from "@data/items";
 import { AsyncDataProcessCallback, DataProcessCallback, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
@@ -396,6 +396,36 @@ export class Unit implements IUnit {
       powDef: 0,
     }
   }
+}
+export function createUnit(name: string): IUnit {
+  const unitData: UnitData = {
+    id: uuid(),
+    name,
+    level: 1,
+    curHP: 10,
+    curMP: 10,
+    curSP: 10,
+    maxHP: 10,
+    maxMP: 10,
+    maxSP: 10,
+    phy: 10,
+    strength: 10,
+    dexterity: 10,
+    intelligence: 10,
+    luck: 10,
+    perception: 10,
+    speed: 10,
+    talent: 10,
+    items: {},
+    skills: {},
+    phyAtk: 0,
+    phyDef: 0,
+    powAtk: 0,
+    powDef: 0,
+    xid: uuid(),
+  }
+
+  return new Unit(unitData);
 }
 //  get maxHP() { return this.unitEntity.maxHP; }
 //  get maxMP() { return this.unitEntity.maxMP; }

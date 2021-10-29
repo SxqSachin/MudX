@@ -4,6 +4,10 @@ import { DataCallback, } from "@/types";
 import { GameEnvironment, GamePanelType } from "@/types/game";
 import { Enemies } from "@data/enemies";
 import { showPanel } from "@/utils/game";
+import { Unit } from "@/models/Unit";
+import { Items } from "@data";
+import { XStorage } from "@/core/storage";
+import { IItem, ItemID } from "@/types/Item";
 
 
 type DebugPanelParam = {
@@ -38,6 +42,64 @@ export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
 
   const enterShop = () => {
     gameEnvironment.panels = showPanel(gameEnvironment, "TRADE");
+    gameEnvironment.trade = {
+      priceList: {
+        'shield': {
+          enterPrice: {
+            amount: 10,
+            subject: 'gold-icon',
+          },
+          salePrice: {
+            amount: 20,
+            subject: 'gold-icon',
+          }
+        },
+        'sword': {
+          enterPrice: {
+            amount: 10,
+            subject: 'gold-icon',
+          },
+          salePrice: {
+            amount: 20,
+            subject: 'gold-icon',
+          }
+        },
+      },
+      shopkeeper: () => {
+        const unit = Unit.create('debug shop');
+
+        let itemStorageString = XStorage.getItem('debug shop');
+        if (!itemStorageString) {
+          itemStorageString = (() => {
+            let res: { [id in ItemID]: number } = {};
+            Items.keys().forEach(key => {
+              res[key] = 999;
+            });
+
+            return JSON.stringify(res);
+          })();
+        }
+
+        const itemStorage: { [id in ItemID]: number } = JSON.parse(itemStorageString);
+
+        Object.keys(itemStorage).forEach(itemID => {
+          unit.addItemByID(itemID, itemStorage[itemID]);
+        })
+
+        return unit;
+      },
+      onDealDone: unit => {
+        const item = (() => {
+          const res: { [id in ItemID]: number } = {};
+          Object.keys(unit.items).map(itemID=> {
+            res[itemID] = unit.items[itemID].length;
+          });
+
+          return res;
+        })();
+        XStorage.setItem('debug shop', JSON.stringify(item));
+      },
+    }
     onEnvironmentChange(gameEnvironment);
   }
 

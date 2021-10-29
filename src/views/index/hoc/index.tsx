@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { TradePanel } from "@/components/ui/trade-panel";
 import { isPanelVisible, showPanel } from "@/utils/game";
+import { ItemPrice } from "@/types/Item";
 
 type MainPanelParam = {
   gameEnvironment: GameEnvironment;
@@ -199,11 +200,42 @@ export const GameEventPanelHOC = ({ gameEnvironment, applyEnvironment }: MainPan
 }
 
 export const TradePanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelParam) => {
-  const { panels } = gameEnvironment;
-
-  if (panels[0] != "TRADE") {
+  if (!isPanelVisible(gameEnvironment, "TRADE")) {
     return null;
   }
 
-  return <TradePanel shopper={gameEnvironment.player} shopkeeper={gameEnvironment.trade.shopkeeper} priceList={gameEnvironment.trade.priceList}></TradePanel>
+  const [shopkeeper, setShopkeeper] = useState(gameEnvironment.trade?.shopkeeper?.(gameEnvironment));
+
+  const onSaleItem = (itemID: string, price: ItemPrice) => {
+    gameEnvironment.player.removeItemByID(itemID, 1);
+    shopkeeper.addItemByID(itemID, 1);
+
+    gameEnvironment.player.addItemByID(price.subject, price.amount);
+    shopkeeper.removeItemByID(price.subject, price.amount);
+
+    setShopkeeper(shopkeeper);
+    gameEnvironment.trade.onDealDone(shopkeeper);
+    applyEnvironment(gameEnvironment);
+  }
+  const onBuyItem = (itemID: string, price: ItemPrice) => {
+    gameEnvironment.player.addItemByID(itemID, 1);
+    shopkeeper.removeItemByID(itemID, 1);
+
+    gameEnvironment.player.removeItemByID(price.subject, price.amount);
+    shopkeeper.addItemByID(price.subject, price.amount);
+
+    setShopkeeper(shopkeeper);
+    gameEnvironment.trade.onDealDone(shopkeeper);
+    applyEnvironment(gameEnvironment);
+  }
+
+  return (
+    <TradePanel
+      onSaleItem={onSaleItem}
+      onBuyItem={onBuyItem}
+      shopper={gameEnvironment.player}
+      shopkeeper={shopkeeper}
+      priceList={gameEnvironment.trade.priceList}
+    ></TradePanel>
+  );
 }

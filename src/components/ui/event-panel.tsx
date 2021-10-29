@@ -19,8 +19,6 @@ export function GameEventPanel({event, onChooseOption, onNeedRefresh}: GameEvent
   const [desc, setDesc] = useState('');
   const gameEnvironment = useRecoilValue(GameEnvironmentAtom);
 
-  // todo onEnter要触发刷新
-
   const onEnterFork = (fork: GameEventFork) => {
     setFork(fork);
     setDesc(typeof fork.description === 'string' ? fork.description : fork.description());

@@ -1,6 +1,8 @@
 import { GameAction, } from "./action";
 import { ConditionExpr } from "./condition";
-import { GameEnvironment } from "./game";
+import { EnvObjectGenerator, GameEnvironment } from "./game";
+import { PriceList, TradeData } from "./Item";
+import { XID } from "./Object";
 import { IUnit } from "./Unit";
 
 export type GameMap = string;
@@ -37,6 +39,7 @@ export enum GameEventNextType {
   PUSH_STORY = "PUSH_STORY",
   STORY_END = "STORY_END",
   START_NEW_STORY = "START_NEW_STORY",
+  TRADE = "TRADE",
 }
 
 export type GameEventOptionID = string;
@@ -55,9 +58,11 @@ export type GameEventOption = {
   next: GameEventNextType | GameEventID | ((environment: GameEnvironment) => GameEventID | GameEvent);
 
   enemyID?: string;
+
+  trade?: TradeData;
 }
 
-// 一组事件的合计
+// 一组事件的合集
 export type StoryEvent = {
   page: number;
   event: GameEventID | GameEvent;

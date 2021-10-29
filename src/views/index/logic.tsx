@@ -37,10 +37,13 @@ export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option:
       gameEnv.story.curPage++;
       gameEvent = GameEvents.get(gameEnv.story.pages[gameEnv.story.curPage - 1].event);
     }
-  } else if(optionNextType === GameEventNextType.START_NEW_STORY) { // 开始新的故事
+  } else if (optionNextType === GameEventNextType.START_NEW_STORY) { // 开始新的故事
     gameEnv.panels = showPanel(gameEnv, "STORY_CHOOSE");
-  } else if(optionNextType === GameEventNextType.GAME_EVENT_END) { // 当前章节结束
+  } else if (optionNextType === GameEventNextType.GAME_EVENT_END) { // 当前章节结束
     gameEvent = endEvent();
+  } else if (optionNextType === GameEventNextType.TRADE) { // 交易
+    gameEnv.trade = option.trade!;
+    gameEnv.panels = showPanel(gameEnv, "TRADE");
   } else { // 普通的故事推进
     gameEvent = calcOptionNextEvent(option, gameEnv);
   }

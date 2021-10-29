@@ -4,11 +4,11 @@ import { DebugPanel } from "../../components/ui/debug-panel";
 import { GameEventPanel } from "../../components/ui/event-panel";
 import { MessagePanel } from "../../components/ui/msg-panel";
 import { UnitInfoPanel } from "../../components/ui/unit-info-panel";
+import { Unit } from "@/models/Unit";
 
 import '@data';
 
 import { Enemies, GameEvents, } from "@data";
-import { Unit } from "@/models/Unit";
 import { GameEnvironmentAtom, } from "../../store";
 import { GameEnvironment, } from "@/types/game";
 import { StoryUtils } from "@/utils/story";
