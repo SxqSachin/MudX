@@ -8,6 +8,12 @@ const _e2: GameEvent = {
 
   forks: {
     description: "你向其中投入了一个金币，许下了一个愿望。",
+    onEnter: env => {
+
+      env.player = env.player.removeItemByID('gold-icon', 1);
+
+      return env;
+    },
     options: [
       {
         name: "心诚则灵",

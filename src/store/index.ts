@@ -2,6 +2,7 @@ import { Enemy } from "@/models/Enemy";
 import { Unit } from "@/models/Unit";
 import { BattleData } from "@/types/battle";
 import { IEnemy } from "@/types/enemy";
+import { TradeData } from "@/types/Item";
 import { atom } from "recoil";
 import { GameEnvironment, GamePanelType, GameState } from "../types/game";
 import { GameEvent, GameEventFork, Story } from "../types/game-event";
@@ -17,9 +18,11 @@ export const GameEnvironmentAtom = atom<GameEnvironment>({
     event: {} as any as GameEvent,
     fork: {} as any as GameEventFork,
 
-    panels: new Set() as any as Set<GamePanelType>,
+    panels: [] as any as GamePanelType[],
     battle: {} as any as BattleData,
     state: ["EVENT"],
+
+    trade: {} as any as TradeData,
   },
   dangerouslyAllowMutability: true,
 });

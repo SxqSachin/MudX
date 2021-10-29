@@ -8,6 +8,7 @@ import { GameEventNextType, GameEventOption } from "@/types/game-event";
 import { IItem } from "@/types/Item";
 import { toArray } from "@/utils";
 import { calcOptionNextEvent, getOptionNextType } from "@/utils/game-event";
+import { showPanel } from "@/utils/game";
 
 export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option: GameEventOption): GameEnvironment => {
   let gameEnv = gameEnvironment;
@@ -28,7 +29,7 @@ export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option:
 
   if (optionNextType === GameEventNextType.ENTER_BATTLE) {
     gameEnv.enemy = Enemies.getGenerator(option.enemyID!)(gameEnv);
-    gameEnv.panels.add("BATTLE").delete("EVENT");
+    gameEnv.panels = showPanel(gameEnv, "BATTLE");
   } else if (optionNextType === GameEventNextType.PUSH_STORY) {
     if (gameEnv.story.curPage >= gameEnv.story.totalPage) { // 故事读完了
       gameEvent = storyEndEvent();
@@ -37,9 +38,7 @@ export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option:
       gameEvent = GameEvents.get(gameEnv.story.pages[gameEnv.story.curPage - 1].event);
     }
   } else if(optionNextType === GameEventNextType.START_NEW_STORY) { // 开始新的故事
-    gameEnv.panels.delete("EVENT");
-    gameEnv.panels.delete("BATTLE");
-    gameEnv.panels.add("STORY_CHOOSE");
+    gameEnv.panels = showPanel(gameEnv, "STORY_CHOOSE");
   } else if(optionNextType === GameEventNextType.GAME_EVENT_END) { // 当前章节结束
     gameEvent = endEvent();
   } else { // 普通的故事推进

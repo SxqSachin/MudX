@@ -12,9 +12,10 @@ import { Unit } from "@/models/Unit";
 import { GameEnvironmentAtom, } from "../../store";
 import { GameEnvironment, } from "@/types/game";
 import { StoryUtils } from "@/utils/story";
-import { BattlePanelHOC, GameEventPanelHOC, StoryChoosePanelHOC } from "./hoc";
+import { BattlePanelHOC, GameEventPanelHOC, StoryChoosePanelHOC, TradePanelHOC } from "./hoc";
 import { handleChooseOption, handleItemAction } from "./logic";
 import { deepClone } from "@/utils";
+import { showPanel } from "@/utils/game";
 
 function App() {
   const [, setForceUpdate] = useState([]);
@@ -40,7 +41,7 @@ function App() {
       pageNum: 3,
     });
     gameEnvironment.event = GameEvents.get(gameEnvironment.story.pages[0].event);
-    gameEnvironment.panels.add('EVENT');
+    gameEnvironment.panels = showPanel(gameEnvironment, "EVENT");
 
     const player = Unit.create('player');
     const enemy = Enemies.getGenerator('神庙守护者')(gameEnvironment);
@@ -63,6 +64,7 @@ function App() {
           <GameEventPanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></GameEventPanelHOC>
           <StoryChoosePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></StoryChoosePanelHOC>
           <BattlePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></BattlePanelHOC>
+          <TradePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></TradePanelHOC>
         </div>
         <div className="w-1/4 ml-2 flex flex-col border rounded-md p-4">
           <UnitInfoPanel unit={gameEnvironment.player} onItemAction={(action, item) => applyEnvironment(handleItemAction(gameEnvironment)(action, item))}></UnitInfoPanel>

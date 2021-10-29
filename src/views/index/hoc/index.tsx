@@ -13,6 +13,8 @@ import { handleChooseOption } from "../logic";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
+import { TradePanel } from "@/components/ui/trade-panel";
+import { isPanelVisible, showPanel } from "@/utils/game";
 
 type MainPanelParam = {
   gameEnvironment: GameEnvironment;
@@ -20,14 +22,14 @@ type MainPanelParam = {
 };
 
 export const StoryChoosePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelParam) => {
-  if (!gameEnvironment.panels.has('STORY_CHOOSE')) {
+  if (gameEnvironment.panels[0] !== 'STORY_CHOOSE') {
       return null;
     }
 
     const handleChooseStory = (story: Story) => {
       gameEnvironment.story = story;
       gameEnvironment.event = GameEvents.get(story.pages[0].event);
-      gameEnvironment.panels.add('EVENT').delete('STORY_CHOOSE');
+      gameEnvironment.panels = showPanel(gameEnvironment, "EVENT");
 
       applyEnvironment(gameEnvironment);
     };
@@ -120,12 +122,12 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
   }
 
   useEffect(() => {
-    if (panels.has("BATTLE")) {
+    if (isPanelVisible(gameEnvironment, "BATTLE")) {
       battleActionMap.ENTER_BATTLE();
     } else {
       battleActionMap.LEAVE_BATTLE();
     }
-  }, [panels.has("BATTLE")])
+  }, [panels[0]])
 
   useEffect(() => {
     (async () => {
@@ -160,7 +162,8 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     if (enemy.status.curHP <= 0) {
       gameEnvironment.event = battleEndEvent({ enemy }, gameEnvironment);
       await delay(600);
-      gameEnvironment.panels.add("EVENT").delete("BATTLE");
+      gameEnvironment.panels.shift();
+      gameEnvironment.panels.unshift("EVENT");
     }
 
     applyEnvironment(gameEnvironment);
@@ -170,7 +173,7 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
     return gameEnvironment.battle.curRoundOwner === 'PLAYER';
   }
 
-  if (!panels.has('BATTLE')) {
+  if (panels[0] != 'BATTLE') {
     return null;
   }
 
@@ -180,9 +183,27 @@ export const BattlePanelHOC = ({gameEnvironment, applyEnvironment}: MainPanelPar
 export const GameEventPanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelParam) => {
   const { panels } = gameEnvironment;
 
-  if (!panels.has("EVENT")) {
+  if (panels[0] != "EVENT") {
     return null;
   }
 
-  return <GameEventPanel event={gameEnvironment.event} onChooseOption={option => applyEnvironment(handleChooseOption(gameEnvironment)(option))}></GameEventPanel>
+  return (
+    <GameEventPanel
+      event={gameEnvironment.event}
+      onNeedRefresh={applyEnvironment}
+      onChooseOption={(option) =>
+        applyEnvironment(handleChooseOption(gameEnvironment)(option))
+      }
+    ></GameEventPanel>
+  );
+}
+
+export const TradePanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelParam) => {
+  const { panels } = gameEnvironment;
+
+  if (panels[0] != "TRADE") {
+    return null;
+  }
+
+  return <TradePanel shopper={gameEnvironment.player} shopkeeper={gameEnvironment.trade.shopkeeper} priceList={gameEnvironment.trade.priceList}></TradePanel>
 }

@@ -24,7 +24,6 @@ export const StoryUtils = {
           //   i--;
           //   continue;
           // }
-
           if (event.ext?.test) {
             i--;
             continue;

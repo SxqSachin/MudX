@@ -1,8 +1,9 @@
 import { useRecoilValue, } from "recoil";
 import { GameEnvironmentAtom } from "../../store";
 import { DataCallback, } from "@/types";
-import { GameEnvironment } from "@/types/game";
+import { GameEnvironment, GamePanelType } from "@/types/game";
 import { Enemies } from "@data/enemies";
+import { showPanel } from "@/utils/game";
 
 
 type DebugPanelParam = {
@@ -18,35 +19,35 @@ export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
     onEnvironmentChange(gameEnvironment);
   }
 
+  const toEvent = () => {
+    gameEnvironment.panels = showPanel(gameEnvironment, "EVENT");
+    onEnvironmentChange(gameEnvironment);
+  }
+
   const enterBattle = () => {
-    gameEnvironment.panels.delete('EVENT');
-    gameEnvironment.panels.add('BATTLE');
+    gameEnvironment.panels = showPanel(gameEnvironment, "BATTLE");
     gameEnvironment.enemy = Enemies.getGenerator('dummy')(gameEnvironment);
 
     onEnvironmentChange(gameEnvironment);
   }
 
-  const leaveBattle = () => {
-    gameEnvironment.panels.delete('BATTLE');
-    gameEnvironment.panels.add('EVENT');
-
+  const chooseStory = () => {
+    gameEnvironment.panels = showPanel(gameEnvironment, "STORY_CHOOSE");
     onEnvironmentChange(gameEnvironment);
   }
 
-  const chooseStory = () => {
-    gameEnvironment.panels.delete('BATTLE');
-    gameEnvironment.panels.delete('EVENT');
-    gameEnvironment.panels.add('STORY_CHOOSE');
-
+  const enterShop = () => {
+    gameEnvironment.panels = showPanel(gameEnvironment, "TRADE");
     onEnvironmentChange(gameEnvironment);
   }
 
   return (
     <div className={"w-full " + className}>
       <button className="btn" onClick={() => increaseHP(1)}> Increase HP </button>
+      <button className="btn" onClick={toEvent}> ToEvent </button>
       <button className="btn" onClick={enterBattle}> EnterBattle </button>
-      <button className="btn" onClick={leaveBattle}> LeaveBattle </button>
       <button className="btn" onClick={chooseStory}> ChooseStory </button>
+      <button className="btn" onClick={enterShop}> EnterShop </button>
     </div>
   );
 }

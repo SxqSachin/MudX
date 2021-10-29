@@ -43,3 +43,19 @@ export interface IItem {
   onEquip(self: IUnit): void;
   onUnequip(self: IUnit): void;
 }
+
+export type PriceList = { [itemID in ItemID]: ItemPrice };
+export type ItemPrice = {
+  enterPrice: {
+    subject: ItemID;
+    amount: number;
+  },
+  salePrice: {
+    subject: ItemID;
+    amount: number;
+  },
+}
+export type TradeData = {
+  shopkeeper: IUnit;
+  priceList: PriceList;
+}

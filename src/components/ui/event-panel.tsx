@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { runExpr } from "../../core/expr";
 import { GameEnvironmentAtom } from "../../store";
-import { DataCallback } from "@/types";
+import { DataCallback, VoidCallback } from "@/types";
 import { GameEvent, GameEventFork, GameEventOption } from "@/types/game-event";
 import { isEmpty, toArray } from "@/utils";
 import { getRandomString } from "@/utils/random";
+import { GameEnvironment } from "@/types/game";
 
 type GameEventPanelParam = {
   event: GameEvent,
   onChooseOption: DataCallback<GameEventOption>,
+  onNeedRefresh: DataCallback<GameEnvironment>,
 }
-export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
+export function GameEventPanel({event, onChooseOption, onNeedRefresh}: GameEventPanelParam) {
   const [, setGameEvent] = useState({} as GameEvent);
   const [fork, setFork] = useState({} as GameEventFork);
   const [desc, setDesc] = useState('');
-  const [gameEnvironment, setGameEnvironment] = useRecoilState(GameEnvironmentAtom);
+  const gameEnvironment = useRecoilValue(GameEnvironmentAtom);
 
   // todo onEnter要触发刷新
 
@@ -28,6 +30,8 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
         cb(gameEnvironment);
       }
     });
+
+    onNeedRefresh(gameEnvironment);
   }
 
   const onLeaveFork = (fork: GameEventFork) => {
@@ -36,6 +40,8 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
         cb(gameEnvironment);
       }
     });
+
+    onNeedRefresh(gameEnvironment);
   }
 
   useEffect(() => {
@@ -75,7 +81,7 @@ export function GameEventPanel({event, onChooseOption}: GameEventPanelParam) {
     gameEnvironment.fork = passedFork;
     gameEnvironment.event = event;
 
-    setGameEnvironment(gameEnvironment);
+    onNeedRefresh(gameEnvironment);
   }, [event]);
 
   const handleChooseOption = (option: GameEventOption) => {
