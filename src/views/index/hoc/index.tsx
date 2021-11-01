@@ -204,28 +204,30 @@ export const TradePanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelPa
     return null;
   }
 
-  const [shopkeeper, setShopkeeper] = useState(gameEnvironment.trade?.shopkeeper?.(gameEnvironment));
+  useEffect(() => {
+    gameEnvironment.trade.shopkeeper = gameEnvironment.trade.shopkeeperGenerator(gameEnvironment);
+
+    applyEnvironment(gameEnvironment);
+  }, []);
 
   const onSaleItem = (itemID: string, price: ItemPrice) => {
     gameEnvironment.player.removeItemByID(itemID, 1);
-    shopkeeper.addItemByID(itemID, 1);
+    gameEnvironment.trade.shopkeeper.addItemByID(itemID, 1);
 
     gameEnvironment.player.addItemByID(price.subject, price.amount);
-    shopkeeper.removeItemByID(price.subject, price.amount);
+    gameEnvironment.trade.shopkeeper.removeItemByID(price.subject, price.amount);
 
-    setShopkeeper(shopkeeper);
-    gameEnvironment.trade.onDealDone(shopkeeper);
+    gameEnvironment.trade.onDealDone(gameEnvironment.trade.shopkeeper);
     applyEnvironment(gameEnvironment);
   }
   const onBuyItem = (itemID: string, price: ItemPrice) => {
     gameEnvironment.player.addItemByID(itemID, 1);
-    shopkeeper.removeItemByID(itemID, 1);
+    gameEnvironment.trade.shopkeeper.removeItemByID(itemID, 1);
 
     gameEnvironment.player.removeItemByID(price.subject, price.amount);
-    shopkeeper.addItemByID(price.subject, price.amount);
+    gameEnvironment.trade.shopkeeper.addItemByID(price.subject, price.amount);
 
-    setShopkeeper(shopkeeper);
-    gameEnvironment.trade.onDealDone(shopkeeper);
+    gameEnvironment.trade.onDealDone(gameEnvironment.trade.shopkeeper);
     applyEnvironment(gameEnvironment);
   }
 
@@ -234,7 +236,7 @@ export const TradePanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelPa
       onSaleItem={onSaleItem}
       onBuyItem={onBuyItem}
       shopper={gameEnvironment.player}
-      shopkeeper={shopkeeper}
+      shopkeeper={gameEnvironment.trade.shopkeeper}
       priceList={gameEnvironment.trade.priceList}
     ></TradePanel>
   );

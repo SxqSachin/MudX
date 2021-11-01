@@ -14,7 +14,8 @@ const e: GameEvent = {
         next: GameEventNextType.TRADE,
         trade: {
           priceList: {},
-          shopkeeper: () => {
+          shopkeeper: null!,
+          shopkeeperGenerator: () => {
             const unit = createUnit("黑市商人");
 
             unit.addItemByID('sword', 1);

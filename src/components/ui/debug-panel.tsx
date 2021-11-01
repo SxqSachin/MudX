@@ -8,6 +8,7 @@ import { Unit } from "@/models/Unit";
 import { Items } from "@data";
 import { XStorage } from "@/core/storage";
 import { IItem, ItemID } from "@/types/Item";
+import { getShopStock } from "@/utils/trade";
 
 
 type DebugPanelParam = {
@@ -65,22 +66,20 @@ export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
           }
         },
       },
-      shopkeeper: () => {
+      shopkeeper: null!,
+      shopkeeperGenerator: () => {
         const unit = Unit.create('debug shop');
 
-        let itemStorageString = XStorage.getItem('debug shop');
-        if (!itemStorageString) {
-          itemStorageString = (() => {
+        let itemStorage = getShopStock('debug shop', (() => {
+          return (() => {
             let res: { [id in ItemID]: number } = {};
             Items.keys().forEach(key => {
               res[key] = 999;
             });
 
-            return JSON.stringify(res);
+            return res;
           })();
-        }
-
-        const itemStorage: { [id in ItemID]: number } = JSON.parse(itemStorageString);
+        })());
 
         Object.keys(itemStorage).forEach(itemID => {
           unit.addItemByID(itemID, itemStorage[itemID]);

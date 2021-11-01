@@ -56,7 +56,8 @@ export type ItemPrice = {
   amount: number;
 }
 export type TradeData = {
-  shopkeeper: EnvObjectGenerator<IUnit>;
+  shopkeeperGenerator: EnvObjectGenerator<IUnit>;
+  shopkeeper: IUnit;
   onDealDone: DataCallback<IUnit>;
   priceList: PriceList;
 }

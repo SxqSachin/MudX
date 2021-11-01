@@ -151,9 +151,12 @@ export class Unit implements IUnit {
       items[itemID] = [];
     }
 
+    const newItem = [];
     for (let i = 0; i < count; i++) {
-      items[itemID].push(Items.getData(itemID) as ItemData);
+      newItem.push(Items.getData(itemID) as ItemData);
     }
+    items[itemID].splice(0, 0, ...newItem)
+
     this._reinitItems();
 
     return this;
@@ -169,9 +172,7 @@ export class Unit implements IUnit {
       return this;
     }
 
-    for (let i = 0; i < count; i++) {
-      items[itemID].pop();
-    }
+    items[itemID].splice(0, count);
     this._reinitItems();
 
     return this;
@@ -283,6 +284,7 @@ export class Unit implements IUnit {
   }
 
   private _reinitItems() {
+    console.time('_reinitItems: ' + this.name);
     this._items = {};
     Object.keys(this.unitEntity.items).forEach((itemID: ItemID) => {
       this._items[itemID] = [];
@@ -290,6 +292,7 @@ export class Unit implements IUnit {
         this._items[itemID].push(new Item(itemData));
       });
     });
+    console.timeEnd('_reinitItems: ' + this.name);
   }
   private _reinitSkills() {
     this._skills = {};
