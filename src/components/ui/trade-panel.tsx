@@ -67,11 +67,9 @@ export function TradePanel({
 }: TradePanelParam) {
   return (
     <>
-      <div>
-        <button className="mr-4 inline-block" onClick={onExit}>
-          {"<<"}
-        </button>
+      <div className="">
         <h2 className="inline-block">{shopkeeper.name}</h2>
+        <button className="float-right inline-block text-red-500" onClick={onExit}>离开</button>
       </div>
       <hr className="my-4" />
       <div className="flex flex-row h-full">

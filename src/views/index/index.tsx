@@ -60,7 +60,7 @@ function App() {
   return (
     <div className="App w-screen h-screen flex flex-col p-8">
       <div className="flex flex-row w-full h-2/3">
-        <div className="w-3/4 mr-2 border rounded-md p-4 relative">
+        <div className="w-3/4 mr-2 border rounded-md p-4 relative overflow-hidden">
           <GameEventPanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></GameEventPanelHOC>
           <StoryChoosePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></StoryChoosePanelHOC>
           <BattlePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></BattlePanelHOC>
