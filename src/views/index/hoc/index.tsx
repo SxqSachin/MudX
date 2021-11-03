@@ -16,6 +16,7 @@ import { useRecoilValue } from "recoil";
 import { TradePanel } from "@/components/ui/trade-panel";
 import { isPanelVisible, showPanel } from "@/utils/game";
 import { ItemPrice } from "@/types/Item";
+import { leaveShopEvent } from "@/models/event/leave-shop";
 
 type MainPanelParam = {
   gameEnvironment: GameEnvironment;
@@ -200,27 +201,30 @@ export const GameEventPanelHOC = ({ gameEnvironment, applyEnvironment }: MainPan
 }
 
 export const TradePanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelParam) => {
+
+  useEffect(() => {
+    if (!gameEnvironment.trade?.shopkeeperGenerator) {
+      return;
+    }
+
+    gameEnvironment.trade.shopkeeper = gameEnvironment.trade.shopkeeperGenerator(gameEnvironment);
+
+    applyEnvironment(gameEnvironment);
+  }, [gameEnvironment.trade, gameEnvironment.player]);
+
   if (!isPanelVisible(gameEnvironment, "TRADE")) {
     return null;
   }
 
-  useEffect(() => {
-    debugger;
-
-  }, [gameEnvironment.trade, gameEnvironment.player]);
-
-  // useEffect(() => {
-  //   console.log('init trade');
-  //   gameEnvironment.trade.shopkeeper = gameEnvironment.trade.shopkeeperGenerator(gameEnvironment);
-
-  //   applyEnvironment(gameEnvironment);
-  // }, [gameEnvironment.trade, gameEnvironment.player]);
-  if (!gameEnvironment.trade.shopkeeper) {
-    gameEnvironment.trade.shopkeeper = gameEnvironment.trade.shopkeeperGenerator(gameEnvironment);
-    applyEnvironment(gameEnvironment);
+  if (!gameEnvironment.trade?.shopkeeper || !gameEnvironment.player) {
+    return <></>;
   }
 
   const onSaleItem = (itemID: string, price: ItemPrice) => {
+    if (!gameEnvironment.trade) {
+      return;
+    }
+
     gameEnvironment.player.removeItemByID(itemID, 1);
     gameEnvironment.trade.shopkeeper.addItemByID(itemID, 1);
 
@@ -231,6 +235,10 @@ export const TradePanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelPa
     applyEnvironment(gameEnvironment);
   }
   const onBuyItem = (itemID: string, price: ItemPrice) => {
+    if (!gameEnvironment.trade) {
+      return;
+    }
+
     gameEnvironment.player.addItemByID(itemID, 1);
     gameEnvironment.trade.shopkeeper.removeItemByID(itemID, 1);
 
@@ -241,8 +249,18 @@ export const TradePanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelPa
     applyEnvironment(gameEnvironment);
   }
 
+  const onExit = () => {
+    gameEnvironment.trade = undefined;
+    gameEnvironment.event = leaveShopEvent();
+
+    gameEnvironment.panels = showPanel(gameEnvironment, 'EVENT');
+
+    applyEnvironment(gameEnvironment);
+  }
+
   return (
     <TradePanel
+      onExit={onExit}
       onSaleItem={onSaleItem}
       onBuyItem={onBuyItem}
       shopper={gameEnvironment.player}

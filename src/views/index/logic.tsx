@@ -9,6 +9,7 @@ import { IItem } from "@/types/Item";
 import { toArray } from "@/utils";
 import { calcOptionNextEvent, getOptionNextType } from "@/utils/game-event";
 import { showPanel } from "@/utils/game";
+import { leaveShopEvent } from "@/models/event/leave-shop";
 
 export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option: GameEventOption): GameEnvironment => {
   let gameEnv = gameEnvironment;
@@ -44,6 +45,7 @@ export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option:
   } else if (optionNextType === GameEventNextType.TRADE) { // 交易
     gameEnv.trade = option.trade!;
     gameEnv.panels = showPanel(gameEnv, "TRADE");
+    gameEvent = leaveShopEvent();
   } else { // 普通的故事推进
     gameEvent = calcOptionNextEvent(option, gameEnv);
   }

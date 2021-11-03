@@ -17,7 +17,7 @@ export type GameEnvironment = {
   state: GameState[];
   panels: GamePanelType[];
 
-  trade: TradeData;
+  trade?: TradeData;
 }
 
 export type GameState = "EVENT" | "BATTLE" | "CHOOSE_STORY" | "TRADE";
