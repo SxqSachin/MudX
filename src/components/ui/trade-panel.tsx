@@ -13,9 +13,9 @@ type ItemTradePanelParam = {
   onItemClick: (itemID: ItemID, price: ItemPrice) => void;
 };
 function ItemTradePanel({ role, shopper, shopkeeper, priceList, onItemClick }: ItemTradePanelParam ) {
-  if (!shopkeeper) {
-    return <></>
-  }
+  // if (!shopkeeper || !shopper) {
+  //   return <></>
+  // }
   return (
     <>
       <div>{shopkeeper.data.name}</div>

@@ -205,10 +205,20 @@ export const TradePanelHOC = ({ gameEnvironment, applyEnvironment }: MainPanelPa
   }
 
   useEffect(() => {
-    gameEnvironment.trade.shopkeeper = gameEnvironment.trade.shopkeeperGenerator(gameEnvironment);
+    debugger;
 
+  }, [gameEnvironment.trade, gameEnvironment.player]);
+
+  // useEffect(() => {
+  //   console.log('init trade');
+  //   gameEnvironment.trade.shopkeeper = gameEnvironment.trade.shopkeeperGenerator(gameEnvironment);
+
+  //   applyEnvironment(gameEnvironment);
+  // }, [gameEnvironment.trade, gameEnvironment.player]);
+  if (!gameEnvironment.trade.shopkeeper) {
+    gameEnvironment.trade.shopkeeper = gameEnvironment.trade.shopkeeperGenerator(gameEnvironment);
     applyEnvironment(gameEnvironment);
-  }, []);
+  }
 
   const onSaleItem = (itemID: string, price: ItemPrice) => {
     gameEnvironment.player.removeItemByID(itemID, 1);
