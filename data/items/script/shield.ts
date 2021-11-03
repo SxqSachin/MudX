@@ -2,7 +2,7 @@ import { ItemData } from "@/types/Item";
 import { EMPTY_XID } from "@/types/Object";
 import { IUnit } from "@/types/Unit";
 
-export const shield: ItemData = {
+const shield: ItemData = {
   xid: EMPTY_XID,
   id: "shield",
   name: "小圆盾",
@@ -35,3 +35,5 @@ export const shield: ItemData = {
     },
   ],
 };
+
+export default shield;

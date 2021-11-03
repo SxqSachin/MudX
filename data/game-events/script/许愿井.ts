@@ -47,4 +47,4 @@ const e: GameEvent = {
 };
 
 const event = Object.freeze(e);
-export { event };
+export default event;
