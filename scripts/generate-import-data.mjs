@@ -20,8 +20,7 @@ const generateImportIndex = async (dir, indexFile) => {
   });
 
   const fileContent = 
-`
-${importPart}
+`${importPart}
 const list = [${arrayPart} \n];
 
 export default list;`
