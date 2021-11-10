@@ -40,6 +40,7 @@ export enum GameEventNextType {
   STORY_END = "STORY_END",
   START_NEW_STORY = "START_NEW_STORY",
   TRADE = "TRADE",
+  EXIT_TRADE = "EXIT_TRADE",
 }
 
 export type GameEventOptionID = string;

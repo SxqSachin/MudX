@@ -1,9 +1,10 @@
-import { shield } from './shield';
-import { item as amulet } from './base_amulet';
 
+import base_amulet from './base_amulet'; 
+import shield from './shield'; 
 
-const a = [
-  shield,
-  amulet
-]
-export default a;
+const list = [
+  base_amulet,
+  shield, 
+];
+
+export default list;

@@ -1,6 +1,6 @@
 import { SkillData } from "@/types/Skill";
 
-export const duocui: SkillData = {
+const duocui: SkillData = {
   colddown: 10,
   id: "duocui",
   name: "夺萃",
@@ -25,3 +25,5 @@ export const duocui: SkillData = {
   ],
   onForget: [],
 };
+
+export default duocui;

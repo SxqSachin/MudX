@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "serve": "vite preview"
+    "build": "npm run import-data && tsc && vite build",
+    "serve": "vite preview",
+    "import-data": "node --experimental-modules ./scripts/generate-import-data.mjs"
   },
   "dependencies": {
     "@types/styled-components": "^5.1.15",

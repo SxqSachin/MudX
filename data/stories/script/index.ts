@@ -1,9 +1,10 @@
-import cityStory from './city-story';
-import tempStory from './temple';
 
-const a = [
-  cityStory,
-  tempStory,
+import citystory from './city-story'; 
+import temple from './temple'; 
+
+const list = [
+  citystory,
+  temple, 
 ];
 
-export default a;
+export default list;

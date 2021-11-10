@@ -1,3 +1,4 @@
+import { VoidCallback } from "@/types";
 import { ItemAction } from "@/types/action";
 import { IItem, ItemID, ItemPrice, PriceList } from "@/types/Item";
 import { IUnit } from "@/types/Unit";
@@ -13,9 +14,9 @@ type ItemTradePanelParam = {
   onItemClick: (itemID: ItemID, price: ItemPrice) => void;
 };
 function ItemTradePanel({ role, shopper, shopkeeper, priceList, onItemClick }: ItemTradePanelParam ) {
-  if (!shopkeeper) {
-    return <></>
-  }
+  // if (!shopkeeper || !shopper) {
+  //   return <></>
+  // }
   return (
     <>
       <div>{shopkeeper.data.name}</div>
@@ -68,6 +69,7 @@ type TradePanelParam = {
 
   onSaleItem: (itemID: string, price: ItemPrice) => void;
   onBuyItem: (itemID: string, price: ItemPrice) => void;
+  onExit: VoidCallback;
 };
 export function TradePanel({
   shopper,
@@ -75,20 +77,40 @@ export function TradePanel({
   priceList,
   onSaleItem,
   onBuyItem,
+  onExit,
 }: TradePanelParam) {
   return (
-    <div className="flex flex-row h-full">
-      <div className="inline-block w-1/2 h-full">
-        <div className="h-full">
-          <ItemTradePanel onItemClick={onSaleItem} role="shopper" shopper={shopkeeper} shopkeeper={shopper} priceList={priceList}></ItemTradePanel>
+    <>
+      <div className="">
+        <h2 className="inline-block">{shopkeeper.name}</h2>
+        <button className="float-right inline-block text-red-500" onClick={onExit}>离开</button>
+      </div>
+      <hr className="my-4" />
+      <div className="flex flex-row h-full">
+        <div className="inline-block w-1/2 h-full">
+          <div className="h-full">
+            <ItemTradePanel
+              onItemClick={onSaleItem}
+              role="shopper"
+              shopper={shopkeeper}
+              shopkeeper={shopper}
+              priceList={priceList}
+            ></ItemTradePanel>
+          </div>
+        </div>
+        <div className="w-0.5 bg-gray-300 mx-4"></div>
+        <div className="inline-block w-1/2 h-full">
+          <div className="h-full">
+            <ItemTradePanel
+              onItemClick={onBuyItem}
+              role="shopkeeper"
+              shopper={shopper}
+              shopkeeper={shopkeeper}
+              priceList={priceList}
+            ></ItemTradePanel>
+          </div>
         </div>
       </div>
-      <div className="w-0.5 bg-gray-300 mx-4"></div>
-      <div className="inline-block w-1/2 h-full">
-        <div className="h-full">
-          <ItemTradePanel onItemClick={onBuyItem} role="shopkeeper" shopper={shopper} shopkeeper={shopkeeper} priceList={priceList}></ItemTradePanel>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
