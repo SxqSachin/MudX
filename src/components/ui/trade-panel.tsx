@@ -14,9 +14,7 @@ type ItemTradePanelParam = {
   onItemClick: (itemID: ItemID, price: ItemPrice) => void;
 };
 function ItemTradePanel({ role, shopper, shopkeeper, priceList, onItemClick }: ItemTradePanelParam ) {
-  // if (!shopkeeper || !shopper) {
-  //   return <></>
-  // }
+  const itemNameMap: {[id: string]: string} = {};
   return (
     <>
       <div>{shopkeeper.data.name}</div>
@@ -44,6 +42,13 @@ function ItemTradePanel({ role, shopper, shopkeeper, priceList, onItemClick }: I
           }
 
           const onClick = (hasStore && canAfford) ? () => onItemClick(itemID, salePrice ?? ({} as any as ItemPrice)) : noop;
+          const itemName = !itemNameMap[itemID]
+            ? (() => {
+                const name = Items.get(itemID).data.name;
+                itemNameMap[itemID] = name;
+                return name;
+              })()
+            : itemNameMap[itemID];
 
           return (
             <div
@@ -51,8 +56,8 @@ function ItemTradePanel({ role, shopper, shopkeeper, priceList, onItemClick }: I
               key={itemID}
               onClick={onClick}
             >
-              <span className="inline-block w-3/6 text-left">{Items.get(itemID).data.name}</span>
-              <span className="inline-block w-2/6 text-left">{salePrice ? `${salePrice.amount}${Items.get(salePrice.subject).data.name}` : '免费'}</span>
+              <span className="inline-block w-3/6 text-left">{itemName}</span>
+              <span className="inline-block w-2/6 text-left">{salePrice ? `${salePrice.amount}${itemName}` : '免费'}</span>
               <span className="inline-block w-1/6 text-right">{shopkeeper.items[itemID].length}</span>
             </div>
           );

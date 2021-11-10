@@ -11,6 +11,50 @@ import { calcOptionNextEvent, getOptionNextType } from "@/utils/game-event";
 import { showPanel } from "@/utils/game";
 import { leaveShopEvent } from "@/models/event/leave-shop";
 
+type AllGameEventNextType = GameEventNextType | 'default' | string;
+const optionNextEventMap: { [type in AllGameEventNextType]: (param: { option: GameEventOption, gameEnv: GameEnvironment }) => GameEnvironment } = {
+  [GameEventNextType.ENTER_BATTLE]: ({ option, gameEnv }) => {
+    gameEnv.enemy = Enemies.getGenerator(option.enemyID!)(gameEnv);
+    gameEnv.panels = showPanel(gameEnv, "BATTLE");
+
+    return gameEnv;
+  },
+  [GameEventNextType.PUSH_STORY]: ({ option, gameEnv }) => {
+    if (gameEnv.story.curPage >= gameEnv.story.totalPage) { // 故事读完了
+      gameEnv.event = storyEndEvent();
+    } else { // 推进到下一章节
+      gameEnv.story.curPage++;
+      gameEnv.event = GameEvents.get(gameEnv.story.pages[gameEnv.story.curPage - 1].event);
+    }
+
+    return gameEnv;
+  },
+  [GameEventNextType.START_NEW_STORY]: ({ option, gameEnv }) => {
+    gameEnv.panels = showPanel(gameEnv, "STORY_CHOOSE");
+
+    return gameEnv;
+  },
+  [GameEventNextType.GAME_EVENT_END]: ({ option, gameEnv }) => {
+    gameEnv.event = endEvent();
+
+    return gameEnv;
+  },
+  [GameEventNextType.TRADE]: ({ option, gameEnv }) => {
+    gameEnv.trade = option.trade!;
+    gameEnv.panels = showPanel(gameEnv, "TRADE");
+    gameEnv.event = leaveShopEvent();
+
+    return gameEnv;
+  },
+  [GameEventNextType.STORY_END]: ({gameEnv}) => gameEnv,
+  [GameEventNextType.EXIT_TRADE]: ({gameEnv}) => gameEnv,
+  'default': ({ option, gameEnv }) => {
+    gameEnv.event = calcOptionNextEvent(option, gameEnv);
+
+    return gameEnv;
+  }
+}
+
 export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option: GameEventOption): GameEnvironment => {
   let gameEnv = gameEnvironment;
 
@@ -26,31 +70,11 @@ export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option:
   });
 
   const optionNextType = getOptionNextType(option, gameEnv);
-  let gameEvent = calcOptionNextEvent(option, gameEnv);
-
-  if (optionNextType === GameEventNextType.ENTER_BATTLE) {
-    gameEnv.enemy = Enemies.getGenerator(option.enemyID!)(gameEnv);
-    gameEnv.panels = showPanel(gameEnv, "BATTLE");
-  } else if (optionNextType === GameEventNextType.PUSH_STORY) {
-    if (gameEnv.story.curPage >= gameEnv.story.totalPage) { // 故事读完了
-      gameEvent = storyEndEvent();
-    } else { // 推进到下一章节
-      gameEnv.story.curPage++;
-      gameEvent = GameEvents.get(gameEnv.story.pages[gameEnv.story.curPage - 1].event);
-    }
-  } else if (optionNextType === GameEventNextType.START_NEW_STORY) { // 开始新的故事
-    gameEnv.panels = showPanel(gameEnv, "STORY_CHOOSE");
-  } else if (optionNextType === GameEventNextType.GAME_EVENT_END) { // 当前章节结束
-    gameEvent = endEvent();
-  } else if (optionNextType === GameEventNextType.TRADE) { // 交易
-    gameEnv.trade = option.trade!;
-    gameEnv.panels = showPanel(gameEnv, "TRADE");
-    gameEvent = leaveShopEvent();
-  } else { // 普通的故事推进
-    gameEvent = calcOptionNextEvent(option, gameEnv);
+  if (optionNextEventMap[optionNextType]) {
+    gameEnv = optionNextEventMap[optionNextType]({ option, gameEnv });
+  } else {
+    gameEnv = optionNextEventMap.default({ option, gameEnv });
   }
-
-  gameEnv.event = gameEvent;
 
   return gameEnv;
 }
