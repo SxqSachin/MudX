@@ -26,7 +26,7 @@ const generator = (env?: GameEnvironment) : IEnemy => {
     talent: 0,
     items: {},
     skills: {},
-    phyAtk: 0,
+    phyAtk: 6,
     phyDef: 0,
     powAtk: 0,
     powDef: 0,
@@ -34,7 +34,7 @@ const generator = (env?: GameEnvironment) : IEnemy => {
   const unit = new Enemy(unitData);
 
   unit.on('aiRoundStart', async data => {
-    data.source.attack(data.target);
+    await data.source.attack(data.target);
 
     return data;
   });
