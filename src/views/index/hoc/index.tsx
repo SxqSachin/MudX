@@ -107,12 +107,14 @@ const battleActionMap: {
     const { player, enemy } = gameEnvironment;
     await player.fire("roundEnd", { source: player, target: enemy });
 
+    // todo 这里没有立刻切换 所以玩家在行动后还可以进行操作，直到下方回合结束
+    await delay(1000);
+
     Message.push("玩家回合结束");
 
+    await delay(1000);
+
     yield gameEnvironment = yield* await battleActionMap.ROUND_END(gameEnvironment);
-
-    // await delay(1000);
-
 
     await delay(1000);
 
