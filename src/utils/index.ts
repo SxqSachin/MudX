@@ -53,3 +53,21 @@ export async function delay(ms: number) {
     }, ms);
   })
 }
+
+export async function runAsyncGenerate<T>(
+  generatorFunction: (t: T) => AsyncGenerator<T, T, T>,
+  t: T,
+  cb: (param: T) => void
+) {
+  let it = await generatorFunction(t);
+
+  let result = await it.next(t);
+  cb(result.value);
+
+  while (!result.done) {
+    t = result.value;
+    cb(t);
+    result = await it.next();
+  }
+};
+
