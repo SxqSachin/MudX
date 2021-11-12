@@ -5,6 +5,7 @@ import { GameEnvironment } from "./game";
 import { IItem, ItemData, ItemID } from "./Item";
 import { XID, XObject, XSerializable } from "./Object";
 import { ISkill, SkillData, SkillID } from "./Skill";
+import { State, StateData, StateID } from "./state";
 
 export type UnitEventType =
   'beforeAttack' | 'afterAttack' |
@@ -110,6 +111,7 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
 
   items: Readonly<{ [id in ItemID]: IItem[] }>;
   skills: Readonly<{ [id in SkillID]: ISkill }>;
+  states: Readonly<{ [id in StateID]: State }>;
   status: Readonly<UnitStatus>;
   data: Readonly<UnitData>;
   equipments: Readonly<IItem[]>;
@@ -152,10 +154,11 @@ export type UnitData = XSerializable & {
 
   items: { [id in ItemID]: ItemData[] };
   skills: { [id in SkillID]: SkillData };
+  states: { [id in StateID]: StateData };
 
   spoils?: ((env: GameEnvironment) => ItemID | ItemID[]) | ItemID | ItemID[];
 }
-export type UnitStatusType = Exclude<keyof UnitData, 'items' | 'skills' | 'xid' | 'name' | 'spoils' | 'id'>;
+export type UnitStatusType = Exclude<keyof UnitData, 'items' | 'skills' | 'states' | 'xid' | 'name' | 'spoils' | 'id'>;
 export type UnitStatus = { [status in UnitStatusType]: number };
 
 export type SourceUnit = IUnit;

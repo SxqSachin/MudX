@@ -11,6 +11,7 @@ import { deepClone } from "../utils";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";
 import { Skill } from "./Skill";
+import { State, StateID } from "@/types/state";
 
 const DefaultDamageInfo: DamageInfo = {
   triggerEvent: true,
@@ -20,6 +21,7 @@ export class Unit implements IUnit {
   private unitEntity!: UnitData;
   private _items!:  { [id in ItemID]: Item[] };
   private _skills!:  { [id in SkillID]: Skill };
+  private _states!:  { [id in StateID]: State };
 
   private _publisher!: Publisher<UnitEventType, UnitEventData>;
   private _subscriber!: Subscriber<UnitEventType, UnitEventData>;
@@ -309,6 +311,7 @@ export class Unit implements IUnit {
     delete data.items;
     delete data.skills;
     delete data.name;
+    delete data.states;
     delete data.id;
 
     const status = data as UnitStatus;
@@ -318,6 +321,7 @@ export class Unit implements IUnit {
   get data() { return this.unitEntity; }
   get items() { return this._items; }
   get skills() { return this._skills; }
+  get states() { return this._states; }
 
   get phyAtk() {
     const { strength, phyAtk } = this.status;
@@ -366,6 +370,7 @@ export class Unit implements IUnit {
       talent: 10,
       items: {},
       skills: {},
+      states: {},
       phyAtk: 0,
       phyDef: 0,
       powAtk: 0,
@@ -421,6 +426,7 @@ export function createUnit(name: string): IUnit {
     talent: 10,
     items: {},
     skills: {},
+    states: {},
     phyAtk: 0,
     phyDef: 0,
     powAtk: 0,

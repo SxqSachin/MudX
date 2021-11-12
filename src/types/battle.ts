@@ -9,4 +9,5 @@ export type BattleData = {
   isInBattle: boolean;
   round: number;
   curRoundOwner: 'PLAYER' | 'ENEMY' | 'NONE';
+  playerCanDoAction: boolean;
 }

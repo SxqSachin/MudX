@@ -1,4 +1,3 @@
-
 import base_amulet from './base_amulet'; 
 import shield from './shield'; 
 

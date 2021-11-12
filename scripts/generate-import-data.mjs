@@ -32,7 +32,7 @@ export default list;`
   const root = path.resolve("./");
   const dataPath = root + "/data";
 
-  const dataTypeList = ['game-events', 'enemies', 'items', 'skills', 'stories'];
+  const dataTypeList = ['game-events', 'enemies', 'items', 'skills', 'stories', 'states'];
 
   for(let dataType of dataTypeList) {
     const eventScriptPath = dataPath + `/${dataType}/script`;

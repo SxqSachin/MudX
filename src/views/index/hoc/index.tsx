@@ -54,6 +54,7 @@ const battleActionMap: {
       isInBattle: false,
       round: 0,
       curRoundOwner: "NONE",
+      playerCanDoAction: false,
     };
 
     return gameEnvironment
@@ -64,6 +65,7 @@ const battleActionMap: {
       isInBattle: true,
       round: 1,
       curRoundOwner: "NONE",
+      playerCanDoAction: false,
     };
 
     Message.push("=========================");
@@ -100,6 +102,7 @@ const battleActionMap: {
     const { player, enemy } = gameEnvironment;
     await player.fire("roundStart", { source: player, target: enemy });
     Message.push("玩家回合开始");
+    gameEnvironment.battle.playerCanDoAction = true;
 
     return gameEnvironment
   },
@@ -108,6 +111,8 @@ const battleActionMap: {
     await player.fire("roundEnd", { source: player, target: enemy });
 
     // todo 这里没有立刻切换 所以玩家在行动后还可以进行操作，直到下方回合结束
+    gameEnvironment.battle.playerCanDoAction = false;
+    yield gameEnvironment;
     await delay(1000);
 
     Message.push("玩家回合结束");
@@ -248,7 +253,7 @@ export const BattlePanelHOC = ({
   };
 
   const calcBtnState = (action: string) => {
-    return gameEnvironment.battle.curRoundOwner === "PLAYER";
+    return gameEnvironment.battle.playerCanDoAction;
   };
 
   if (panels[0] != "BATTLE") {
