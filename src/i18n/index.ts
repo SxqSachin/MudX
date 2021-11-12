@@ -8,8 +8,8 @@ const i18nMap = {
 
 const curLanguage = i18nMap['zh_cn'];
 
-function i18n(key: string): string {
-  return (curLanguage as any)[key] ?? `(I18N ERROR: ${key})`;
+function i18n(key: string, fallback?: string): string {
+  return (curLanguage as any)[key] ?? (fallback ?? `(I18N ERROR: ${key})`);
 }
 
 export {

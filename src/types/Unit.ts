@@ -109,9 +109,14 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
   decreaseStatus(statusKey: UnitStatusType, val: number): UnitSelf;
   setStatus(statusKey: UnitStatusType, val: number): UnitSelf;
 
+  addState(state: State): UnitSelf;
+  removeState(state: State): UnitSelf;
+  addStateByID(id: StateID): UnitSelf;
+  removeStateByID(id: StateID): UnitSelf;
+
   items: Readonly<{ [id in ItemID]: IItem[] }>;
   skills: Readonly<{ [id in SkillID]: ISkill }>;
-  states: Readonly<{ [id in StateID]: State }>;
+  states: Readonly<{ [id in StateID]: State[] }>;
   status: Readonly<UnitStatus>;
   data: Readonly<UnitData>;
   equipments: Readonly<IItem[]>;
@@ -154,7 +159,7 @@ export type UnitData = XSerializable & {
 
   items: { [id in ItemID]: ItemData[] };
   skills: { [id in SkillID]: SkillData };
-  states: { [id in StateID]: StateData };
+  states: { [id in StateID]: StateData[] };
 
   spoils?: ((env: GameEnvironment) => ItemID | ItemID[]) | ItemID | ItemID[];
 }

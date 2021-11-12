@@ -1,4 +1,4 @@
-import { BattlePanel } from "@/components/ui/battle-panel";
+import { BattleActionCalbackParam, BattlePanel } from "@/components/ui/battle-panel";
 import { StoryChoosePanel } from "@/components/ui/story-choose-panel";
 import { Message } from "@/core/message";
 import { GameEvents } from "@data";
@@ -44,12 +44,13 @@ export const StoryChoosePanelHOC = ({
   );
 };
 
+type BattleActionMapParam = { gameEnvironment: GameEnvironment } & Partial<Pick<BattleActionCalbackParam, 'ext'>>;
 const battleActionMap: {
   [action in BattleAction]: (
-    gameEnvironment: GameEnvironment,
-  ) => AsyncGenerator<GameEnvironment, GameEnvironment, GameEnvironment>;
+    obj: BattleActionMapParam
+  ) => AsyncGenerator<BattleActionMapParam, BattleActionMapParam, BattleActionMapParam>;
 } = {
-  LEAVE_BATTLE: async function*(gameEnvironment) {
+  LEAVE_BATTLE: async function* ({ gameEnvironment, ext }) {
     gameEnvironment.battle = {
       isInBattle: false,
       round: 0,
@@ -57,9 +58,9 @@ const battleActionMap: {
       playerCanDoAction: false,
     };
 
-    return gameEnvironment
+    return { gameEnvironment, ext }
   },
-  ENTER_BATTLE: async function*(gameEnvironment) {
+  ENTER_BATTLE: async function* ({ gameEnvironment, ext }) {
     const { player, enemy } = gameEnvironment;
     gameEnvironment.battle = {
       isInBattle: true,
@@ -82,84 +83,91 @@ const battleActionMap: {
     const roundOwner = isPlayerFirst ? "PLAYER" : "ENEMY";
     gameEnvironment.battle.curRoundOwner = roundOwner;
 
-    return gameEnvironment
+    return { gameEnvironment, ext }
   },
-  ROUND_START: async function*(gameEnvironment) {
+  ROUND_START: async function* ({ gameEnvironment, ext }) {
     gameEnvironment.battle.round += 1;
 
-    return gameEnvironment
+    return { gameEnvironment, ext }
   },
-  ROUND_END: async function*(gameEnvironment) {
+  ROUND_END: async function* ({ gameEnvironment, ext }) {
     if (gameEnvironment.battle.curRoundOwner === "ENEMY") {
       gameEnvironment.battle.curRoundOwner = "PLAYER";
     } else if (gameEnvironment.battle.curRoundOwner === "PLAYER") {
       gameEnvironment.battle.curRoundOwner = "ENEMY";
     }
 
-    return gameEnvironment
+    return { gameEnvironment, ext }
   },
-  PLAYER_ROUND_START: async function*(gameEnvironment) {
+  PLAYER_ROUND_START: async function* ({ gameEnvironment, ext }) {
     const { player, enemy } = gameEnvironment;
     await player.fire("roundStart", { source: player, target: enemy });
     Message.push("玩家回合开始");
     gameEnvironment.battle.playerCanDoAction = true;
 
-    return gameEnvironment
+    return { gameEnvironment, ext }
   },
-  PLAYER_ROUND_END: async function*(gameEnvironment) {
+  PLAYER_ROUND_END: async function* ({ gameEnvironment, ext }) {
     const { player, enemy } = gameEnvironment;
     await player.fire("roundEnd", { source: player, target: enemy });
 
     // todo 这里没有立刻切换 所以玩家在行动后还可以进行操作，直到下方回合结束
     gameEnvironment.battle.playerCanDoAction = false;
-    yield gameEnvironment;
+    yield { gameEnvironment, ext };
     await delay(1000);
 
     Message.push("玩家回合结束");
 
     await delay(1000);
 
-    yield gameEnvironment = yield* await battleActionMap.ROUND_END(gameEnvironment);
+    yield {gameEnvironment, ext} = yield* await battleActionMap.ROUND_END({ gameEnvironment, ext });
 
     await delay(1000);
 
-    return gameEnvironment
+    return { gameEnvironment, ext }
   },
-  ENEMY_ROUND_START: async function*(gameEnvironment) {
+  ENEMY_ROUND_START: async function* ({ gameEnvironment, ext }) {
     const { player, enemy } = gameEnvironment;
     await enemy.fire("roundStart", { source: enemy, target: player });
     Message.push("敌方回合开始");
 
     await delay(1000);
     await enemy.fire("aiRoundStart", { source: enemy, target: player });
-    yield gameEnvironment;
+    yield { gameEnvironment, ext };
 
     await delay(1000);
 
-    yield gameEnvironment = yield* await battleActionMap.ENEMY_ROUND_END(gameEnvironment);
+    yield {gameEnvironment, ext} = yield* await battleActionMap.ENEMY_ROUND_END({ gameEnvironment, ext });
 
-    return gameEnvironment
+    return { gameEnvironment, ext }
   },
-  ENEMY_ROUND_END: async function*(gameEnvironment) {
+  ENEMY_ROUND_END: async function* ({ gameEnvironment, ext }) {
     const { player, enemy } = gameEnvironment;
     await enemy.fire("roundEnd", { source: enemy, target: player });
     Message.push("敌方回合结束");
     await delay(1000);
-    yield gameEnvironment = yield* await battleActionMap.ROUND_END(gameEnvironment);
+    yield {gameEnvironment, ext} = yield* await battleActionMap.ROUND_END({ gameEnvironment, ext });
 
-    return gameEnvironment
+    return { gameEnvironment, ext }
   },
 
-  ATTACK: async function*(gameEnvironment) {
+  ATTACK: async function* ({ gameEnvironment, ext }) {
     const { player, enemy } = gameEnvironment;
     await player.attack(enemy);
 
-    yield gameEnvironment;
+    yield { gameEnvironment, ext };
 
-    yield gameEnvironment = yield* await battleActionMap.PLAYER_ROUND_END(gameEnvironment);
+    yield {gameEnvironment, ext} = yield* await battleActionMap.PLAYER_ROUND_END({ gameEnvironment, ext });
 
-    return gameEnvironment;
+    return { gameEnvironment, ext };
   },
+  SKILL: async function* ({ gameEnvironment, ext }) {
+    await gameEnvironment.player.castSkill(ext?.id!, gameEnvironment.player);
+
+    yield {gameEnvironment, ext} = yield* await battleActionMap.PLAYER_ROUND_END({ gameEnvironment, ext });
+
+    return { gameEnvironment, ext };
+  }
 };
 
 export const BattlePanelHOC = ({
@@ -171,15 +179,15 @@ export const BattlePanelHOC = ({
   useEffect(() => {
     (async () => {
       if (isPanelVisible(gameEnvironment, "BATTLE")) {
-        await runAsyncGenerate(battleActionMap.ENTER_BATTLE, gameEnvironment, env => {
-          gameEnvironment = env;
-          applyEnvironment(env);
+        await runAsyncGenerate(battleActionMap.ENTER_BATTLE, { gameEnvironment }, obj => {
+          gameEnvironment = obj.gameEnvironment;
+          applyEnvironment(gameEnvironment);
         })
         // battleActionMap.ENTER_BATTLE(gameEnvironment);
       } else {
-        await runAsyncGenerate(battleActionMap.LEAVE_BATTLE, gameEnvironment, env => {
-          gameEnvironment = env;
-          applyEnvironment(env);
+        await runAsyncGenerate(battleActionMap.LEAVE_BATTLE, { gameEnvironment }, obj => {
+          gameEnvironment = obj.gameEnvironment;
+          applyEnvironment(gameEnvironment);
         })
       }
     })();
@@ -193,13 +201,13 @@ export const BattlePanelHOC = ({
           gameEnvironment.battle.curRoundOwner = "PLAYER";
           applyEnvironment(gameEnvironment);
 
-          await runAsyncGenerate(battleActionMap.ROUND_START, gameEnvironment, env => {
-            gameEnvironment = env;
-            applyEnvironment(env);
+          await runAsyncGenerate(battleActionMap.ROUND_START, { gameEnvironment }, obj => {
+            gameEnvironment = obj.gameEnvironment;
+            applyEnvironment(gameEnvironment);
           })
-          await runAsyncGenerate(battleActionMap.PLAYER_ROUND_START, gameEnvironment, env => {
-            gameEnvironment = env;
-            applyEnvironment(env);
+          await runAsyncGenerate(battleActionMap.PLAYER_ROUND_START, { gameEnvironment }, obj => {
+            gameEnvironment = obj.gameEnvironment;
+            applyEnvironment(gameEnvironment);
           })
 
           break;
@@ -207,13 +215,13 @@ export const BattlePanelHOC = ({
           gameEnvironment.battle.curRoundOwner = "ENEMY";
           applyEnvironment(gameEnvironment);
 
-          await runAsyncGenerate(battleActionMap.ROUND_START, gameEnvironment, env => {
-            gameEnvironment = env;
-            applyEnvironment(env);
+          await runAsyncGenerate(battleActionMap.ROUND_START, { gameEnvironment }, obj => {
+            gameEnvironment = obj.gameEnvironment;
+            applyEnvironment(gameEnvironment);
           })
-          await runAsyncGenerate(battleActionMap.ENEMY_ROUND_START, gameEnvironment, env => {
-            gameEnvironment = env;
-            applyEnvironment(env);
+          await runAsyncGenerate(battleActionMap.ENEMY_ROUND_START, { gameEnvironment }, obj => {
+            gameEnvironment = obj.gameEnvironment;
+            applyEnvironment(gameEnvironment);
           })
 
           break;
@@ -224,15 +232,15 @@ export const BattlePanelHOC = ({
     })();
   }, [gameEnvironment.battle.curRoundOwner]);
 
-  const handleBattleAction = async (action: BattleAction) => {
+  const handleBattleAction = async ({ action, ext }: BattleActionCalbackParam) => {
     const { player, enemy } = gameEnvironment;
     if (!enemy) {
       return;
     }
 
-    await runAsyncGenerate(battleActionMap[action], gameEnvironment, env => {
-      gameEnvironment = env;
-      applyEnvironment(env);
+    await runAsyncGenerate(battleActionMap[action], { gameEnvironment, ext }, obj => {
+      gameEnvironment = obj.gameEnvironment;
+      applyEnvironment(gameEnvironment);
     })
 
     // let result = await it.next(curGameEnvironment);

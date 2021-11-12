@@ -26,6 +26,7 @@ const generator = (env?: GameEnvironment) : IEnemy => {
     talent: 0,
     items: {},
     skills: {},
+    states: {},
     phyAtk: 6,
     phyDef: 0,
     powAtk: 0,

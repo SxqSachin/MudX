@@ -58,7 +58,7 @@ jsonSkillList.forEach(jsonSkill => {
 
 const Skills = {
   get: (skillID: SkillID): ISkill => {
-    return deepClone(SkillMap.get(skillID) as any as ISkill);
+    return new Skill(SkillMap.get(skillID)?.data!);
   },
 }
 

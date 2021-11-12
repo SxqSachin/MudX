@@ -7,11 +7,12 @@ import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
 import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSimpleEventData, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
-import { deepClone } from "../utils";
+import { deepClone, toArray } from "../utils";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";
 import { Skill } from "./Skill";
-import { State, StateID } from "@/types/state";
+import { State, StateData, StateID } from "@/types/state";
+import { States } from "@data/states";
 
 const DefaultDamageInfo: DamageInfo = {
   triggerEvent: true,
@@ -21,7 +22,7 @@ export class Unit implements IUnit {
   private unitEntity!: UnitData;
   private _items!:  { [id in ItemID]: Item[] };
   private _skills!:  { [id in SkillID]: Skill };
-  private _states!:  { [id in StateID]: State };
+  private _states!:  { [id in StateID]: State[] };
 
   private _publisher!: Publisher<UnitEventType, UnitEventData>;
   private _subscriber!: Subscriber<UnitEventType, UnitEventData>;
@@ -39,9 +40,11 @@ export class Unit implements IUnit {
 
     this._reinitItems();
     this._reinitSkills();
+    this._reinitState();
   }
 
   async attack(target: IUnit) {
+    Message.push(`${this.data.name} 准备对 ${target.data.name} 发起攻击 `);
     const damage = this.phyAtk;
     const targetDef = target.phyDef;
 
@@ -101,6 +104,10 @@ export class Unit implements IUnit {
     }
 
     this.skills[skillID].cast(this, target);
+
+
+    Message.push(`${this.data.name} 释放技能 “${this.skills[skillID].data.name}” `);
+
     this.fire('castSkill', { source: this, target, skill: this.skills[skillID] })
     target.fire('beSkillTarget', { source: this, target, skill: this.skills[skillID] })
 
@@ -265,6 +272,51 @@ export class Unit implements IUnit {
     return this;
   }
 
+  addState(state: State) {
+    if (!this.unitEntity.states[state.id]) {
+      this.unitEntity.states[state.id] = [];
+    }
+
+    if (this.unitEntity.states[state.id].length && !state.stackable) {
+      return this;;
+    }
+
+    const stateData: StateData = {
+      xid: uuid(),
+      id: state.id,
+      remainTime: state.remainTime,
+    }
+    this.unitEntity.states[state.id].push(stateData);
+
+    this._reinitState();
+
+    Message.push(`${this.data.name} 获得状态“${state.name}” `);
+    toArray(state.actions).forEach(action => {
+      if (typeof action === 'function') {
+        action(this, this);
+      }
+    })
+
+    return this;
+  }
+  removeState(state: State) {
+    if (!this.unitEntity.states[state.id].length) {
+      return this;
+    }
+
+    this.unitEntity.states[state.id].pop();
+    this._reinitState();
+
+    Message.push(`${this.data.name} 失去状态“${state.name}” `);
+    return this;
+  }
+  addStateByID(stateID: StateID) {
+    return this.addState(States.get(stateID));
+  }
+  removeStateByID(stateID: StateID) {
+    return this.removeState(States.get(stateID));
+  }
+
   on(event: 'beforeAttack' | 'afterAttack', listener: AsyncDataProcessCallback<UnitAttackEventData>): VoidCallback;
   on(event: 'beforeAttacked' | 'afterAttacked', listener: AsyncDataProcessCallback<UnitAttackedEventData>): VoidCallback;
   on(event: 'dealDamage' | 'takeDamage', listener: AsyncDataProcessCallback<UnitDamageEventData>): VoidCallback;
@@ -301,6 +353,18 @@ export class Unit implements IUnit {
     Object.keys(this.unitEntity.skills).forEach((skillID: SkillID) => {
       const skillData = this.unitEntity.skills[skillID];
       this._skills[skillID] = new Skill(skillData);
+    });
+  }
+  private _reinitState() {
+    this._states = {};
+    if (!this.unitEntity.skills) {
+      this.unitEntity.skills = {};
+    }
+    Object.keys(this.unitEntity.states).forEach((id: StateID) => {
+      this._states[id] = [];
+      this.unitEntity.states[id].forEach(data => {
+        this._states[id].push(States.get(data.id));
+      })
     });
   }
 

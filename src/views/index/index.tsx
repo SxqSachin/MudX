@@ -8,7 +8,7 @@ import { Unit } from "@/models/Unit";
 
 import '@data';
 
-import { Enemies, GameEvents, } from "@data";
+import { Enemies, GameEvents, Skills, } from "@data";
 import { GameEnvironmentAtom, } from "../../store";
 import { GameEnvironment, } from "@/types/game";
 import { StoryUtils } from "@/utils/story";
@@ -45,6 +45,9 @@ function App() {
 
     const player = Unit.create('player');
     const enemy = Enemies.getGenerator('神庙守护者')(gameEnvironment);
+
+    console.log(Skills.get('mental-shield'));
+    player.learnSkill(Skills.get('mental-shield'));
 
     gameEnvironment.player = player;
     gameEnvironment.enemy = enemy;

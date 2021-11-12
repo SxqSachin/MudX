@@ -6,21 +6,26 @@ import { ProgressBar } from "../widget/progress-bar";
 import { noop } from "@/utils";
 import { i18n } from "@/i18n";
 
+export type BattleActionCalbackParam = { action: BattleAction; ext: { id: string } };
 type BattlePanelParam = {
-  player: IUnit,
-  enemy: IUnit,
+  player: IUnit;
+  enemy: IUnit;
 
   calcBtnState: (btnKey: string) => boolean;
 
-  onAction: DataCallback<BattleAction>,
-}
+  onAction: DataCallback<BattleActionCalbackParam>;
+};
 export function BattlePanel({player, enemy, onAction, calcBtnState}: BattlePanelParam) {
 
-  const handleAction = (action: BattleAction) => {
-    onAction(action);
+  const handleAction = (action: BattleAction, id: string) => {
+    onAction({ action, ext: { id } });
   }
 
-  const btnList = [{ action: "ATTACK", label: "btn_attack" }];
+  const btnList = [{ action: "ATTACK" as BattleAction, label: "btn_attack", id: 'attack' }];
+
+  Object.keys(player.skills).forEach(key => {
+    btnList.push({action: "SKILL", id: key, label: player.skills[key].data.name})
+  })
 
   return (
     <div className="w-full">
@@ -39,10 +44,10 @@ export function BattlePanel({player, enemy, onAction, calcBtnState}: BattlePanel
           btnList.map(btn => {
             const isBtnEnable = calcBtnState(btn.action);
 
-            const onClick = isBtnEnable ? () => handleAction("ATTACK") : noop;
+            const onClick = isBtnEnable ? () => handleAction(btn.action, btn.id) : noop;
             const btnClass = `btn ${isBtnEnable ? "" : 'btn--disabled cursor-not-allowed'}`;
 
-            return <button key={btn.action} className={btnClass} onClick={onClick}>{i18n(btn.label)}</button>
+            return <button key={btn.action} className={btnClass} onClick={onClick}>{i18n(btn.label, btn.label)}</button>
           })
         }
       </div>
