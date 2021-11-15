@@ -1,5 +1,7 @@
 import { DataProcessCallback } from ".";
 import { GameEnvironment } from "./game";
+import { IItem } from "./Item";
+import { ISkill } from "./Skill";
 import { IUnit, UnitData, UnitStatusType } from "./Unit";
 
 type ActionEffectData = {
@@ -23,4 +25,14 @@ export type SelfAction = ActionEffectData | ((self: IUnit) => void);
 
 export type GameAction = DataProcessCallback<GameEnvironment>;
 
-export type ItemAction = 'USE' | 'EQUIP' | 'UNEQUIP';
+export type ItemAction = 'USE_ITEM' | 'EQUIP' | 'UNEQUIP';
+
+export type PlayerAction = 'CAST_SKILL' | 'USE_ITEM' | 'EQUIP' | 'UNEQUIP';
+export type PlayerActionData = {
+  item: IItem;
+  skill: ISkill;
+}
+export type PlayerActionCallback =
+  ((action: PlayerAction, data: PlayerActionData) => void) &
+  ((action: 'CAST_SKILL', data: Pick<PlayerActionData, 'skill'>) => void) &
+  ((action: 'USE_ITEM' | 'EQUIP' | 'UNEQUIP', data: Pick<PlayerActionData, 'item'>) => void);

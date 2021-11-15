@@ -15,7 +15,7 @@ export function ItemDetailPanel({ item, onItemAction }: ItemDetailUIParam) {
       <hr />
       <div>
         {item.data.isUseable && (
-          <button className="btn" onClick={() => onItemAction?.("USE", item)}>
+          <button className="btn" onClick={() => onItemAction?.("USE_ITEM", item)}>
             Use
           </button>
         )}

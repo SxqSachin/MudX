@@ -7,13 +7,13 @@ import { ItemDetailPopup } from "./item-detail";
 
 type UnitItemPanelParam = {
   unit: IUnit;
-  onItemAction: (action: ItemAction, item: IItem) => void;
+  onItemAction: (action: ItemAction, unit: IUnit, item: IItem) => void;
 };
 export function UnitItemPanel({ unit, onItemAction }: UnitItemPanelParam) {
   const [curFocusItem, setCurFocusItem] = useState<IItem>({} as any as IItem);
 
   const handleItemAction = (action: ItemAction, item: IItem) => {
-    onItemAction(action, item);
+    onItemAction(action, unit, item);
     clearCurFocusItem();
   }
 

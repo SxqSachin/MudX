@@ -1,5 +1,5 @@
 import { Component, useState } from "react";
-import { ItemAction } from "@/types/action";
+import { ItemAction, PlayerAction, PlayerActionCallback } from "@/types/action";
 import { IItem } from "@/types/Item";
 import { IUnit } from "@/types/Unit";
 import { UnitEquipmentPanel } from "./unit-equipment-panel";
@@ -9,10 +9,12 @@ import { UnitStatePanel } from "./unit-state-panel";
 import { GiSkills, GiBackpack, GiBattleGear, GiHistogram, GiSpellBook } from 'react-icons/gi';
 import { IconType } from "react-icons/lib";
 import { UnitSkillPanel } from "./unit-skill-panel";
+import { ISkill } from "@/types/Skill";
 
 type UnitInfoPanelParam = {
   unit: IUnit,
   onItemAction: (action: ItemAction, item: IItem) => void;
+  onAction: PlayerActionCallback;
 }
 type PanelType = 'STATUS' | 'SKILL' | 'STATE' | 'ITEM' | 'EQUIPMENT';
 
@@ -24,18 +26,26 @@ const PanelList: {type: PanelType, name: string, icon: IconType}[] = [
   { type: 'EQUIPMENT', name: '装备', icon: GiBattleGear },
 ];
 
-export function UnitInfoPanel({unit, onItemAction}: UnitInfoPanelParam) {
+export function UnitInfoPanel({unit, onAction}: UnitInfoPanelParam) {
   const [curPanel, setCurPanel] = useState<PanelType>('STATUS');
 
   const onPanelChange = (panel: PanelType) => {
     setCurPanel(panel);
   }
 
+  const onCastSkill = (unit: IUnit, skill: ISkill) => {
+    onAction("CAST_SKILL", { skill })
+  }
+
+  const onItemAction = (action: ItemAction, unit: IUnit, item: IItem) => {
+    onAction(action, { item })
+  }
+
   return (
     <div className="w-full h-full relative">
       <div className="h-full flex flex-col overflow-auto" style={{height: "calc(100% - 3rem)"}}>
         { curPanel === 'STATUS' && <UnitStatusPanel unit={unit}></UnitStatusPanel> }
-        { curPanel === 'SKILL' && <UnitSkillPanel unit={unit}></UnitSkillPanel> }
+        { curPanel === 'SKILL' && <UnitSkillPanel unit={unit} onCastSkill={onCastSkill}></UnitSkillPanel> }
         { curPanel === 'STATE' && <UnitStatePanel unit={unit}></UnitStatePanel> }
         { curPanel === 'ITEM' && <UnitItemPanel unit={unit} onItemAction={onItemAction}></UnitItemPanel> }
         { curPanel === 'EQUIPMENT' && <UnitEquipmentPanel unit={unit} onItemAction={onItemAction}></UnitEquipmentPanel> }
