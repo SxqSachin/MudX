@@ -83,15 +83,20 @@ export class Unit implements IUnit {
 
     this._reinitSkills();
 
+    Message.push(`${this.data.name} 习得技能 “${skill.data.name}” `);
+
     this.skills[id].onLearn(this);
     this.fire('learnSkill', { source: this, target: this, skill: this.skills[id] })
 
     return this;
   }
-  forgetSkill({ data: { id } }: ISkill) {
+  forgetSkill(skill: ISkill) {
+    const { data: { id } } = skill;
     delete this.unitEntity.skills[id];
 
-    this.skills[id].onLearn(this);
+    Message.push(`${this.data.name} 遗忘了技能 “${skill.data.name}” `);
+
+    this.skills[id].onForget(this);
     this.fire('forgetSkill', { source: this, target: this, skill: this.skills[id] })
 
     this._reinitSkills();
@@ -103,18 +108,16 @@ export class Unit implements IUnit {
       return this;
     }
 
-    this.skills[skillID].cast(this, target);
-
-
     Message.push(`${this.data.name} 释放技能 “${this.skills[skillID].data.name}” `);
+    this.skills[skillID].cast(this, target);
 
     this.fire('castSkill', { source: this, target, skill: this.skills[skillID] })
     target.fire('beSkillTarget', { source: this, target, skill: this.skills[skillID] })
 
-
     return this;
   }
 
+  // addItem与addItemByID是两种状态，不能合并，id一定是新物品;item可能是新物品也可能是旧物品
   addItem(item: IItem): UnitSelf {
     const itemData = item.data;
     const { id: itemID } = itemData;
@@ -129,6 +132,8 @@ export class Unit implements IUnit {
       items[itemID].push(itemData);
       this._reinitItems();
     }
+
+    Message.push(`${this.data.name} 获得物品 “${item.data.name}” `);
 
     return this;
   }
@@ -146,6 +151,8 @@ export class Unit implements IUnit {
     }
     items[itemID].pop();
     this._reinitItems();
+
+    Message.push(`${this.data.name} 失去物品 “${item.data.name}” `);
 
     return this;
   }
@@ -168,6 +175,8 @@ export class Unit implements IUnit {
 
     this._reinitItems();
 
+    Message.push(`${this.data.name} 获得物品 “${Items.getData(itemID).name}”*${count} `);
+
     return this;
   }
   removeItemByID(itemID: ItemID, count: number) {
@@ -183,6 +192,8 @@ export class Unit implements IUnit {
 
     items[itemID].splice(0, count);
     this._reinitItems();
+
+    Message.push(`${this.data.name} 失去物品 “${Items.getData(itemID).name}”*${count} `);
 
     return this;
   }
@@ -202,6 +213,7 @@ export class Unit implements IUnit {
 
           Object.values(this.items).some(itemList => itemList.some(curItem => {
             if (xid === curItem.data.xid) {
+              Message.push(`${this.data.name} 装备了 “${curItem.data.name}” `);
               curItem.onEquip(this);
               return true;
             }
@@ -229,6 +241,7 @@ export class Unit implements IUnit {
 
           Object.values(this.items).some(itemList => itemList.some(curItem => {
             if (xid === curItem.data.xid) {
+              Message.push(`${this.data.name} 卸下了 “${curItem.data.name}” `);
               curItem.onUnequip(this);
               return true;
             }
@@ -290,7 +303,7 @@ export class Unit implements IUnit {
 
     this._reinitState();
 
-    Message.push(`${this.data.name} 获得状态“${state.name}” `);
+    Message.push(`${this.data.name} 获得状态 “${state.name}” `);
     toArray(state.actions).forEach(action => {
       if (typeof action === 'function') {
         action(this, this);

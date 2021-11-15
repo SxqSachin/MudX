@@ -18,7 +18,7 @@ export function MessagePanel() {
   }, []);
 
   return (
-    <MsgPanelWrapper className="w-full h-full flex flex-col">
+    <MsgPanelWrapper className="w-full h-full flex flex-col overflow-y-auto">
       {
         [...msgList].reverse().map((msg, index) => {
           return (

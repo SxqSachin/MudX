@@ -120,7 +120,7 @@ const battleActionMap: {
 
     await delay(1000);
 
-    yield {gameEnvironment, ext} = yield* await battleActionMap.ROUND_END({ gameEnvironment, ext });
+    yield { gameEnvironment, ext } = yield* await battleActionMap.ROUND_END({ gameEnvironment, ext });
 
     await delay(1000);
 
@@ -137,7 +137,7 @@ const battleActionMap: {
 
     await delay(1000);
 
-    yield {gameEnvironment, ext} = yield* await battleActionMap.ENEMY_ROUND_END({ gameEnvironment, ext });
+    yield { gameEnvironment, ext } = yield* await battleActionMap.ENEMY_ROUND_END({ gameEnvironment, ext });
 
     return { gameEnvironment, ext }
   },
@@ -146,7 +146,7 @@ const battleActionMap: {
     await enemy.fire("roundEnd", { source: enemy, target: player });
     Message.push("敌方回合结束");
     await delay(1000);
-    yield {gameEnvironment, ext} = yield* await battleActionMap.ROUND_END({ gameEnvironment, ext });
+    yield { gameEnvironment, ext } = yield* await battleActionMap.ROUND_END({ gameEnvironment, ext });
 
     return { gameEnvironment, ext }
   },
@@ -157,14 +157,14 @@ const battleActionMap: {
 
     yield { gameEnvironment, ext };
 
-    yield {gameEnvironment, ext} = yield* await battleActionMap.PLAYER_ROUND_END({ gameEnvironment, ext });
+    yield { gameEnvironment, ext } = yield* await battleActionMap.PLAYER_ROUND_END({ gameEnvironment, ext });
 
     return { gameEnvironment, ext };
   },
   SKILL: async function* ({ gameEnvironment, ext }) {
     await gameEnvironment.player.castSkill(ext?.id!, gameEnvironment.player);
 
-    yield {gameEnvironment, ext} = yield* await battleActionMap.PLAYER_ROUND_END({ gameEnvironment, ext });
+    yield { gameEnvironment, ext } = yield* await battleActionMap.PLAYER_ROUND_END({ gameEnvironment, ext });
 
     return { gameEnvironment, ext };
   }
@@ -242,13 +242,6 @@ export const BattlePanelHOC = ({
       gameEnvironment = obj.gameEnvironment;
       applyEnvironment(gameEnvironment);
     })
-
-    // let result = await it.next(curGameEnvironment);
-    // while (!result.done) {
-    //   result = await it.next();
-    //   curGameEnvironment = result.value;
-    //   applyEnvironment(curGameEnvironment);
-    // }
 
     if (enemy.status.curHP <= 0) {
       gameEnvironment.event = battleEndEvent({ enemy }, gameEnvironment);
