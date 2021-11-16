@@ -4,6 +4,7 @@ const duocui: SkillData = {
   colddown: 10,
   id: "duocui",
   name: "夺萃",
+  chooseTarget: true,
   actions: [
     (self, target) => {
       self.dealDamage(target, target.status.maxHP - 1, {

@@ -21,5 +21,6 @@
   "powAtk": "魔法攻击",
   "powDef": "魔法防御",
 
-  "btn_attack": "普通攻击"
+  "btn_attack": "普通攻击",
+  "castSpell": "释放"
 }

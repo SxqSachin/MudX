@@ -8,12 +8,13 @@ export type SkillData = {
   name: string;
 
   colddown: number;
+  chooseTarget: boolean;
 
   actions: Action | Action[];
   onLearn: SelfAction | SelfAction[];
   onForget: SelfAction | SelfAction[];
 };
-export type SkillSerializeData = Omit<SkillData, 'actions'>;
+export type SkillSerializeData = Omit<SkillData, 'actions' | 'onLearn' | 'onForget'>;
 
 export interface ISkill {
   data: Readonly<SkillData>;
