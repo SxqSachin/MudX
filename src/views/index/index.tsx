@@ -16,6 +16,7 @@ import { BattlePanelHOC, GameEventPanelHOC, StoryChoosePanelHOC, TradePanelHOC }
 import { handleChooseOption, handleItemAction } from "./logic";
 import { deepClone } from "@/utils";
 import { showPanel } from "@/utils/game";
+import { PlayerActionCallback } from "@/types/action";
 
 function App() {
   const [, setForceUpdate] = useState([]);
@@ -56,6 +57,20 @@ function App() {
     forceUpdate();
   }, []);
 
+  const handleAction: PlayerActionCallback = (action, data) => {
+    if (action === 'USE_ITEM') {
+    }
+    switch (action) {
+      case 'USE_ITEM':
+      case 'EQUIP':
+      case 'UNEQUIP':
+        applyEnvironment(handleItemAction(gameEnvironment)(action, data));
+        break;
+    }
+    if (action === 'USE_ITEM') {
+    }
+  }
+
   if (!gameEnvironment.player) {
     return <></>;
   }
@@ -70,7 +85,7 @@ function App() {
           <TradePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></TradePanelHOC>
         </div>
         <div className="w-1/4 ml-2 flex flex-col border rounded-md p-4">
-          <UnitInfoPanel unit={gameEnvironment.player} onItemAction={(action, item) => applyEnvironment(handleItemAction(gameEnvironment)(action, item))}></UnitInfoPanel>
+          <UnitInfoPanel unit={gameEnvironment.player} onAction={handleAction} onItemAction={(action, item) => )}></UnitInfoPanel>
         </div>
       </div>
       <div>

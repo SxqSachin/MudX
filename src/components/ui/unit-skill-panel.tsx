@@ -1,14 +1,20 @@
-import { i18n } from "../../i18n";
-import { IUnit, UnitStatusType } from "@/types/Unit";
-import { States } from "@data/states";
+import { IUnit, } from "@/types/Unit";
 import { ISkill } from "@/types/Skill";
-import skill from "@data/skills/script/mental-shield";
+import { useState } from "react";
+import { isEmpty } from "@/utils";
+import { SkillDetailPopup } from "./skill-detail";
 
 type UnitSkillPanelParam = {
   unit: IUnit;
   onCastSkill: (unit: IUnit, skill: ISkill, ext?: any) => void;
 };
 export function UnitSkillPanel({ unit, onCastSkill }: UnitSkillPanelParam) {
+  const [curFocusSkill, setCurFocusSkill] = useState<ISkill>(null!);
+
+  const clearCurFocusItem = () => {
+    setCurFocusSkill({} as any as ISkill);
+  }
+
   return (
     <>
       <ul className="w-full h-full flex flex-col relative">
@@ -16,9 +22,7 @@ export function UnitSkillPanel({ unit, onCastSkill }: UnitSkillPanelParam) {
           return (
             <li
               className="mb-1 cursor-pointer"
-              onClick={() =>
-                onCastSkill(unit, unit.skills[key])
-              }
+              onClick={() => setCurFocusSkill(unit.skills[key]) }
               key={unit.skills[key].data.id}
             >
               <span> {unit.skills[key].data.name} </span>
@@ -27,6 +31,7 @@ export function UnitSkillPanel({ unit, onCastSkill }: UnitSkillPanelParam) {
           );
         })}
       </ul>
+      {!isEmpty(curFocusSkill) && <SkillDetailPopup skill={curFocusSkill} onClose={clearCurFocusItem} onSkillAction={() => onCastSkill(unit, curFocusSkill)}></SkillDetailPopup>}
     </>
   );
 }
