@@ -27,7 +27,8 @@ export type GameAction = DataProcessCallback<GameEnvironment>;
 
 export type ItemAction = 'USE_ITEM' | 'EQUIP' | 'UNEQUIP';
 export type SkillAction = 'CAST_SKILL' | 'LEARN_SKILL' | 'FORGET_SKILL';
-export type PlayerAction = ItemAction | SkillAction;
+export type BattleEventAction = 'ATTACK';
+export type PlayerAction = ItemAction | SkillAction | BattleEventAction;
 
 export type PlayerActionData = {
   item?: IItem;
