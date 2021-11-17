@@ -22,7 +22,7 @@ export function UnitSkillPanel({ unit, onCastSkill }: UnitSkillPanelParam) {
           return (
             <li
               className="mb-1 cursor-pointer"
-              onClick={() => setCurFocusSkill(unit.skills[key]) }
+              onClick={() => setCurFocusSkill(unit.skills[key])}
               key={unit.skills[key].data.id}
             >
               <span> {unit.skills[key].data.name} </span>
@@ -31,7 +31,16 @@ export function UnitSkillPanel({ unit, onCastSkill }: UnitSkillPanelParam) {
           );
         })}
       </ul>
-      {!isEmpty(curFocusSkill) && <SkillDetailPopup skill={curFocusSkill} onClose={clearCurFocusItem} onSkillAction={() => onCastSkill(unit, curFocusSkill)}></SkillDetailPopup>}
+      {!isEmpty(curFocusSkill) && (
+        <SkillDetailPopup
+          skill={curFocusSkill}
+          onClose={clearCurFocusItem}
+          onSkillAction={() => {
+            clearCurFocusItem();
+            onCastSkill(unit, curFocusSkill);
+          }}
+        ></SkillDetailPopup>
+      )}
     </>
   );
 }

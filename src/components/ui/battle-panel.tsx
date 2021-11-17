@@ -47,7 +47,7 @@ export function BattlePanel({player, enemy, onAction, calcBtnState}: BattlePanel
             const onClick = isBtnEnable ? () => handleAction(btn.action, btn.id) : noop;
             const btnClass = `btn ${isBtnEnable ? "" : 'btn--disabled cursor-not-allowed'}`;
 
-            return <button key={btn.action} className={btnClass} onClick={onClick}>{i18n(btn.label, btn.label)}</button>
+            return <button key={btn.action + btn.id} className={btnClass} onClick={onClick}>{i18n(btn.label, btn.label)}</button>
           })
         }
       </div>

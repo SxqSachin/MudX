@@ -2,7 +2,7 @@ import { Message } from "../../core/message";
 import { Enemies, GameEvents, } from "@data";
 import { endEvent } from "@/models/event/event-end";
 import { storyEndEvent } from "@/models/event/story-end";
-import { ItemAction } from "@/types/action";
+import { ItemAction, PlayerActionCallback, SkillAction } from "@/types/action";
 import { GameEnvironment } from "@/types/game";
 import { GameEventNextType, GameEventOption } from "@/types/game-event";
 import { IItem } from "@/types/Item";
@@ -10,6 +10,7 @@ import { toArray } from "@/utils";
 import { calcOptionNextEvent, getOptionNextType } from "@/utils/game-event";
 import { showPanel } from "@/utils/game";
 import { leaveShopEvent } from "@/models/event/leave-shop";
+import { ISkill } from "@/types/Skill";
 
 type AllGameEventNextType = GameEventNextType | 'default' | string;
 const optionNextEventMap: { [type in AllGameEventNextType]: (param: { option: GameEventOption, gameEnv: GameEnvironment }) => GameEnvironment } = {
@@ -89,6 +90,18 @@ export const handleItemAction = (gameEnvironment: GameEnvironment) => (action: I
     case 'UNEQUIP':
       player.unequipItem(item);
       gameEnvironment.player = player;
+      break;
+  }
+
+  return gameEnvironment;
+}
+
+export const handleSkillAction = (gameEnvironment: GameEnvironment) => (action: SkillAction, skill: ISkill): GameEnvironment => {
+  const { player } = gameEnvironment;
+  switch (action) {
+    case 'CAST_SKILL':
+      const p = player.castSkill(skill.data.id, player);
+      gameEnvironment.player = p;
       break;
   }
 

@@ -35,6 +35,5 @@ export type PlayerActionData = {
   skill: ISkill;
 }
 export type PlayerActionCallback =
-  ((action: PlayerAction, data: PlayerActionData) => void) &
-  ((action: 'CAST_SKILL', data: Pick<PlayerActionData, 'skill'>) => void) &
-  ((action: 'USE_ITEM' | 'EQUIP' | 'UNEQUIP', data: Pick<PlayerActionData, 'item'>) => void);
+  ((action: 'CAST_SKILL', data: {skill: ISkill, item?: IItem}) => void) &
+  ((action: 'USE_ITEM' | 'EQUIP' | 'UNEQUIP', data: {item: IItem, skill?: ISkill}) => void);

@@ -13,10 +13,10 @@ import { GameEnvironmentAtom, } from "../../store";
 import { GameEnvironment, } from "@/types/game";
 import { StoryUtils } from "@/utils/story";
 import { BattlePanelHOC, GameEventPanelHOC, StoryChoosePanelHOC, TradePanelHOC } from "./hoc";
-import { handleChooseOption, handleItemAction } from "./logic";
+import { handleChooseOption, handleItemAction, handleSkillAction } from "./logic";
 import { deepClone } from "@/utils";
 import { showPanel } from "@/utils/game";
-import { PlayerActionCallback } from "@/types/action";
+import { PlayerActionCallback, PlayerActionData } from "@/types/action";
 
 function App() {
   const [, setForceUpdate] = useState([]);
@@ -49,6 +49,7 @@ function App() {
 
     console.log(Skills.get('mental-shield'));
     player.learnSkill(Skills.get('mental-shield'));
+    player.learnSkill(Skills.get('duocui'));
 
     gameEnvironment.player = player;
     gameEnvironment.enemy = enemy;
@@ -58,16 +59,15 @@ function App() {
   }, []);
 
   const handleAction: PlayerActionCallback = (action, data) => {
-    if (action === 'USE_ITEM') {
-    }
     switch (action) {
       case 'USE_ITEM':
       case 'EQUIP':
       case 'UNEQUIP':
-        applyEnvironment(handleItemAction(gameEnvironment)(action, data));
+        applyEnvironment(handleItemAction(gameEnvironment)(action, data.item!));
         break;
-    }
-    if (action === 'USE_ITEM') {
+      case 'CAST_SKILL':
+        applyEnvironment(handleSkillAction(gameEnvironment)(action, data.skill!));
+        break;
     }
   }
 
@@ -85,7 +85,7 @@ function App() {
           <TradePanelHOC applyEnvironment={applyEnvironment} gameEnvironment={gameEnvironment}></TradePanelHOC>
         </div>
         <div className="w-1/4 ml-2 flex flex-col border rounded-md p-4">
-          <UnitInfoPanel unit={gameEnvironment.player} onAction={handleAction} onItemAction={(action, item) => )}></UnitInfoPanel>
+          <UnitInfoPanel unit={gameEnvironment.player} onAction={handleAction}></UnitInfoPanel>
         </div>
       </div>
       <div>

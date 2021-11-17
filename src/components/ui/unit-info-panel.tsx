@@ -13,7 +13,6 @@ import { ISkill } from "@/types/Skill";
 
 type UnitInfoPanelParam = {
   unit: IUnit,
-  onItemAction: (action: ItemAction, item: IItem) => void;
   onAction: PlayerActionCallback;
 }
 type PanelType = 'STATUS' | 'SKILL' | 'STATE' | 'ITEM' | 'EQUIPMENT';
