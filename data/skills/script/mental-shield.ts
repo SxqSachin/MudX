@@ -6,7 +6,7 @@ const skill: SkillData = {
   chooseTarget: true,
   name: "金钟罩",
   actions: [
-    (self, target) => {
+    async function*(self, target) {
       // self.dealDamage(target, target.status.maxHP - 1, {
       //   triggerEvent: true
       // });

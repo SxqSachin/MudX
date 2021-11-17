@@ -103,18 +103,20 @@ export class Unit implements IUnit {
 
     return this;
   }
-  castSkill(skillID: SkillID, target: IUnit) {
+  async *castSkill(skillID: SkillID, target: IUnit) {
     if (!this.skills[skillID]) {
       return this;
     }
 
     Message.push(`${this.data.name} 释放技能 “${this.skills[skillID].data.name}” `);
-    this.skills[skillID].cast(this, target);
 
-    this.fire('castSkill', { source: this, target, skill: this.skills[skillID] })
-    target.fire('beSkillTarget', { source: this, target, skill: this.skills[skillID] })
+    const generator = await this.skills[skillID].cast(this, target);
+    for await (const result of generator) {
+      yield result;
+    }
 
-    return this;
+    await this.fire('castSkill', { source: this, target, skill: this.skills[skillID] })
+    await target.fire('beSkillTarget', { source: this, target, skill: this.skills[skillID] })
   }
 
   // addItem与addItemByID是两种状态，不能合并，id一定是新物品;item可能是新物品也可能是旧物品

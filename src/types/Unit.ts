@@ -91,7 +91,7 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
 
   learnSkill(skill: ISkill): UnitSelf;
   forgetSkill(skill: ISkill): UnitSelf;
-  castSkill(skillID: SkillID, target: IUnit): UnitSelf;
+  castSkill(skillID: SkillID, target: IUnit): AsyncGenerator;
 
   addItemByID(itemID: ItemID, count: number): UnitSelf;
   removeItemByID(itemID: ItemID, count: number): UnitSelf;

@@ -19,9 +19,9 @@ type ActionEffectData = {
 
 export type Action = ({
   target: 'target' | 'self';
-} & ActionEffectData) | ((self: IUnit, target: IUnit) => void);
+} & ActionEffectData) | ((self: IUnit, target: IUnit) => AsyncGenerator);
 
-export type SelfAction = ActionEffectData | ((self: IUnit) => void);
+export type SelfAction = ActionEffectData | ((self: IUnit) => AsyncGenerator);
 
 export type GameAction = DataProcessCallback<GameEnvironment>;
 

@@ -1,12 +1,13 @@
+import { agNoop, } from "@/utils";
 import { Skills } from "@data";
 import { Action, SelfAction } from "../types/action";
 import { IUnit } from "../types/Unit";
 
-export function actionExecuter(
+export async function actionExecuter(
   action: Action,
   self: IUnit,
   target: IUnit
-): void {
+): Promise<AsyncGenerator> {
   let actionTarget;
 
   if (typeof action === 'function') {
@@ -23,7 +24,7 @@ export function actionExecuter(
   }
 
   if (!actionTarget) {
-    return;
+    return agNoop;
   }
 
   const unitEffectActionMap = {
@@ -57,18 +58,20 @@ export function actionExecuter(
       unitEffectActionMap.status[effectValDirection](action.effectTo, action.val);
       break;
   }
+
+  return agNoop;
 }
 
 
-export function executeSelfAction(action: SelfAction, self: IUnit): void {
+export async function executeSelfAction(action: SelfAction, self: IUnit): Promise<AsyncGenerator> {
   if (typeof action === 'function') {
-    return action(self);
+    return await action(self);
   }
 
   let actionTarget = self;
 
   if (!actionTarget) {
-    return;
+    return agNoop;
   }
 
   const unitEffectActionMap = {
@@ -103,4 +106,6 @@ export function executeSelfAction(action: SelfAction, self: IUnit): void {
       unitEffectActionMap.status[effectValDirection].call(actionTarget, action.effectTo, action.val);
       break;
   }
+
+  return agNoop;
 }

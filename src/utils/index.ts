@@ -45,6 +45,8 @@ export function toArray<T>(obj: T | T[]): T[] {
 // ====================
 
 export const noop: VoidCallback = () => void(0);
+export const agNoopG: () => AsyncGenerator = async function* () { return void 0 };
+export const agNoop: AsyncGenerator = agNoopG();
 
 export async function delay(ms: number) {
   return new Promise<void>((resolve) => {
@@ -71,3 +73,15 @@ export async function runAsyncGenerate<T>(
   }
 };
 
+export async function iterateAsyncGenerator<T>(
+  generator: AsyncGenerator<T>,
+  cb: (param: T) => void
+) {
+  let result = await generator.next();
+  cb(result.value);
+
+  while (!result.done) {
+    result = await generator.next();
+    cb(result.value);
+  }
+}

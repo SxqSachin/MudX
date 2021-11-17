@@ -18,8 +18,8 @@ export type SkillSerializeData = Omit<SkillData, 'actions' | 'onLearn' | 'onForg
 
 export interface ISkill {
   data: Readonly<SkillData>;
-  cast(source: SourceUnit, target: TargetUnit): void;
+  cast(source: SourceUnit, target: TargetUnit): AsyncGenerator;
 
-  onLearn(target: IUnit): void;
-  onForget(target: IUnit): void;
+  onLearn(target: IUnit): Promise<void>;
+  onForget(target: IUnit): Promise<void>;
 }

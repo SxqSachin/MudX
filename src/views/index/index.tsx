@@ -59,7 +59,7 @@ function App() {
     forceUpdate();
   }, []);
 
-  const handleAction: PlayerActionCallback = (action, data) => {
+  const handleAction: PlayerActionCallback = async (action, data) => {
     switch (action) {
       case 'USE_ITEM':
       case 'EQUIP':
@@ -67,7 +67,7 @@ function App() {
         applyEnvironment(handleItemAction(gameEnvironment)(action, data.item!, data.target));
         break;
       case 'CAST_SKILL':
-        applyEnvironment(handleSkillAction(gameEnvironment)(action, data.skill!, data.target));
+        applyEnvironment(await handleSkillAction(gameEnvironment)(action, data.skill!, data.target));
         break;
     }
   }

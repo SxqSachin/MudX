@@ -100,15 +100,15 @@ export const handleItemAction = (gameEnvironment: GameEnvironment) => (action: I
   return gameEnvironment;
 }
 
-export const handleSkillAction = (gameEnvironment: GameEnvironment) => (action: SkillAction, skill: ISkill, target?: IUnit[]): GameEnvironment => {
+export const handleSkillAction = (gameEnvironment: GameEnvironment) => async (action: SkillAction, skill: ISkill, target?: IUnit[]): Promise<GameEnvironment> => {
   const { player } = gameEnvironment;
   if (!target || !target.length) {
     target = [player];
   }
   switch (action) {
     case 'CAST_SKILL':
-      for (const unit of target) {
-        let p = player.castSkill(skill.data.id, unit);
+      for await (const unit of target) {
+        let p = await player.castSkill(skill.data.id, unit);
         gameEnvironment.player = p;
       }
       break;

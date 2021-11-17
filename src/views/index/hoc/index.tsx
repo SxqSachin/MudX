@@ -7,7 +7,7 @@ import { DataCallback, VoidCallback } from "@/types";
 import { BattleAction } from "@/types/battle";
 import { GameEnvironment } from "@/types/game";
 import { Story } from "@/types/game-event";
-import { delay, runAsyncGenerate } from "@/utils";
+import { delay, iterateAsyncGenerator, runAsyncGenerate } from "@/utils";
 import { GameEventPanel } from "@/components/ui/event-panel";
 import { handleChooseOption } from "../logic";
 import { useState } from "react";
@@ -162,7 +162,10 @@ const battleActionMap: {
     return { gameEnvironment, data };
   },
   CAST_SKILL: async function* ({ gameEnvironment, data }) {
-    await gameEnvironment.player.castSkill(data.skill!.data.id, data.target![0]);
+    const generator = await gameEnvironment.player.castSkill(data.skill!.data.id, data.target![0]);
+    for await (const iterator of generator) {
+      yield { gameEnvironment, data };
+    }
 
     yield { gameEnvironment, data } = yield* await battleActionMap.PLAYER_ROUND_END({ gameEnvironment, data });
 
