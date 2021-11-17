@@ -11,6 +11,7 @@ import { calcOptionNextEvent, getOptionNextType } from "@/utils/game-event";
 import { showPanel } from "@/utils/game";
 import { leaveShopEvent } from "@/models/event/leave-shop";
 import { ISkill } from "@/types/Skill";
+import { IUnit } from "@/types/Unit";
 
 type AllGameEventNextType = GameEventNextType | 'default' | string;
 const optionNextEventMap: { [type in AllGameEventNextType]: (param: { option: GameEventOption, gameEnv: GameEnvironment }) => GameEnvironment } = {
@@ -80,8 +81,11 @@ export const handleChooseOption = (gameEnvironment: GameEnvironment) => (option:
   return gameEnv;
 }
 
-export const handleItemAction = (gameEnvironment: GameEnvironment) => (action: ItemAction, item: IItem): GameEnvironment => {
+export const handleItemAction = (gameEnvironment: GameEnvironment) => (action: ItemAction, item: IItem, target?: IUnit[]): GameEnvironment => {
   const { player } = gameEnvironment;
+  if (!target || !target.length) {
+    target = [player];
+  }
   switch (action) {
     case 'EQUIP':
       player.equipItem(item);
@@ -96,12 +100,17 @@ export const handleItemAction = (gameEnvironment: GameEnvironment) => (action: I
   return gameEnvironment;
 }
 
-export const handleSkillAction = (gameEnvironment: GameEnvironment) => (action: SkillAction, skill: ISkill): GameEnvironment => {
+export const handleSkillAction = (gameEnvironment: GameEnvironment) => (action: SkillAction, skill: ISkill, target?: IUnit[]): GameEnvironment => {
   const { player } = gameEnvironment;
+  if (!target || !target.length) {
+    target = [player];
+  }
   switch (action) {
     case 'CAST_SKILL':
-      const p = player.castSkill(skill.data.id, player);
-      gameEnvironment.player = p;
+      for (const unit of target) {
+        let p = player.castSkill(skill.data.id, unit);
+        gameEnvironment.player = p;
+      }
       break;
   }
 

@@ -10,10 +10,12 @@ import { GiSkills, GiBackpack, GiBattleGear, GiHistogram, GiSpellBook } from 're
 import { IconType } from "react-icons/lib";
 import { UnitSkillPanel } from "./unit-skill-panel";
 import { ISkill } from "@/types/Skill";
+import { KVPair } from "@/types";
 
 type UnitInfoPanelParam = {
   unit: IUnit,
   onAction: PlayerActionCallback;
+  getTargets: () => KVPair<IUnit>[];
 }
 type PanelType = 'STATUS' | 'SKILL' | 'STATE' | 'ITEM' | 'EQUIPMENT';
 
@@ -25,26 +27,26 @@ const PanelList: {type: PanelType, name: string, icon: IconType}[] = [
   { type: 'EQUIPMENT', name: '装备', icon: GiBattleGear },
 ];
 
-export function UnitInfoPanel({unit, onAction}: UnitInfoPanelParam) {
+export function UnitInfoPanel({unit, onAction, getTargets}: UnitInfoPanelParam) {
   const [curPanel, setCurPanel] = useState<PanelType>('STATUS');
 
   const onPanelChange = (panel: PanelType) => {
     setCurPanel(panel);
   }
 
-  const onCastSkill = (unit: IUnit, skill: ISkill) => {
-    onAction("CAST_SKILL", { skill })
+  const onSkillAction: PlayerActionCallback = (action, data) => {
+    onAction(action, data);
   }
 
-  const onItemAction = (action: ItemAction, unit: IUnit, item: IItem) => {
-    onAction(action, { item })
+  const onItemAction: PlayerActionCallback  = (action, data) => {
+    onAction(action, data);
   }
 
   return (
     <div className="w-full h-full relative">
       <div className="h-full flex flex-col overflow-auto" style={{height: "calc(100% - 3rem)"}}>
         { curPanel === 'STATUS' && <UnitStatusPanel unit={unit}></UnitStatusPanel> }
-        { curPanel === 'SKILL' && <UnitSkillPanel unit={unit} onCastSkill={onCastSkill}></UnitSkillPanel> }
+        { curPanel === 'SKILL' && <UnitSkillPanel unit={unit} onSkillAction={onSkillAction} getTargets={getTargets}></UnitSkillPanel> }
         { curPanel === 'STATE' && <UnitStatePanel unit={unit}></UnitStatePanel> }
         { curPanel === 'ITEM' && <UnitItemPanel unit={unit} onItemAction={onItemAction}></UnitItemPanel> }
         { curPanel === 'EQUIPMENT' && <UnitEquipmentPanel unit={unit} onItemAction={onItemAction}></UnitEquipmentPanel> }

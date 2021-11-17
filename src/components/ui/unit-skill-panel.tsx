@@ -3,12 +3,15 @@ import { ISkill } from "@/types/Skill";
 import { useState } from "react";
 import { isEmpty } from "@/utils";
 import { SkillDetailPopup } from "./skill-detail";
+import { KVPair } from "@/types";
+import { PlayerAction, PlayerActionCallback, SkillAction } from "@/types/action";
 
 type UnitSkillPanelParam = {
   unit: IUnit;
-  onCastSkill: (unit: IUnit, skill: ISkill, ext?: any) => void;
+  onSkillAction: PlayerActionCallback
+  getTargets: () => KVPair<IUnit>[]
 };
-export function UnitSkillPanel({ unit, onCastSkill }: UnitSkillPanelParam) {
+export function UnitSkillPanel({ unit, onSkillAction, getTargets }: UnitSkillPanelParam) {
   const [curFocusSkill, setCurFocusSkill] = useState<ISkill>(null!);
 
   const clearCurFocusItem = () => {
@@ -35,10 +38,11 @@ export function UnitSkillPanel({ unit, onCastSkill }: UnitSkillPanelParam) {
         <SkillDetailPopup
           skill={curFocusSkill}
           onClose={clearCurFocusItem}
-          onSkillAction={() => {
+          onSkillAction={(action, data) => {
             clearCurFocusItem();
-            onCastSkill(unit, curFocusSkill);
+            onSkillAction(action, data);
           }}
+          getTargets={getTargets}
         ></SkillDetailPopup>
       )}
     </>

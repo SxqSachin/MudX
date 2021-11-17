@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ItemAction } from "@/types/action";
+import { ItemAction, PlayerActionCallback } from "@/types/action";
 import { IItem } from "@/types/Item";
 import { IUnit } from "@/types/Unit";
 import { isEmpty } from "@/utils";
@@ -7,7 +7,7 @@ import { ItemDetailPopup } from "./item-detail";
 
 type UnitEquipmentPanelParam = {
   unit: IUnit;
-  onItemAction: (action: ItemAction, unit: IUnit, item: IItem) => void;
+  onItemAction: PlayerActionCallback,
 };
 export function UnitEquipmentPanel({
   unit,
@@ -15,8 +15,8 @@ export function UnitEquipmentPanel({
 }: UnitEquipmentPanelParam) {
   const [curFocusItem, setCurFocusItem] = useState<IItem>({} as any as IItem);
 
-  const handleItemAction = (action: ItemAction, item: IItem) => {
-    onItemAction(action, unit, item);
+  const handleItemAction: PlayerActionCallback = (action, data) => {
+    onItemAction(action, data);
     clearCurFocusItem();
   }
 

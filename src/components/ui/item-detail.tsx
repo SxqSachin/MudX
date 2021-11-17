@@ -1,10 +1,10 @@
-import { ItemAction } from "@/types/action";
+import { ItemAction, PlayerActionCallback } from "@/types/action";
 import { IItem } from "@/types/Item";
 import { Popup, PopupParam } from "../widget/popup";
 
 type ItemDetailUIParam = {
   item: IItem;
-  onItemAction?: (action: ItemAction, item: IItem) => void;
+  onItemAction: PlayerActionCallback,
 };
 export function ItemDetailPanel({ item, onItemAction }: ItemDetailUIParam) {
   return (
@@ -15,20 +15,20 @@ export function ItemDetailPanel({ item, onItemAction }: ItemDetailUIParam) {
       <hr />
       <div>
         {item.data.isUseable && (
-          <button className="btn" onClick={() => onItemAction?.("USE_ITEM", item)}>
+          <button className="btn" onClick={() => onItemAction?.("USE_ITEM", { item })}>
             Use
           </button>
         )}
         {item.data.isEquipable && item.data.isEquipped && (
           <button
             className="btn"
-            onClick={() => onItemAction?.("UNEQUIP", item)}
+            onClick={() => onItemAction?.("UNEQUIP", { item })}
           >
             Unequip
           </button>
         )}
         {item.data.isEquipable && !item.data.isEquipped && (
-          <button className="btn" onClick={() => onItemAction?.("EQUIP", item)}>
+          <button className="btn" onClick={() => onItemAction?.("EQUIP", { item })}>
             Equip
           </button>
         )}

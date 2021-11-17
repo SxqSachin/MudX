@@ -111,7 +111,6 @@ const battleActionMap: {
     const { player, enemy } = gameEnvironment;
     await player.fire("roundEnd", { source: player, target: enemy });
 
-    // todo 这里没有立刻切换 所以玩家在行动后还可以进行操作，直到下方回合结束
     gameEnvironment.battle.playerCanDoAction = false;
     yield { gameEnvironment, ext };
     await delay(1000);
