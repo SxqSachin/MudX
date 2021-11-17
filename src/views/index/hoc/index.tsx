@@ -7,7 +7,7 @@ import { DataCallback, VoidCallback } from "@/types";
 import { BattleAction } from "@/types/battle";
 import { GameEnvironment } from "@/types/game";
 import { Story } from "@/types/game-event";
-import { delay, iterateAsyncGenerator, runAsyncGenerate } from "@/utils";
+import { delay, runAsyncGenerate } from "@/utils";
 import { GameEventPanel } from "@/components/ui/event-panel";
 import { handleChooseOption } from "../logic";
 import { useState } from "react";

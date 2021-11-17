@@ -48,9 +48,9 @@ function App() {
     const enemy = Enemies.getGenerator('神庙守护者')(gameEnvironment);
 
     console.log(Skills.get('mental-shield'));
-    player.learnSkill(Skills.get('mental-shield'));
-    player.learnSkill(Skills.get('duocui'));
-    player.learnSkill(Skills.get('lianxuquan'));
+    player.learnSkill(Skills.get('mental-shield')).next();
+    player.learnSkill(Skills.get('duocui')).next();
+    player.learnSkill(Skills.get('lianxuquan')).next();
 
     gameEnvironment.player = player;
     gameEnvironment.enemy = enemy;

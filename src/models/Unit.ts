@@ -2,7 +2,7 @@ import { ElementType } from "react";
 import { Message } from "../core/message";
 import { Publisher, Subscriber } from "../core/subscribe";
 import { Items } from "@data/items";
-import { AsyncDataProcessCallback, DataProcessCallback, VoidCallback } from "../types";
+import { AsyncDataProcessCallback, DataProcessCallback, VAG, VoidCallback } from "../types";
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
@@ -13,6 +13,7 @@ import { Item } from "./Item";
 import { Skill } from "./Skill";
 import { State, StateData, StateID } from "@/types/state";
 import { States } from "@data/states";
+import { actionExecuter, executeSelfAction } from "@/core/actionExecuter";
 
 const DefaultDamageInfo: DamageInfo = {
   triggerEvent: true,
@@ -84,8 +85,10 @@ export class Unit implements IUnit {
     this._reinitSkills();
 
     Message.push(`${this.data.name} 习得技能 “${skill.data.name}” `);
+    for await (const result of await this.skills[id].onLearn(this)) {
+      yield;
+    }
 
-    this.skills[id].onLearn(this);
     this.fire('learnSkill', { source: this, target: this, skill: this.skills[id] })
   }
   async *forgetSkill(skill: ISkill) {
@@ -94,7 +97,9 @@ export class Unit implements IUnit {
 
     Message.push(`${this.data.name} 遗忘了技能 “${skill.data.name}” `);
 
-    this.skills[id].onForget(this);
+    for await (const result of await this.skills[id].onForget(this)) {
+      yield;
+    }
     this.fire('forgetSkill', { source: this, target: this, skill: this.skills[id] })
 
     this._reinitSkills();
@@ -283,13 +288,13 @@ export class Unit implements IUnit {
     return this;
   }
 
-  addState(state: State) {
+  async *addState(state: State): VAG {
     if (!this.unitEntity.states[state.id]) {
       this.unitEntity.states[state.id] = [];
     }
 
     if (this.unitEntity.states[state.id].length && !state.stackable) {
-      return this;;
+      return;
     }
 
     const stateData: StateData = {
@@ -302,15 +307,11 @@ export class Unit implements IUnit {
     this._reinitState();
 
     Message.push(`${this.data.name} 获得状态 “${state.name}” `);
-    toArray(state.actions).forEach(action => {
-      if (typeof action === 'function') {
-        action(this, this);
-      }
-    })
-
-    return this;
+    for await (const action of toArray(state.actions)) {
+      yield* await actionExecuter(action, this, this);
+    }
   }
-  removeState(state: State) {
+  async *removeState(state: State) {
     if (!this.unitEntity.states[state.id].length) {
       return this;
     }
@@ -319,13 +320,12 @@ export class Unit implements IUnit {
     this._reinitState();
 
     Message.push(`${this.data.name} 失去状态“${state.name}” `);
-    return this;
   }
-  addStateByID(stateID: StateID) {
-    return this.addState(States.get(stateID));
+  async *addStateByID(stateID: StateID) {
+    yield* await this.addState(States.get(stateID));
   }
-  removeStateByID(stateID: StateID) {
-    return this.removeState(States.get(stateID));
+  async *removeStateByID(stateID: StateID) {
+    yield* await this.removeState(States.get(stateID));
   }
 
   on(event: 'beforeAttack' | 'afterAttack', listener: AsyncDataProcessCallback<UnitAttackEventData>): VoidCallback;

@@ -9,3 +9,5 @@ export interface KVPair<T = string> {
   value: T;
   label: string;
 }
+
+export type VAG = AsyncGenerator<void>;

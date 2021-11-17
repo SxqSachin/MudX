@@ -1,3 +1,4 @@
+import { VAG } from "@/types";
 import { agNoop, } from "@/utils";
 import { Skills } from "@data";
 import { Action, SelfAction } from "../types/action";
@@ -7,7 +8,7 @@ export async function actionExecuter(
   action: Action,
   self: IUnit,
   target: IUnit
-): Promise<AsyncGenerator> {
+): Promise<VAG> {
   let actionTarget;
 
   if (typeof action === 'function') {
@@ -63,7 +64,7 @@ export async function actionExecuter(
 }
 
 
-export async function executeSelfAction(action: SelfAction, self: IUnit): Promise<AsyncGenerator> {
+export async function executeSelfAction(action: SelfAction, self: IUnit): Promise<VAG> {
   if (typeof action === 'function') {
     return await action(self);
   }

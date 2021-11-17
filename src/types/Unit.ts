@@ -1,4 +1,4 @@
-import { AsyncDataProcessCallback, DataCallback, DataProcessCallback, VoidCallback } from ".";
+import { AsyncDataProcessCallback, DataCallback, DataProcessCallback, VAG, VoidCallback } from ".";
 import { Item } from "../models/Item";
 import { Skill } from "../models/Skill";
 import { GameEnvironment } from "./game";
@@ -89,9 +89,9 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
 
   dealDamage(target: IUnit, damage: number, info?: DamageInfo): Promise<number>;
 
-  learnSkill(skill: ISkill): AsyncGenerator;
-  forgetSkill(skill: ISkill): AsyncGenerator;
-  castSkill(skillID: SkillID, target: IUnit): AsyncGenerator;
+  learnSkill(skill: ISkill): VAG;
+  forgetSkill(skill: ISkill): VAG;
+  castSkill(skillID: SkillID, target: IUnit): VAG;
 
   addItemByID(itemID: ItemID, count: number): UnitSelf;
   removeItemByID(itemID: ItemID, count: number): UnitSelf;
@@ -109,10 +109,10 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
   decreaseStatus(statusKey: UnitStatusType, val: number): UnitSelf;
   setStatus(statusKey: UnitStatusType, val: number): UnitSelf;
 
-  addState(state: State): UnitSelf;
-  removeState(state: State): UnitSelf;
-  addStateByID(id: StateID): UnitSelf;
-  removeStateByID(id: StateID): UnitSelf;
+  addState(state: State): VAG;
+  removeState(state: State): VAG;
+  addStateByID(id: StateID): VAG;
+  removeStateByID(id: StateID): VAG;
 
   items: Readonly<{ [id in ItemID]: IItem[] }>;
   skills: Readonly<{ [id in SkillID]: ISkill }>;

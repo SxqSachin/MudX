@@ -1,3 +1,4 @@
+import { VAG } from ".";
 import { Action, SelfAction } from "./action";
 import { XObject, XSerializable } from "./Object";
 import { IUnit, SourceUnit, TargetUnit, } from "./Unit";
@@ -18,8 +19,8 @@ export type SkillSerializeData = Omit<SkillData, 'actions' | 'onLearn' | 'onForg
 
 export interface ISkill {
   data: Readonly<SkillData>;
-  cast(source: SourceUnit, target: TargetUnit): AsyncGenerator;
+  cast(source: SourceUnit, target: TargetUnit): VAG;
 
-  onLearn(target: IUnit): Promise<void>;
-  onForget(target: IUnit): Promise<void>;
+  onLearn(target: IUnit): VAG;
+  onForget(target: IUnit): VAG;
 }

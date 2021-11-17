@@ -1,4 +1,4 @@
-import { DataProcessCallback } from ".";
+import { DataProcessCallback, VAG } from ".";
 import { GameEnvironment } from "./game";
 import { IItem } from "./Item";
 import { ISkill } from "./Skill";
@@ -19,9 +19,9 @@ type ActionEffectData = {
 
 export type Action = ({
   target: 'target' | 'self';
-} & ActionEffectData) | ((self: IUnit, target: IUnit) => AsyncGenerator);
+} & ActionEffectData) | ((self: IUnit, target: IUnit) => VAG);
 
-export type SelfAction = ActionEffectData | ((self: IUnit) => AsyncGenerator);
+export type SelfAction = ActionEffectData | ((self: IUnit) => VAG);
 
 export type GameAction = DataProcessCallback<GameEnvironment>;
 

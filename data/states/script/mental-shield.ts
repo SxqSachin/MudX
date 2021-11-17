@@ -8,13 +8,13 @@ const state: State = {
   stackable: false,
   remainTime: -1,
   actions: [
-    self => {
+    async function*(self) {
       self.on('takeDamage', async data => {
         data.damage = 0;
 
         Message.push(`${self.name} 发动金钟罩，本次伤害归零。`);
 
-        self.removeStateByID('mental-shield');
+        self.removeStateByID('mental-shield').next();
 
         return data;
       });

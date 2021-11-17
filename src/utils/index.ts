@@ -1,5 +1,5 @@
 import clone from 'just-clone';
-import { VoidCallback } from '../types';
+import { VAG, VoidCallback } from '../types';
 
 export function isString(obj: any) {
   return typeof obj === 'string';
@@ -45,8 +45,8 @@ export function toArray<T>(obj: T | T[]): T[] {
 // ====================
 
 export const noop: VoidCallback = () => void(0);
-export const agNoopG: () => AsyncGenerator = async function* () { return void 0 };
-export const agNoop: AsyncGenerator = agNoopG();
+export const agNoopG: () => VAG = async function* () { return void 0 };
+export const agNoop: VAG = agNoopG();
 
 export async function delay(ms: number) {
   return new Promise<void>((resolve) => {
@@ -73,7 +73,7 @@ export async function runAsyncGenerate<T>(
   }
 };
 
-export async function iterateAsyncGenerator<T>(
+export async function iterateVAG<T>(
   generator: AsyncGenerator<T>,
   cb: (param: T) => void
 ) {
