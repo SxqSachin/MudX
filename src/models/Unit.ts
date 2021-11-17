@@ -71,12 +71,12 @@ export class Unit implements IUnit {
     return damage;
   }
 
-  learnSkill(skill: ISkill) {
+  async *learnSkill(skill: ISkill) {
     const skillData = skill.data;
     const { id } = skillData;
 
     if (!!this.unitEntity.skills[id]) {
-      return this;;
+      return;
     }
 
     this.unitEntity.skills[id] = skillData;
@@ -87,10 +87,8 @@ export class Unit implements IUnit {
 
     this.skills[id].onLearn(this);
     this.fire('learnSkill', { source: this, target: this, skill: this.skills[id] })
-
-    return this;
   }
-  forgetSkill(skill: ISkill) {
+  async *forgetSkill(skill: ISkill) {
     const { data: { id } } = skill;
     delete this.unitEntity.skills[id];
 
@@ -100,19 +98,17 @@ export class Unit implements IUnit {
     this.fire('forgetSkill', { source: this, target: this, skill: this.skills[id] })
 
     this._reinitSkills();
-
-    return this;
   }
   async *castSkill(skillID: SkillID, target: IUnit) {
     if (!this.skills[skillID]) {
-      return this;
+      return;
     }
 
     Message.push(`${this.data.name} 释放技能 “${this.skills[skillID].data.name}” `);
 
     const generator = await this.skills[skillID].cast(this, target);
     for await (const result of generator) {
-      yield result;
+      yield;
     }
 
     await this.fire('castSkill', { source: this, target, skill: this.skills[skillID] })

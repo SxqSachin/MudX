@@ -14,10 +14,9 @@ const skill: SkillData = {
       for (let i = 0; i < 10; i++) {
         await self.dealDamage(target, damage);
 
-        yield;
-
         Message.push(`${self.name} 发动技能“连续拳”，对${target.name}造成${damage}点伤害`);
-        await delay(200);
+
+        yield await delay(200);
       }
 
       return Promise.resolve();

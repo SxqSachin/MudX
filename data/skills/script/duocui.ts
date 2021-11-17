@@ -7,14 +7,14 @@ const duocui: SkillData = {
   name: "夺萃",
   chooseTarget: true,
   actions: [
-    (self, target) => {
+    async function*(self, target) {
       self.dealDamage(target, 1, {
         triggerEvent: true
       });
     }
   ],
   onLearn: [
-    self => {
+    async function*(self) {
       self.on('dealDamage', async data => {
         const extraDamage = self.status.strength;
         Message.push(`${self.name} 发动技能“夺萃”，造成1倍力量(${extraDamage})的额外伤害。`);
@@ -24,7 +24,6 @@ const duocui: SkillData = {
       })
       self.on('takeDamage', async data => {
         Message.push(`${self.name} 发动技能“夺萃”，受到伤害时该伤害增加1点。`);
-        // self.increaseStatus('curHP', 1);
         data.damage += 1;
 
         return data;

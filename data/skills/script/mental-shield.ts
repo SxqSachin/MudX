@@ -7,12 +7,7 @@ const skill: SkillData = {
   name: "金钟罩",
   actions: [
     async function*(self, target) {
-      // self.dealDamage(target, target.status.maxHP - 1, {
-      //   triggerEvent: true
-      // });
       self.addStateByID('mental-shield');
-
-      console.log(self);
 
       return self;
     }
