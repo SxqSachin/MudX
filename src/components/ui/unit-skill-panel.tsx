@@ -1,7 +1,7 @@
 import { IUnit, } from "@/types/Unit";
 import { ISkill } from "@/types/Skill";
 import { useState } from "react";
-import { isEmpty } from "@/utils";
+import { calcFunctionalVal, isEmpty } from "@/utils";
 import { SkillDetailPopup } from "./skill-detail";
 import { KVPair } from "@/types";
 import { PlayerAction, PlayerActionCallback, SkillAction } from "@/types/action";
@@ -22,13 +22,15 @@ export function UnitSkillPanel({ unit, onSkillAction, getTargets }: UnitSkillPan
     <>
       <ul className="w-full h-full flex flex-col relative">
         {Object.keys(unit.skills).map((key) => {
+          const skill = unit.skills[key];
           return (
             <li
               className="mb-1 cursor-pointer"
-              onClick={() => setCurFocusSkill(unit.skills[key])}
-              key={unit.skills[key].data.id}
+              onClick={() => setCurFocusSkill(skill)}
+              key={skill.data.id}
+              title={calcFunctionalVal(skill.data.description, unit)}
             >
-              <span> {unit.skills[key].data.name} </span>
+              <span> {skill.data.name} </span>
               <span className="float-right"></span>
             </li>
           );
@@ -36,6 +38,7 @@ export function UnitSkillPanel({ unit, onSkillAction, getTargets }: UnitSkillPan
       </ul>
       {!isEmpty(curFocusSkill) && (
         <SkillDetailPopup
+          unit={unit}
           skill={curFocusSkill}
           onClose={clearCurFocusItem}
           onSkillAction={(action, data) => {

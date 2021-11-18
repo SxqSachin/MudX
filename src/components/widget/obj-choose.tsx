@@ -1,3 +1,4 @@
+import { i18n } from "@/i18n";
 import { KVPair } from "@/types";
 import { IUnit } from "@/types/Unit";
 import { useState } from "react";
@@ -44,29 +45,36 @@ export function ObjectChooseUI<T>({options, multiple, onChoose}: ObjectChooseUIP
     multiple = false;
   }
 
-  return <div>
-    <div>
-      {options.filter(option => !!option.value && !!option.key).map((option) => {
-        const cls = "px-4 py-2 border rounded-md cursor-pointer" + (value.includes(option.key) ? " bg-black": '');
-        console.log('render', option.label, value.includes(option.key), cls);
-        return (
-          <div
-            className={cls}
-            onClick={() => onChooseOption(option.key)}
-            key={option.key}
-          >
-            {option.label}
-          </div>
-        );
-      })}
+  return (
+    <div className="w-full h-full flex flex-col justify-between">
+      <div>
+        {options
+          .filter((option) => !!option.value && !!option.key)
+          .map((option) => {
+            const cls =
+              "px-4 py-2 mb-2 border border-gray-400 rounded-md cursor-pointer" +
+              (value.includes(option.key) ? " bg-blue-300 border-blue-300 text-white" : "");
+            return (
+              <div
+                className={cls}
+                onClick={() => onChooseOption(option.key)}
+                key={option.key}
+              >
+                {option.label}
+              </div>
+            );
+          })}
+      </div>
+      <button className="btn text-center block mx-auto" onClick={onSubmit}>
+        {i18n("confirm")}
+      </button>
     </div>
-    <button className="btn" onClick={onSubmit}></button>
-  </div>;
+  );
 }
 
 export function ObjectChoosePopup<T>({options, multiple, onChoose, onClose}: ObjectChooseUIParam<T> & PopupParam) {
   return (
-    <Popup onClose={onClose}>
+    <Popup title="选择目标" onClose={onClose}>
       <ObjectChooseUI
         onChoose={onChoose}
         options={options}

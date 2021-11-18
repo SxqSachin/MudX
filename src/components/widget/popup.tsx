@@ -13,12 +13,14 @@ export function Popup({title, onClose, children}: PopupParam) {
                     border rounded-md
                     bg-gray-300 shadow-lg">
 
-      <div className="mb-2">
-        <div className="float-left">{title}</div>
+      <div className="mb-2 pb-2 h-8">
+        <div className="float-left opacity-60">{title ?? '信息'}</div>
         <div className="float-right cursor-pointer" onClick={() => onClose?.()}>X</div>
+        <div className="clear-both"></div>
       </div>
-
-      { children }
+      <div className="w-full relative" style={{height: "calc(100% - 2.5rem)"}}>
+        { children }
+      </div>
     </div>
   )
 }

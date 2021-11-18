@@ -22,5 +22,9 @@
   "powDef": "魔法防御",
 
   "btn_attack": "普通攻击",
-  "castSpell": "释放"
+  "castSpell": "释放",
+
+  "submit": "提交",
+  "confirm": "确定",
+  "cancel": "取消"
 }

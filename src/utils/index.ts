@@ -85,3 +85,14 @@ export async function iterateVAG<T>(
     cb(result.value);
   }
 }
+
+export function calcFunctionalVal<T extends string | number | Object>(
+  obj: T | ((...args: any) => T),
+  ...args: any
+): T {
+  if (typeof obj === "function") {
+    return obj(...args);
+  }
+
+  return obj;
+}

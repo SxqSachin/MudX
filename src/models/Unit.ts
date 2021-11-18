@@ -52,18 +52,20 @@ export class Unit implements IUnit {
     const damage = this.phyAtk;
     const targetDef = target.phyDef;
 
-    const damageVal = damage - targetDef;
+    let damageVal = damage - targetDef;
 
-    this.fire("beforeAttack", { source: this, target, damage: damageVal });
-    target.fire("beforeAttacked", { source: this, target, damage: damageVal });
+    let eventResult = await this.fire("beforeAttack", { source: this, target, damage: damageVal });
+    damageVal = eventResult.damage ?? damageVal;
+    eventResult = await target.fire("beforeAttacked", { source: this, target, damage: damageVal });
+    damageVal = eventResult.damage ?? damageVal;
 
     const resDamage = await this.dealDamage(target, damageVal);
     Message.push(
       `${this.data.name} 攻击了 ${target.data.name}，造成 ${resDamage} 点伤害 `
     );
 
-    this.fire("afterAttack", { source: this, target, damage: resDamage });
-    target.fire("afterAttacked", { source: this, target, damage: resDamage });
+    await this.fire("afterAttack", { source: this, target, damage: resDamage });
+    await target.fire("afterAttacked", { source: this, target, damage: resDamage });
   }
 
   async dealDamage(
@@ -81,7 +83,7 @@ export class Unit implements IUnit {
     }
     if (options?.triggerTakeDamageEvent) {
       const eventResult = await target.fire("takeDamage", { source: this, target, damage });
-      damage = eventResult?.damage ?? damage;
+      damage = eventResult.damage ?? damage;
     }
 
     target.decreaseStatus("curHP", Math.max(damage, 0));

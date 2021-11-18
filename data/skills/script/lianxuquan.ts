@@ -1,4 +1,5 @@
 import { Message } from "@/core/message";
+import { GameEnvironment } from "@/types/game";
 import { SkillData } from "@/types/Skill";
 import { delay } from "@/utils";
 
@@ -6,6 +7,9 @@ const skill: SkillData = {
   colddown: 10,
   id: "lianxuquan",
   chooseTarget: true,
+  description: unit => {
+    return `快速攻击 10 次，每次攻击造成0.2倍攻击(${unit.phyAtk*0.2})的伤害。`;
+  },
   name: "连续拳",
   actions: [
     async function*(self, target) {

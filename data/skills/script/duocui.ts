@@ -6,6 +6,7 @@ const duocui: SkillData = {
   id: "duocui",
   name: "夺萃",
   chooseTarget: true,
+  description: "攻击目标，并使目标损失生命值。",
   actions: [
     async function*(self, target) {
       self.dealDamage(target, 1, {

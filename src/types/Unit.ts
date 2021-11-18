@@ -36,7 +36,7 @@ export type UnitItemEventData = Pick<UnitEventData, 'item'>;
 export type UnitSkillEventData = Pick<UnitEventData, 'source' | 'target' | 'skill'>;
 export type UnitSimpleEventData = Pick<UnitEventData, 'source' | 'target'>;
 
-type _T1<T, T2> = (event: T, data: T2) => Promise<T2 | null>;
+type _T1<T, T2> = (event: T, data: T2) => Promise<T2>;
 export type UnitFireEventFunc =
   _T1<'beforeAttack' | 'afterAttack', UnitAttackEventData> &
   _T1<'beforeAttacked' | 'afterAttacked', UnitAttackedEventData> &
