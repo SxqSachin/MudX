@@ -79,7 +79,10 @@ export interface UnitEvent {
 }
 
 export type DamageInfo = {
-  triggerEvent: boolean;
+}
+export type DealDamageOption = {
+  triggerDealDamageEvent?: boolean;
+  triggerTakeDamageEvent?: boolean;
 }
 
 // IUnit只是Entity的壳子，用于对数据进行操作
@@ -87,7 +90,7 @@ export type UnitSelf = IUnit;
 export interface IUnit extends XObject, XSerializable, UnitEvent {
   attack(target: IUnit): Promise<void>;
 
-  dealDamage(target: IUnit, damage: number, info?: DamageInfo): Promise<number>;
+  dealDamage(target: IUnit, damage: number, info?: DamageInfo, options?: DealDamageOption): Promise<number>;
 
   learnSkill(skill: ISkill): VAG;
   forgetSkill(skill: ISkill): VAG;

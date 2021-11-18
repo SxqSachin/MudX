@@ -6,7 +6,7 @@ import { AsyncDataProcessCallback, DataProcessCallback, VAG, VoidCallback } from
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { DamageInfo, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSimpleEventData, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, DealDamageOption, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSimpleEventData, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
 import { deepClone, toArray } from "../utils";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";
@@ -15,15 +15,18 @@ import { State, StateData, StateID } from "@/types/state";
 import { States } from "@data/states";
 import { actionExecuter, executeSelfAction } from "@/core/actionExecuter";
 
+const DefaultDealDamageOption: DealDamageOption = {
+  triggerDealDamageEvent: true,
+  triggerTakeDamageEvent: true,
+};
 const DefaultDamageInfo: DamageInfo = {
-  triggerEvent: true,
 };
 
 export class Unit implements IUnit {
   private unitEntity!: UnitData;
-  private _items!:  { [id in ItemID]: Item[] };
-  private _skills!:  { [id in SkillID]: Skill };
-  private _states!:  { [id in StateID]: State[] };
+  private _items!: { [id in ItemID]: Item[] };
+  private _skills!: { [id in SkillID]: Skill };
+  private _states!: { [id in StateID]: State[] };
 
   private _publisher!: Publisher<UnitEventType, UnitEventData>;
   private _subscriber!: Subscriber<UnitEventType, UnitEventData>;
@@ -51,23 +54,37 @@ export class Unit implements IUnit {
 
     const damageVal = damage - targetDef;
 
-    this.fire('beforeAttack', { source: this, target, damage: damageVal });
-    target.fire('beforeAttacked', { source: this, target, damage: damageVal });
+    this.fire("beforeAttack", { source: this, target, damage: damageVal });
+    target.fire("beforeAttacked", { source: this, target, damage: damageVal });
 
-    const resDamage = await this.dealDamage(target, damageVal)
-    Message.push(`${this.data.name} 攻击了 ${target.data.name}，造成 ${resDamage} 点伤害 `);
+    const resDamage = await this.dealDamage(target, damageVal);
+    Message.push(
+      `${this.data.name} 攻击了 ${target.data.name}，造成 ${resDamage} 点伤害 `
+    );
 
-    this.fire('afterAttack', { source: this, target, damage: resDamage });
-    target.fire('afterAttacked', { source: this, target, damage: resDamage });
+    this.fire("afterAttack", { source: this, target, damage: resDamage });
+    target.fire("afterAttacked", { source: this, target, damage: resDamage });
   }
 
-  async dealDamage(target: IUnit, damage: number, info: DamageInfo = DefaultDamageInfo) {
-    if (info?.triggerEvent) {
-      damage = (await this.fire('dealDamage', { source: this, target, damage }))?.damage ?? damage;
-      damage = (await target.fire('takeDamage', { source: this, target, damage }))?.damage ?? damage;
+  async dealDamage(
+    target: IUnit,
+    damage: number,
+    info: DamageInfo = {},
+    options: DealDamageOption = {},
+  ) {
+    info = { ...DefaultDamageInfo, ...info, };
+    options = { ...DefaultDealDamageOption, ...options, };
+
+    if (options?.triggerDealDamageEvent) {
+      const eventResult = await this.fire("dealDamage", { source: this, target, damage });
+      damage = eventResult.damage ?? damage;
+    }
+    if (options?.triggerTakeDamageEvent) {
+      const eventResult = await target.fire("takeDamage", { source: this, target, damage });
+      damage = eventResult?.damage ?? damage;
     }
 
-    target.decreaseStatus('curHP', Math.max(damage, 0));
+    target.decreaseStatus("curHP", Math.max(damage, 0));
 
     return damage;
   }
@@ -89,10 +106,16 @@ export class Unit implements IUnit {
       yield;
     }
 
-    this.fire('learnSkill', { source: this, target: this, skill: this.skills[id] })
+    this.fire("learnSkill", {
+      source: this,
+      target: this,
+      skill: this.skills[id],
+    });
   }
   async *forgetSkill(skill: ISkill) {
-    const { data: { id } } = skill;
+    const {
+      data: { id },
+    } = skill;
     delete this.unitEntity.skills[id];
 
     Message.push(`${this.data.name} 遗忘了技能 “${skill.data.name}” `);
@@ -100,7 +123,11 @@ export class Unit implements IUnit {
     for await (const result of this.skills[id].onForget(this)) {
       yield;
     }
-    this.fire('forgetSkill', { source: this, target: this, skill: this.skills[id] })
+    this.fire("forgetSkill", {
+      source: this,
+      target: this,
+      skill: this.skills[id],
+    });
 
     this._reinitSkills();
   }
@@ -109,15 +136,25 @@ export class Unit implements IUnit {
       return;
     }
 
-    Message.push(`${this.data.name} 释放技能 “${this.skills[skillID].data.name}” `);
+    Message.push(
+      `${this.data.name} 释放技能 “${this.skills[skillID].data.name}” `
+    );
 
     const generator = await this.skills[skillID].cast(this, target);
     for await (const result of generator) {
       yield;
     }
 
-    await this.fire('castSkill', { source: this, target, skill: this.skills[skillID] })
-    await target.fire('beSkillTarget', { source: this, target, skill: this.skills[skillID] })
+    await this.fire("castSkill", {
+      source: this,
+      target,
+      skill: this.skills[skillID],
+    });
+    await target.fire("beSkillTarget", {
+      source: this,
+      target,
+      skill: this.skills[skillID],
+    });
   }
 
   // addItem与addItemByID是两种状态，不能合并，id一定是新物品;item可能是新物品也可能是旧物品
@@ -130,7 +167,9 @@ export class Unit implements IUnit {
       items[itemID] = [];
     }
 
-    const isItemExist = Object.values(items).some(itemList => itemList.some(curItem => curItem.xid === item.data.xid));
+    const isItemExist = Object.values(items).some((itemList) =>
+      itemList.some((curItem) => curItem.xid === item.data.xid)
+    );
     if (!isItemExist) {
       items[itemID].push(itemData);
       this._reinitItems();
@@ -174,11 +213,13 @@ export class Unit implements IUnit {
     for (let i = 0; i < count; i++) {
       newItem.push(Items.getData(itemID) as ItemData);
     }
-    items[itemID].splice(0, 0, ...newItem)
+    items[itemID].splice(0, 0, ...newItem);
 
     this._reinitItems();
 
-    Message.push(`${this.data.name} 获得物品 “${Items.getData(itemID).name}”*${count} `);
+    Message.push(
+      `${this.data.name} 获得物品 “${Items.getData(itemID).name}”*${count} `
+    );
 
     return this;
   }
@@ -196,7 +237,9 @@ export class Unit implements IUnit {
     items[itemID].splice(0, count);
     this._reinitItems();
 
-    Message.push(`${this.data.name} 失去物品 “${Items.getData(itemID).name}”*${count} `);
+    Message.push(
+      `${this.data.name} 失去物品 “${Items.getData(itemID).name}”*${count} `
+    );
 
     return this;
   }
@@ -207,56 +250,64 @@ export class Unit implements IUnit {
   }
 
   equip(xid: XID) {
-    Object.keys(this.unitEntity.items).some(itemID => {
+    Object.keys(this.unitEntity.items).some((itemID) => {
       const itemDataList = this.unitEntity.items[itemID];
       return itemDataList.some((_, index) => {
         const itemData = this.unitEntity.items[itemID][index];
         if (itemData.xid === xid && itemData.isEquipable === true) {
           itemData.isEquipped = true;
 
-          Object.values(this.items).some(itemList => itemList.some(curItem => {
-            if (xid === curItem.data.xid) {
-              Message.push(`${this.data.name} 装备了 “${curItem.data.name}” `);
-              curItem.onEquip(this);
-              return true;
-            }
+          Object.values(this.items).some((itemList) =>
+            itemList.some((curItem) => {
+              if (xid === curItem.data.xid) {
+                Message.push(
+                  `${this.data.name} 装备了 “${curItem.data.name}” `
+                );
+                curItem.onEquip(this);
+                return true;
+              }
 
-            return false;
-          }));
+              return false;
+            })
+          );
 
           return true;
         }
 
         return false;
-      })
+      });
     });
     this._reinitItems();
 
     return this;
   }
   unequip(xid: XID) {
-    Object.keys(this.unitEntity.items).some(itemID => {
+    Object.keys(this.unitEntity.items).some((itemID) => {
       const itemDataList = this.unitEntity.items[itemID];
       return itemDataList.some((_, index) => {
         const itemData = this.unitEntity.items[itemID][index];
         if (itemData.xid === xid && itemData.isEquipable === true) {
           itemData.isEquipped = false;
 
-          Object.values(this.items).some(itemList => itemList.some(curItem => {
-            if (xid === curItem.data.xid) {
-              Message.push(`${this.data.name} 卸下了 “${curItem.data.name}” `);
-              curItem.onUnequip(this);
-              return true;
-            }
+          Object.values(this.items).some((itemList) =>
+            itemList.some((curItem) => {
+              if (xid === curItem.data.xid) {
+                Message.push(
+                  `${this.data.name} 卸下了 “${curItem.data.name}” `
+                );
+                curItem.onUnequip(this);
+                return true;
+              }
 
-            return false;
-          }));
+              return false;
+            })
+          );
 
           return true;
         }
 
         return false;
-      })
+      });
     });
     this._reinitItems();
 
@@ -271,9 +322,11 @@ export class Unit implements IUnit {
   }
 
   get equipments() {
-    return Object.values(this.items).flatMap(itemList => {
-      return itemList.filter(item => item.data.isEquipable && item.data.isEquipped);
-    })
+    return Object.values(this.items).flatMap((itemList) => {
+      return itemList.filter(
+        (item) => item.data.isEquipable && item.data.isEquipped
+      );
+    });
   }
 
   increaseStatus(status: UnitStatusType, val: number): UnitSelf {
@@ -301,7 +354,7 @@ export class Unit implements IUnit {
       xid: uuid(),
       id: state.id,
       remainTime: state.remainTime,
-    }
+    };
     this.unitEntity.states[state.id].push(stateData);
 
     this._reinitState();
@@ -328,36 +381,78 @@ export class Unit implements IUnit {
     yield* await this.removeState(States.get(stateID));
   }
 
-  on(event: 'beforeAttack' | 'afterAttack', listener: AsyncDataProcessCallback<UnitAttackEventData>): VoidCallback;
-  on(event: 'beforeAttacked' | 'afterAttacked', listener: AsyncDataProcessCallback<UnitAttackedEventData>): VoidCallback;
-  on(event: 'dealDamage' | 'takeDamage', listener: AsyncDataProcessCallback<UnitDamageEventData>): VoidCallback;
-  on(event: 'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', listener: AsyncDataProcessCallback<UnitItemEventData>): VoidCallback;
-  on(event: 'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', listener: AsyncDataProcessCallback<UnitSkillEventData>): VoidCallback;
-  on(event: 'roundStart' | 'roundEnd' | 'aiRoundStart', listener: AsyncDataProcessCallback<UnitSimpleEventData>): VoidCallback;
-  on(event: UnitEventType, listener: AsyncDataProcessCallback<UnitEventData>): VoidCallback {
+  on(
+    event: "beforeAttack" | "afterAttack",
+    listener: AsyncDataProcessCallback<UnitAttackEventData>
+  ): VoidCallback;
+  on(
+    event: "beforeAttacked" | "afterAttacked",
+    listener: AsyncDataProcessCallback<UnitAttackedEventData>
+  ): VoidCallback;
+  on(
+    event: "dealDamage" | "takeDamage",
+    listener: AsyncDataProcessCallback<UnitDamageEventData>
+  ): VoidCallback;
+  on(
+    event: "addItem" | "removeItem" | "equipItem" | "unequipItem",
+    listener: AsyncDataProcessCallback<UnitItemEventData>
+  ): VoidCallback;
+  on(
+    event: "learnSkill" | "forgetSkill" | "castSkill" | "beSkillTarget",
+    listener: AsyncDataProcessCallback<UnitSkillEventData>
+  ): VoidCallback;
+  on(
+    event: "roundStart" | "roundEnd" | "aiRoundStart",
+    listener: AsyncDataProcessCallback<UnitSimpleEventData>
+  ): VoidCallback;
+  on(
+    event: UnitEventType,
+    listener: AsyncDataProcessCallback<UnitEventData>
+  ): VoidCallback {
     return this._subscriber.subscribe(this._publisher, event, listener);
   }
 
-  async fire(event: 'beforeAttack' | 'afterAttack', data: UnitAttackEventData): Promise<UnitAttackEventData>;
-  async fire(event: 'beforeAttacked' | 'afterAttacked', data: UnitAttackedEventData): Promise<UnitAttackedEventData>;
-  async fire(event: 'dealDamage' | 'takeDamage', data: UnitDamageEventData): Promise<UnitAttackedEventData>;
-  async fire(event: 'addItem' | 'removeItem' | 'equipItem' | 'unequipItem', data: UnitItemEventData): Promise<UnitItemEventData>;
-  async fire(event: 'learnSkill' | 'forgetSkill' | 'castSkill' | 'beSkillTarget', data: UnitSkillEventData): Promise<UnitSkillEventData>;
-  async fire(event: 'roundStart' | 'roundEnd' | 'aiRoundStart', data: UnitSimpleEventData): Promise<UnitSimpleEventData>;
-  async fire(event: UnitEventType, data: UnitEventData): Promise<UnitEventData> {
+  async fire(
+    event: "beforeAttack" | "afterAttack",
+    data: UnitAttackEventData
+  ): Promise<UnitAttackEventData>;
+  async fire(
+    event: "beforeAttacked" | "afterAttacked",
+    data: UnitAttackedEventData
+  ): Promise<UnitAttackedEventData>;
+  async fire(
+    event: "dealDamage" | "takeDamage",
+    data: UnitDamageEventData
+  ): Promise<UnitAttackedEventData>;
+  async fire(
+    event: "addItem" | "removeItem" | "equipItem" | "unequipItem",
+    data: UnitItemEventData
+  ): Promise<UnitItemEventData>;
+  async fire(
+    event: "learnSkill" | "forgetSkill" | "castSkill" | "beSkillTarget",
+    data: UnitSkillEventData
+  ): Promise<UnitSkillEventData>;
+  async fire(
+    event: "roundStart" | "roundEnd" | "aiRoundStart",
+    data: UnitSimpleEventData
+  ): Promise<UnitSimpleEventData>;
+  async fire(
+    event: UnitEventType,
+    data: UnitEventData
+  ): Promise<UnitEventData> {
     return await this._publisher.publish(event, data);
   }
 
   private _reinitItems() {
-    console.time('_reinitItems: ' + this.name);
+    console.time("_reinitItems: " + this.name);
     this._items = {};
     Object.keys(this.unitEntity.items).forEach((itemID: ItemID) => {
       this._items[itemID] = [];
-      this.unitEntity.items[itemID].forEach(itemData => {
+      this.unitEntity.items[itemID].forEach((itemData) => {
         this._items[itemID].push(new Item(itemData));
       });
     });
-    console.timeEnd('_reinitItems: ' + this.name);
+    console.timeEnd("_reinitItems: " + this.name);
   }
   private _reinitSkills() {
     this._skills = {};
@@ -373,13 +468,15 @@ export class Unit implements IUnit {
     }
     Object.keys(this.unitEntity.states).forEach((id: StateID) => {
       this._states[id] = [];
-      this.unitEntity.states[id].forEach(data => {
+      this.unitEntity.states[id].forEach((data) => {
         this._states[id].push(States.get(data.id));
-      })
+      });
     });
   }
 
-  get xid() { return this.unitEntity.xid; }
+  get xid() {
+    return this.unitEntity.xid;
+  }
   get status(): UnitStatus {
     const data: Partial<UnitData> = { ...this.unitEntity };
     delete data.xid;
@@ -393,10 +490,18 @@ export class Unit implements IUnit {
 
     return status;
   }
-  get data() { return this.unitEntity; }
-  get items() { return this._items; }
-  get skills() { return this._skills; }
-  get states() { return this._states; }
+  get data() {
+    return this.unitEntity;
+  }
+  get items() {
+    return this._items;
+  }
+  get skills() {
+    return this._skills;
+  }
+  get states() {
+    return this._states;
+  }
 
   get phyAtk() {
     const { strength, phyAtk } = this.status;
@@ -451,7 +556,7 @@ export class Unit implements IUnit {
       powAtk: 0,
       powDef: 0,
       xid: uuid(),
-    }
+    };
 
     return new Unit(unitData);
   }
@@ -477,7 +582,7 @@ export class Unit implements IUnit {
       phyDef: 0,
       powAtk: 0,
       powDef: 0,
-    }
+    };
   }
 }
 export function createUnit(name: string): IUnit {

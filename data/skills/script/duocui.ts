@@ -18,8 +18,8 @@ const duocui: SkillData = {
       self.on('dealDamage', async data => {
         const extraDamage = self.status.strength;
         Message.push(`${self.name} 发动技能“夺萃”，造成1倍力量(${extraDamage})的额外伤害。`);
-        self.dealDamage(data.target, extraDamage, {
-          triggerEvent: false,
+        self.dealDamage(data.target, extraDamage, {}, {
+          triggerDealDamageEvent: false,
         });
       })
       self.on('takeDamage', async data => {
