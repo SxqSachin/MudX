@@ -5,13 +5,30 @@ export type PopupParam = {
   title?: string;
   onClose?: VoidCallback;
   children?: ReactChild;
+  size?: "auto" | "big";
 }
-export function Popup({title, onClose, children}: PopupParam) {
+export function Popup({title, onClose, children, size}: PopupParam) {
+  if (!size) {
+    size = 'auto';
+  }
+
+  let width = '50%';
+  let height = '50%';
+  let translate = 'translate-x-1/2 translate-y-1/2';
+
+  switch (size) {
+    case 'big':
+      width = '50vw';
+      height = '50vh';
+      translate = '';
+      break;
+  }
+
   return (
-    <div className="fixed w-2/4 h-2/4 top-0 left-0 transform translate-x-1/2 translate-y-1/2
-                    p-4
+    <div className={`fixed top-0 left-0 p-4
+                    transform ${translate}
                     border rounded-md
-                    bg-gray-300 shadow-lg">
+                    bg-gray-300 shadow-lg`} style={{ width, height }}>
 
       <div className="mb-2 pb-2 h-8">
         <div className="float-left opacity-60">{title ?? '信息'}</div>

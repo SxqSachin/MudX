@@ -74,7 +74,7 @@ export function ObjectChooseUI<T>({options, multiple, onChoose}: ObjectChooseUIP
 
 export function ObjectChoosePopup<T>({options, multiple, onChoose, onClose}: ObjectChooseUIParam<T> & PopupParam) {
   return (
-    <Popup title="选择目标" onClose={onClose}>
+    <Popup title="选择目标" onClose={onClose} size="big">
       <ObjectChooseUI
         onChoose={onChoose}
         options={options}
