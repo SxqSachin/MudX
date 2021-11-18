@@ -6,17 +6,16 @@ import { MessagePanel } from "../../components/ui/msg-panel";
 import { UnitInfoPanel } from "../../components/ui/unit-info-panel";
 import { Unit } from "@/models/Unit";
 
-import '@data';
-
 import { Enemies, GameEvents, Skills, } from "@data";
 import { GameEnvironmentAtom, } from "../../store";
 import { GameEnvironment, } from "@/types/game";
 import { StoryUtils } from "@/utils/story";
-import { BattlePanelHOC, GameEventPanelHOC, StoryChoosePanelHOC, TradePanelHOC } from "./hoc";
+import { GameEventPanelHOC, StoryChoosePanelHOC, TradePanelHOC } from "./hoc";
 import { handleChooseOption, handleItemAction, handleSkillAction } from "./logic";
 import { deepClone } from "@/utils";
 import { showPanel } from "@/utils/game";
 import { PlayerActionCallback, PlayerActionData } from "@/types/action";
+import { BattlePanelHOC } from "./hoc/battle-panel";
 
 function App() {
   const [, setForceUpdate] = useState([]);

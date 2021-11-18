@@ -1,16 +1,13 @@
-import { useCallback, useEffect, } from "react";
-import { DataCallback, VoidCallback, } from "@/types";
-import { BattleAction } from "@/types/battle";
+import { VoidCallback, } from "@/types";
 import { IUnit } from "@/types/Unit";
 import { ProgressBar } from "../widget/progress-bar";
 import { noop } from "@/utils";
 import { i18n } from "@/i18n";
-import { PlayerAction, PlayerActionCallback } from "@/types/action";
+import { PlayerAction, PlayerActionCallback, } from "@/types/action";
 import { ISkill } from "@/types/Skill";
 import { UnitChoosePopup } from "../widget/obj-choose";
 import { useState } from "react";
 
-export type BattleActionCalbackParam = { action: BattleAction; ext: { id: string } };
 type BattlePanelParam = {
   player: IUnit;
   enemy: IUnit;
@@ -129,18 +126,11 @@ export function BattlePanel({player, enemy, onAction, calcBtnState}: BattlePanel
                 target: [enemy],
               });
             } else if (btn.action === "CAST_SKILL") {
-              if (!btn.skill.data.chooseTarget) {
-                handleAction("CAST_SKILL", {
-                  skill: btn.skill,
-                  target: [enemy],
-                });
-              } else {
-                console.log(target);
-                handleAction("CAST_SKILL", {
-                  skill: btn.skill,
-                  target,
-                });
-              }
+              target = !btn.skill.data.chooseTarget ? [enemy] : target;
+              handleAction("CAST_SKILL", {
+                skill: btn.skill,
+                target,
+              });
             }
           }}
           options={[

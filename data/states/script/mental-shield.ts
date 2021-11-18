@@ -9,12 +9,15 @@ const state: State = {
   remainTime: -1,
   actions: [
     async function*(self) {
-      self.on('takeDamage', async data => {
+      const unbind = self.on('takeDamage', async data => {
         data.damage = 0;
 
         Message.push(`${self.name} 发动金钟罩，本次伤害归零。`);
 
+        console.log(self);
         self.removeStateByID('mental-shield').next();
+
+        unbind();
 
         return data;
       });

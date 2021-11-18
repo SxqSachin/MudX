@@ -85,7 +85,7 @@ export class Unit implements IUnit {
     this._reinitSkills();
 
     Message.push(`${this.data.name} 习得技能 “${skill.data.name}” `);
-    for await (const result of await this.skills[id].onLearn(this)) {
+    for await (const result of this.skills[id].onLearn(this)) {
       yield;
     }
 
@@ -97,7 +97,7 @@ export class Unit implements IUnit {
 
     Message.push(`${this.data.name} 遗忘了技能 “${skill.data.name}” `);
 
-    for await (const result of await this.skills[id].onForget(this)) {
+    for await (const result of this.skills[id].onForget(this)) {
       yield;
     }
     this.fire('forgetSkill', { source: this, target: this, skill: this.skills[id] })

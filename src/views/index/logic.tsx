@@ -108,7 +108,7 @@ export const handleSkillAction = (gameEnvironment: GameEnvironment) => async (ac
   switch (action) {
     case 'CAST_SKILL':
       for await (const unit of target) {
-        for await (const iter of await player.castSkill(skill.data.id, unit)) {
+        for await (const iter of player.castSkill(skill.data.id, unit)) {
         }
       }
       break;

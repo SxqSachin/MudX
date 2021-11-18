@@ -19,7 +19,7 @@ type ActionEffectData = {
 
 export type Action = ({
   target: 'target' | 'self';
-} & ActionEffectData) | ((self: IUnit, target: IUnit) => VAG);
+} & ActionEffectData) | ((self: IUnit, target: IUnit, ext?: any) => VAG);
 
 export type SelfAction = ActionEffectData | ((self: IUnit) => VAG);
 
@@ -27,8 +27,8 @@ export type GameAction = DataProcessCallback<GameEnvironment>;
 
 export type ItemAction = 'USE_ITEM' | 'EQUIP' | 'UNEQUIP';
 export type SkillAction = 'CAST_SKILL' | 'LEARN_SKILL' | 'FORGET_SKILL';
-export type BattleEventAction = 'ATTACK';
-export type PlayerAction = ItemAction | SkillAction | BattleEventAction;
+export type BattleAction = 'ATTACK' | 'CAST_SKILL';
+export type PlayerAction = ItemAction | SkillAction | BattleAction;
 
 export type PlayerActionData = {
   item?: IItem;
@@ -36,12 +36,20 @@ export type PlayerActionData = {
   target?: IUnit[];
 }
 
-export type PlayerActionCallback = (action: PlayerAction, data: PlayerActionData) => void;
-//   ((
-//   action: "CAST_SKILL",
-//   data: { skill: ISkill; item?: IItem; target: IUnit[] }
-// ) => void) &
-//   ((
-//     action: "USE_ITEM" | "EQUIP" | "UNEQUIP",
-//     data: { item: IItem; skill?: ISkill; target: IUnit[] }
-//   ) => void);
+// export type PlayerItemActionCallback = (action: ItemAction, data: Required<Omit<PlayerActionData, "skill">>) => void;
+// export type PlayerSkillActionCallback = (action: SkillAction, data: Required<Omit<PlayerActionData, "item">>) => void;
+// export type PlayerBattleActionCallback = (action: BattleAction, data: Required<Omit<PlayerActionData, "item">>) => void;
+export type PlayerActionCallback =
+  // & PlayerItemActionCallback
+  // & PlayerSkillActionCallback
+  // & PlayerBattleActionCallback &
+  ((action: PlayerAction, data: PlayerActionData) => void);
+
+const a:  PlayerActionCallback = (action, data) => { };
+a('USE_ITEM', {
+  item: {} as IItem,
+  target: [],
+})
+const b: PlayerActionCallback = (action, data) => {
+  a(action, <PlayerActionData>data);
+}

@@ -5,6 +5,8 @@ import './style/base.scss';
 import App from './views/index';
 import { RecoilRoot } from 'recoil';
 
+import '@data';
+
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>

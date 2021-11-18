@@ -9,23 +9,34 @@ type ObjectChooseUIParam<T> = {
   onChoose: (options: T[]) => void;
 }
 export function ObjectChooseUI<T>({options, multiple, onChoose}: ObjectChooseUIParam<T>) {
-  const [value, setValue] = useState<T[]>([]);
+  const [value, setValue] = useState<string[]>([]);
 
-  const onChooseOption = (option: T) => {
-    setValue(val => {
-      if (val.includes(option)) {
-        val = val.filter(v => v != option)
-      } else {
-        val.push(option);
-        val = [...new Set(val)];
-      }
+  const onChooseOption = (option: string) => {
+    let val = value;
+    if (val.includes(option)) {
+      val = val.filter(v => v != option)
+    } else {
+      val.push(option);
+    }
 
-      return val;
-    });
+    val = [...new Set(val)];
+    setValue(val);
   }
 
   const onSubmit = () => {
-    onChoose(value);
+    const val = value
+      .map((key) => {
+        const res = options.find((option) => option.key === key);
+        if (!res) {
+          return null;
+        }
+        return res.value;
+      })
+      .filter((val) => val !== null) as T[];
+
+    console.log(val, value);
+
+    onChoose(val);
     setValue([]);
   }
 
@@ -36,10 +47,12 @@ export function ObjectChooseUI<T>({options, multiple, onChoose}: ObjectChooseUIP
   return <div>
     <div>
       {options.filter(option => !!option.value && !!option.key).map((option) => {
+        const cls = "px-4 py-2 border rounded-md cursor-pointer" + (value.includes(option.key) ? " bg-black": '');
+        console.log('render', option.label, value.includes(option.key), cls);
         return (
           <div
-            className={"px-4 py-2 border rounded-md cursor-pointer" + (value.includes(option.value) ? " bg-black": '')}
-            onClick={() => onChooseOption(option.value)}
+            className={cls}
+            onClick={() => onChooseOption(option.key)}
             key={option.key}
           >
             {option.label}
