@@ -6,7 +6,7 @@ import { AsyncDataProcessCallback, DataProcessCallback, VAG, VoidCallback } from
 import { IItem, ItemData, ItemID } from "../types/Item";
 import { XID } from "../types/Object";
 import { ISkill, SkillID } from "../types/Skill";
-import { DamageInfo, DealDamageOption, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSimpleEventData, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
+import { DamageInfo, DamageType, IUnit, UnitAttackedEventData, UnitAttackEventData, UnitDamageEventData, UnitData, UnitEventData, UnitEventType, UnitItemEventData, UnitSelf, UnitSimpleEventData, UnitSkillEventData, UnitStatus, UnitStatusType, } from "../types/Unit";
 import { deepClone, toArray } from "../utils";
 import { uuid } from "../utils/uuid";
 import { Item } from "./Item";
@@ -14,13 +14,7 @@ import { Skill } from "./Skill";
 import { State, StateData, StateID } from "@/types/state";
 import { States } from "@data/states";
 import { actionExecuter, executeSelfAction } from "@/core/actionExecuter";
-
-const DefaultDealDamageOption: DealDamageOption = {
-  triggerDealDamageEvent: true,
-  triggerTakeDamageEvent: true,
-};
-const DefaultDamageInfo: DamageInfo = {
-};
+import { baseAttackDamageInfo, calcActualDamage, DefaultDamageInfo, sendDamageMsg } from "@/utils/unit";
 
 export class Unit implements IUnit {
   private unitEntity!: UnitData;
@@ -49,42 +43,41 @@ export class Unit implements IUnit {
 
   async attack(target: IUnit) {
     Message.push(`${this.data.name} 准备对 ${target.data.name} 发起攻击 `);
-    const damage = this.phyAtk;
-    const targetDef = target.phyDef;
 
-    let damageVal = damage - targetDef;
+    let damageInfo = baseAttackDamageInfo(this.phyAtk);
+    damageInfo = calcActualDamage(target, damageInfo)
+
+    let damageVal = damageInfo.damage;
 
     let eventResult = await this.fire("beforeAttack", { source: this, target, damage: damageVal });
     damageVal = eventResult.damage ?? damageVal;
     eventResult = await target.fire("beforeAttacked", { source: this, target, damage: damageVal });
     damageVal = eventResult.damage ?? damageVal;
 
-    const resDamage = await this.dealDamage(target, damageVal);
-    Message.push(
-      `${this.data.name} 攻击了 ${target.data.name}，造成 ${resDamage} 点伤害 `
-    );
+    damageVal = await this.dealDamage(target, damageInfo);
 
-    await this.fire("afterAttack", { source: this, target, damage: resDamage });
-    await target.fire("afterAttacked", { source: this, target, damage: resDamage });
+    await this.fire("afterAttack", { source: this, target, damage: damageVal });
+    await target.fire("afterAttacked", { source: this, target, damage: damageVal });
   }
 
   async dealDamage(
     target: IUnit,
-    damage: number,
-    info: DamageInfo = {},
-    options: DealDamageOption = {},
+    info: DamageInfo = {} as DamageInfo,
   ) {
     info = { ...DefaultDamageInfo, ...info, };
-    options = { ...DefaultDealDamageOption, ...options, };
 
-    if (options?.triggerDealDamageEvent) {
+    let damage = info.damage;
+
+    if (info?.triggerDealDamageEvent) {
       const eventResult = await this.fire("dealDamage", { source: this, target, damage });
       damage = eventResult.damage ?? damage;
     }
-    if (options?.triggerTakeDamageEvent) {
+    if (info?.triggerTakeDamageEvent) {
       const eventResult = await target.fire("takeDamage", { source: this, target, damage });
       damage = eventResult.damage ?? damage;
     }
+
+    sendDamageMsg(this, target, info, damage);
 
     target.decreaseStatus("curHP", Math.max(damage, 0));
 

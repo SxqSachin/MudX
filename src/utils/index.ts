@@ -1,3 +1,4 @@
+import { ACTION_MSG_DELAY, BATTLE_PARSE_DELAY } from '@/option';
 import clone from 'just-clone';
 import { VAG, VoidCallback } from '../types';
 
@@ -48,14 +49,6 @@ export const noop: VoidCallback = () => void(0);
 export const agNoopG: () => VAG = async function* () { return void 0 };
 export const agNoop: VAG = agNoopG();
 
-export async function delay(ms: number) {
-  return new Promise<void>((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, ms);
-  })
-}
-
 export async function runAsyncGenerate<T>(
   generatorFunction: (t: T) => AsyncGenerator<T, T, T>,
   t: T,
@@ -95,4 +88,19 @@ export function calcFunctionalVal<T extends string | number | Object>(
   }
 
   return obj;
+}
+
+
+export async function delay(ms: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  })
+}
+export async function waitBattleParseDelay() {
+  return await delay(BATTLE_PARSE_DELAY);
+}
+export async function waitActionMessageDelay() {
+  return await delay(ACTION_MSG_DELAY);
 }

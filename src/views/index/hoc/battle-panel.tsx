@@ -4,7 +4,7 @@ import { battleEndEvent } from "@/models/event/battle-end";
 import { PlayerActionData, BattleAction, PlayerActionCallback } from "@/types/action";
 import { BattleParse } from "@/types/battle";
 import { GameEnvironment } from "@/types/game";
-import { delay, runAsyncGenerate } from "@/utils";
+import { delay, runAsyncGenerate, waitBattleParseDelay } from "@/utils";
 import { isPanelVisible } from "@/utils/game";
 import { useEffect } from "react";
 import { MainPanelParam } from ".";
@@ -36,14 +36,14 @@ const battleActionMap: {
 
     Message.push("=========================");
     Message.push("进入战斗");
-    await delay(620);
+    await waitBattleParseDelay();
     const isPlayerFirst = enemy.status.speed <= player.status.speed;
     Message.push(
       `速度对比：玩家(${player.status.speed}) vs 对方(${enemy.status.speed})。${
         isPlayerFirst ? "玩家" : "对方"
       }先手。`
     );
-    await delay(620);
+    await waitBattleParseDelay();
 
     const roundOwner = isPlayerFirst ? "PLAYER" : "ENEMY";
     gameEnvironment.battle.curRoundOwner = roundOwner;
@@ -78,15 +78,15 @@ const battleActionMap: {
 
     gameEnvironment.battle.playerCanDoAction = false;
     yield { gameEnvironment, data };
-    await delay(1000);
+    await waitBattleParseDelay();
 
     Message.push("玩家回合结束");
 
-    await delay(1000);
+    await waitBattleParseDelay();
 
     yield { gameEnvironment, data } = yield* await battleActionMap.ROUND_END({ gameEnvironment, data });
 
-    await delay(1000);
+    await waitBattleParseDelay();
 
     return { gameEnvironment, data }
   },
@@ -95,11 +95,12 @@ const battleActionMap: {
     await enemy.fire("roundStart", { source: enemy, target: player });
     Message.push("敌方回合开始");
 
-    await delay(1000);
+    await waitBattleParseDelay();
+
     await enemy.fire("aiRoundStart", { source: enemy, target: player });
     yield { gameEnvironment, data };
 
-    await delay(1000);
+    await waitBattleParseDelay();
 
     yield { gameEnvironment, data } = yield* await battleActionMap.ENEMY_ROUND_END({ gameEnvironment, data });
 
@@ -109,7 +110,7 @@ const battleActionMap: {
     const { player, enemy } = gameEnvironment;
     await enemy.fire("roundEnd", { source: enemy, target: player });
     Message.push("敌方回合结束");
-    await delay(1000);
+    await waitBattleParseDelay();
     yield { gameEnvironment, data } = yield* await battleActionMap.ROUND_END({ gameEnvironment, data });
 
     return { gameEnvironment, data }
@@ -220,7 +221,9 @@ export const BattlePanelHOC = ({
 
     if (enemy.status.curHP <= 0) {
       gameEnvironment.event = battleEndEvent({ enemy }, gameEnvironment);
-      await delay(600);
+
+      await waitBattleParseDelay();
+
       gameEnvironment.panels.shift();
       gameEnvironment.panels.unshift("EVENT");
     }

@@ -1,6 +1,7 @@
 import { Message } from "@/core/message";
 import { GameEnvironment } from "@/types/game";
 import { SkillData } from "@/types/Skill";
+import { DamageType } from "@/types/Unit";
 import { delay } from "@/utils";
 
 const skill: SkillData = {
@@ -16,11 +17,14 @@ const skill: SkillData = {
       const damage = self.phyAtk * 0.2;
 
       for (let i = 0; i < 10; i++) {
-        await self.dealDamage(target, damage);
+        await self.dealDamage(target, {
+          damage,
+          actionName: "连续拳",
+          damageType: DamageType.PHYSICAL,
+          actionType: "CAST_SKILL",
+        });
 
-        Message.push(`${self.name} 发动技能“连续拳”，对${target.name}造成${damage}点伤害`);
-
-        yield await delay(200);
+        yield await delay(100);
       }
 
       return Promise.resolve();

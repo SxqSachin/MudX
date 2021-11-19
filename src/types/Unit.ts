@@ -1,6 +1,7 @@
 import { AsyncDataProcessCallback, DataCallback, DataProcessCallback, VAG, VoidCallback } from ".";
 import { Item } from "../models/Item";
 import { Skill } from "../models/Skill";
+import { BattleAction } from "./action";
 import { GameEnvironment } from "./game";
 import { IItem, ItemData, ItemID } from "./Item";
 import { XID, XObject, XSerializable } from "./Object";
@@ -78,11 +79,28 @@ export interface UnitEvent {
   fire: UnitFireEventFunc;
 }
 
-export type DamageInfo = {
+export enum DamageType {
+  PHYSICAL = 'physical',
+  MAGICAL = 'magical',
+  PURE = 'pure',
 }
-export type DealDamageOption = {
-  triggerDealDamageEvent?: boolean;
-  triggerTakeDamageEvent?: boolean;
+
+// actionType = ATTACK -> A 攻击了 B，造成了 {damage} 点伤害。
+// actionType = CAST_SKILL -> A 使用了 “{actionName}”，对 B 造成 {damage} 点伤害。
+// actionType = CAST_SKILL -> A 使用了 “{actionName}”，{damageDescription}。
+// actionType = CAST_SKILL && isDamageFromPassive = true -> A 发动技能 “{actionName}”，对 B 造成 {damage} 点伤害。
+export type DamageInfo = {
+  damage: number; // 预期伤害
+
+  isDamageFromPassive?: boolean; // 是否是被动行为造成的伤害，比如触发了技能的被动效果
+  actionType?: BattleAction; // 战斗行为
+  actionName?: string; // 导致伤害的行为
+  damageType?: DamageType; // 伤害类型
+
+  damageDescription?: string; // 自定义伤害行为描述
+
+  triggerDealDamageEvent?: boolean; // 是否触发dealDamage事件
+  triggerTakeDamageEvent?: boolean; // 是否触发takeDamage事件
 }
 
 // IUnit只是Entity的壳子，用于对数据进行操作
@@ -90,7 +108,7 @@ export type UnitSelf = IUnit;
 export interface IUnit extends XObject, XSerializable, UnitEvent {
   attack(target: IUnit): Promise<void>;
 
-  dealDamage(target: IUnit, damage: number, info?: DamageInfo, options?: DealDamageOption): Promise<number>;
+  dealDamage(target: IUnit, info?: DamageInfo): Promise<number>;
 
   learnSkill(skill: ISkill): VAG;
   forgetSkill(skill: ISkill): VAG;
