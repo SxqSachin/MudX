@@ -14,7 +14,7 @@ const state: State = {
         Message.push(`${self.name} 发动金钟罩，本次伤害归零。${makeDamageChangeString(data.damage, 0)}`);
 
         data.damage = 0;
-        self.removeStateByID('mental-shield').next();
+        self.removeStateByID('mental-shield');
 
         unbind();
 

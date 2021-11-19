@@ -1,6 +1,6 @@
 import { useRecoilValue, } from "recoil";
 import { GameEnvironmentAtom } from "../../store";
-import { DataCallback, } from "@/types";
+import { DataCallback, KVPair, } from "@/types";
 import { GameEnvironment, GamePanelType } from "@/types/game";
 import { Enemies } from "@data/enemies";
 import { showPanel } from "@/utils/game";
@@ -9,6 +9,8 @@ import { Items } from "@data";
 import { XStorage } from "@/core/storage";
 import { IItem, ItemID } from "@/types/Item";
 import { getShopStock } from "@/utils/trade";
+import { ObjectChoosePopup } from "../widget/obj-choose";
+import { useMemo, useState } from "react";
 
 
 type DebugPanelParam = {
@@ -17,6 +19,7 @@ type DebugPanelParam = {
 }
 export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
   const gameEnvironment = useRecoilValue(GameEnvironmentAtom);
+  const [showEnemyChooseUI, setShowEnemyChooseUI] = useState(false);
 
   const increaseHP = (val: number) => {
     gameEnvironment.player.increaseStatus('curHP', val);
@@ -29,12 +32,22 @@ export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
     onEnvironmentChange(gameEnvironment);
   }
 
-  const enterBattle = () => {
+  const handleChooseEnemy = (enemyID: string[]) => {
     gameEnvironment.panels = showPanel(gameEnvironment, "BATTLE");
-    gameEnvironment.enemy = Enemies.getGenerator('dummy')(gameEnvironment);
+    gameEnvironment.enemy = Enemies.getGenerator(enemyID[0])(gameEnvironment);
 
     onEnvironmentChange(gameEnvironment);
+
+    setShowEnemyChooseUI(false);
   }
+
+  const getAllEnemy: KVPair[] = useMemo(() => Enemies.getIDList().map((id) => {
+    return {
+      key: id,
+      value: id,
+      label: Enemies.getGenerator(id)(gameEnvironment).name,
+    };
+  }), []);
 
   const chooseStory = () => {
     gameEnvironment.panels = showPanel(gameEnvironment, "STORY_CHOOSE");
@@ -103,12 +116,15 @@ export function DebugPanel({onEnvironmentChange, className}: DebugPanelParam) {
   }
 
   return (
-    <div className={"w-full " + className}>
-      <button className="btn" onClick={() => increaseHP(1)}> Increase HP </button>
-      <button className="btn" onClick={toEvent}> ToEvent </button>
-      <button className="btn" onClick={enterBattle}> EnterBattle </button>
-      <button className="btn" onClick={chooseStory}> ChooseStory </button>
-      <button className="btn" onClick={enterShop}> EnterShop </button>
-    </div>
+    <>
+      <div className={"w-full " + className}>
+        <button className="btn" onClick={() => increaseHP(1)}> Increase HP </button>
+        <button className="btn" onClick={toEvent}> ToEvent </button>
+        <button className="btn" onClick={() => setShowEnemyChooseUI(true)}> EnterBattle </button>
+        <button className="btn" onClick={chooseStory}> ChooseStory </button>
+        <button className="btn" onClick={enterShop}> EnterShop </button>
+      </div>
+      {showEnemyChooseUI && <ObjectChoosePopup onClose={() => setShowEnemyChooseUI(false)} onChoose={handleChooseEnemy} options={getAllEnemy}></ObjectChoosePopup>}
+    </>
   );
 }

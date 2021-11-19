@@ -6,6 +6,8 @@ export type State = {
   id: StateID;
   name: string;
 
+  description?: string | (() => string);
+
   stackable: boolean;
 
   actions: Action | Action[];

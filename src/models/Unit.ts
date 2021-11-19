@@ -45,8 +45,6 @@ export class Unit implements IUnit {
     Message.push(`${this.data.name} 准备对 ${target.data.name} 发起攻击 `);
 
     let damageInfo = baseAttackDamageInfo(this.phyAtk);
-    damageInfo = calcActualDamage(target, damageInfo)
-
     let damageVal = damageInfo.damage;
 
     let eventResult = await this.fire("beforeAttack", { source: this, target, damage: damageVal });
@@ -65,6 +63,8 @@ export class Unit implements IUnit {
     info: DamageInfo = {} as DamageInfo,
   ) {
     info = { ...DefaultDamageInfo, ...info, };
+
+    info = calcActualDamage(target, info)
 
     let damage = info.damage;
 
@@ -336,12 +336,16 @@ export class Unit implements IUnit {
     return this;
   }
 
-  async *addState(state: State): VAG {
+  async *createAddStateAction(state: State): VAG {
     if (!this.unitEntity.states[state.id]) {
       this.unitEntity.states[state.id] = [];
     }
 
     if (this.unitEntity.states[state.id].length && !state.stackable) {
+      return;
+    }
+
+    if (!state) {
       return;
     }
 
@@ -359,7 +363,7 @@ export class Unit implements IUnit {
       yield* await actionExecuter(action, this, this);
     }
   }
-  async *removeState(state: State) {
+  async *createRemoveStateAction(state: State) {
     if (!this.unitEntity.states[state.id].length) {
       return this;
     }
@@ -369,12 +373,17 @@ export class Unit implements IUnit {
 
     Message.push(`${this.data.name} 失去状态“${state.name}” `);
   }
-  async *addStateByID(stateID: StateID) {
-    yield* await this.addState(States.get(stateID));
+  async *createAddStateByIDAction(stateID: StateID) {
+    yield* await this.createAddStateAction(States.get(stateID));
   }
-  async *removeStateByID(stateID: StateID) {
-    yield* await this.removeState(States.get(stateID));
+  async *createRemoveStateByIDAction(stateID: StateID) {
+    yield* await this.createRemoveStateAction(States.get(stateID));
   }
+
+  async addState(state: State) { for await (const iterator of this.createAddStateAction(state)) { } }
+  async addStateByID(stateID: StateID) { for await (const iterator of this.createAddStateByIDAction(stateID)) { } }
+  async removeState(state: State) { for await (const iterator of this.createRemoveStateAction(state)) { } }
+  async removeStateByID(stateID: StateID) { for await (const iterator of this.createRemoveStateByIDAction(stateID)) { } }
 
   on(
     event: "beforeAttack" | "afterAttack",

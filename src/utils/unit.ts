@@ -8,6 +8,8 @@ export const DefaultDamageInfo: DamageInfo = Object.freeze<DamageInfo>({
   actionType: "ATTACK",
   damageDescription: "",
 
+  noMessage: false,
+
   triggerDealDamageEvent: true,
   triggerTakeDamageEvent: true,
 });
@@ -76,5 +78,8 @@ export const makeDamageChangeString = (from: number, to: number): string => {
 }
 
 export const sendDamageMsg = (source: IUnit, target: IUnit, damageInfo: DamageInfo, actualDamage: number) => {
+  if (damageInfo.noMessage) {
+    return;
+  }
   Message.push(parseDamageInfoToString(source, target, damageInfo, actualDamage));
 }

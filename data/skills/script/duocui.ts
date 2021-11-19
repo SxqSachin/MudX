@@ -19,9 +19,10 @@ const duocui: SkillData = {
     async function*(self) {
       self.on('dealDamage', async data => {
         const extraDamage = self.status.strength;
-        data.damage += extraDamage;
 
         Message.push(`${self.name} 发动技能“夺萃”，造成1倍力量(${extraDamage})的额外伤害。${makeDamageChangeString(data.damage, data.damage + extraDamage)}`);
+
+        data.damage += extraDamage;
 
         await waitActionMessageDelay();
 

@@ -18,6 +18,9 @@ const Enemies = {
   getGenerator: (id: string): EnvObjectGenerator<IEnemy> => {
     return generatorMap.get(id) as any as EnvObjectGenerator<IEnemy>;
   },
+  getIDList: (): string[] => {
+    return [...generatorMap.keys()];
+  }
 }
 
 export {

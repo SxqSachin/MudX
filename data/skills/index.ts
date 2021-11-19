@@ -17,6 +17,7 @@ jsonSkillList.forEach(jsonSkill => {
     name,
     colddown,
     chooseTarget: false,
+    description: '',
     actions: (() => {
       const actions = toArray(jsonSkill.actions);
 

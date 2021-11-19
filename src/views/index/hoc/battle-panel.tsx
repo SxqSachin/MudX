@@ -88,9 +88,12 @@ const battleActionMap: {
   PLAYER_ROUND_END: async function* ({ gameEnvironment, data }) {
     const { player, enemy } = gameEnvironment;
     await player.fire("roundEnd", { source: player, target: enemy });
+    yield { gameEnvironment, data };
 
     gameEnvironment.battle.playerCanDoAction = false;
+
     yield { gameEnvironment, data };
+
     await waitBattleParseDelay();
 
     Message.push("玩家回合结束");

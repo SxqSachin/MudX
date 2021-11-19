@@ -8,7 +8,7 @@ const skill: SkillData = {
   name: "金钟罩",
   actions: [
     async function*(self, target) {
-      target.addStateByID('mental-shield').next();
+      target.addStateByID('mental-shield');
 
       return self;
     }

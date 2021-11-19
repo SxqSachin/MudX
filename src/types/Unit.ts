@@ -99,6 +99,8 @@ export type DamageInfo = {
 
   damageDescription?: string; // 自定义伤害行为描述
 
+  noMessage?: boolean; // 是否不显示伤害信息
+
   triggerDealDamageEvent?: boolean; // 是否触发dealDamage事件
   triggerTakeDamageEvent?: boolean; // 是否触发takeDamage事件
 }
@@ -130,10 +132,15 @@ export interface IUnit extends XObject, XSerializable, UnitEvent {
   decreaseStatus(statusKey: UnitStatusType, val: number): UnitSelf;
   setStatus(statusKey: UnitStatusType, val: number): UnitSelf;
 
-  addState(state: State): VAG;
-  removeState(state: State): VAG;
-  addStateByID(id: StateID): VAG;
-  removeStateByID(id: StateID): VAG;
+  createAddStateAction(state: State): VAG;
+  createRemoveStateAction(state: State): VAG;
+  createAddStateByIDAction(id: StateID): VAG;
+  createRemoveStateByIDAction(id: StateID): VAG;
+
+  addState(state: State): Promise<void>;
+  removeState(state: State): Promise<void>;
+  addStateByID(id: StateID): Promise<void>;
+  removeStateByID(id: StateID): Promise<void>;
 
   items: Readonly<{ [id in ItemID]: IItem[] }>;
   skills: Readonly<{ [id in SkillID]: ISkill }>;
