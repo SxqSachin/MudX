@@ -12,7 +12,7 @@ export function ProgressBar({ max, cur, direction, className }: ProgressBarParam
   const directionClass = (direction === 'left' ? 'float-left' : 'float-right');
   const textDirectionClass = (direction === 'left' ? 'float-right' : 'float-left');
 
-  const percent = (cur / max) * 100;
+  const percent = Math.max(0, (cur / max) * 100);
 
   return (
     <div className={className + " w-full h-6 border border-black relative"}>
