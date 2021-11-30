@@ -41,7 +41,7 @@ const generator = (env?: GameEnvironment) : IEnemy => {
   const unit = new Enemy(unitData);
 
   unit.on('aiRoundStart', async function(data) {
-    if (isEmpty(data.target.states["气宗拳"])) {
+    if (isEmpty(data.target.states["气宗拳-debuff"])) {
       for await (const iterator of data.source.castSkill("气宗拳", data.target)) {
       }
     } else {
